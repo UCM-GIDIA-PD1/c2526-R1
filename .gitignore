@@ -1,3 +1,8 @@
+# Carpeta del entorno virtual
+.venv 
+
+# Carpeta con las claves privadas
 Private
+
+# Carpeta de los subtitulos (no necesario subirlo a Git)
 subs
-.venv
