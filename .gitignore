@@ -6,3 +6,6 @@ Private
 
 # Carpeta de los subtitulos (no necesario subirlo a Git)
 subs
+
+# Datos
+*.csv
