@@ -50,16 +50,17 @@ def collect_all_data(num_videos):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
-    upload_dataframe_minio(df = df_data, bucket = "pd1/grupo1/", object_name=f"df_videos_{timestamp}", claves=claves, file_format="parquet") 
+    upload_dataframe_minio(df = df_data, bucket = "pd1", object_name=f"grupo1/df_videos_{timestamp}", claves=claves, file_format="parquet") 
 
     return df_data
 
 if __name__ == '__main__':
-    # data = collect_all_data(20)#(1000)
+    data = collect_all_data(20)#(1000)
 
     #Para probar el trabajo con MinIO
-    data = pd.read_csv("src\data\data_videos_2026-02-24_14-06-23.csv")
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
-        claves = json.load(archivo)
-    upload_dataframe_minio(df = data, bucket = "pd1/grupo1/", object_name=f"df_videos_{timestamp}", claves=claves, file_format="parquet")
+    # data = pd.read_csv("src\data\data_videos_2026-02-24_14-06-23.csv")
+    # timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+    #     claves = json.load(archivo)
+    # upload_dataframe_minio(df = data, bucket = "pd1", object_name=f"grupo1/df_videos_{timestamp}", claves=claves, file_format="parquet")
+    # print("uploaded")
