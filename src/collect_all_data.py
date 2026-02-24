@@ -7,6 +7,7 @@ import datetime
 
 from get_video_info_api import get_info
 from get_video_ids_bs4 import get_random_ids, get_random_ids_kids
+from Server_PD import upload_dataframe_minio
 
 def collect_all_data(num_videos):
     '''
@@ -41,9 +42,24 @@ def collect_all_data(num_videos):
         except Exception as e: print("Ran into exception", e, "for video", id) #for some videos the downloader does not work for some reason
 
     df_data = pd.concat(df_videos, ignore_index=True)
+
+    #Guardar en local en formato .parquet con la fecha
+    #data_parquet = df_data.to_parquet(f"src/data/data_videos_{timestamp}.parquet", index=False)
+
+    #Guardar en MinIO
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    data_parquet = df_data.to_parquet(f"src/data/data_videos_{timestamp}.parquet", index=False)
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    upload_dataframe_minio(df = df_data, bucket = "pd1/grupo1/", object_name=f"df_videos_{timestamp}", claves=claves, file_format="parquet") 
+
     return df_data
 
 if __name__ == '__main__':
-    data = collect_all_data(20)#(1000)
+    # data = collect_all_data(20)#(1000)
+
+    #Para probar el trabajo con MinIO
+    data = pd.read_csv("src\data\data_videos_2026-02-24_14-06-23.csv")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    upload_dataframe_minio(df = data, bucket = "pd1/grupo1/", object_name=f"df_videos_{timestamp}", claves=claves, file_format="parquet")

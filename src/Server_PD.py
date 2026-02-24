@@ -13,6 +13,7 @@ def get_minio_client(claves):
         endpoint=claves["Url"],
         access_key=claves["Access_Key"],
         secret_key=claves["Secret_Key"],
+        secure=True
     )
 
 #Subir el dataframe
