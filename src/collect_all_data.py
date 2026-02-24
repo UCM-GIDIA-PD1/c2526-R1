@@ -1,18 +1,34 @@
 import time
 from tqdm import tqdm
-from get_video_info_api import get_info
-from get_video_ids_bs4 import get_random_ids
 import pandas as pd
 from pandas import DataFrame
 import json
 import datetime
 
+from get_video_info_api import get_info
+from get_video_ids_bs4 import get_random_ids, get_random_ids_kids
+
 def collect_all_data(num_videos):
+    '''
+    Elegimos y descargamos n videos random, donde n es el parámetro num_videos de la función. 
+    Dividimos los datos, para que aproximadamente 80% de los videos recopilados sean de adultos y 20% de niños 
+    Los videos para niños se dividen de manera equitativa entre videos para niños de 0-4 años, 5-8 años y 9-12 años.
+    '''
+
+    num_adults = int(num_videos * 0.8)
+    num_kids = num_videos - num_adults
+    num_rango_kids = [num_kids // 3, num_kids // 3, num_kids - 2 * (num_kids // 3)]
+
     print("PART 1.1 - GETTING RANDOM IDS FOR ADULTS VIDEOS")
-    palabras, ids = get_random_ids(num_ids=num_videos, after_date=str(datetime.date.today()-datetime.timedelta(days=1)))
+    palabras, ids = get_random_ids(num_ids=num_adults, after_date=str(datetime.date.today()-datetime.timedelta(days=1)))
     print(list(zip(palabras,ids)))
 
     print("PART 1.2 - GETTING RANDOM IDS FOR KIDS VIDEOS")
+    for i, rango in enumerate(["0-4", "5-8", "9-12"]):
+        palabras_kids, ids_kids = get_random_ids_kids(num_ids=num_rango_kids[i], after_date=str(datetime.date.today()-datetime.timedelta(days=1)), rango=rango)
+        print(list(zip(palabras_kids,ids_kids)))
+        palabras.extend(palabras_kids)
+        ids.extend(ids_kids)
 
     print("PART 2 - PROCESSING VIDEOS")
     df_videos = []
