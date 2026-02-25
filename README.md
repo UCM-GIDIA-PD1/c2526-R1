@@ -8,7 +8,7 @@
 
 2. [Estructura del repositorio](#2-estructura-del-repositorio)
 
-3. [Instalación del entorno de desarrollo y sus dependecias](#3-️-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
+3. [Iniciar el entorno de desarrollo y sus dependecias](#3-️-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
 
 4. [Descarga de la base de datos](#4-descarga-de-la-base-de-datos)
 
