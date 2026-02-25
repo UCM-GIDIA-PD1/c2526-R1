@@ -63,7 +63,7 @@ def collect_all_data(num_videos):
     return df_data
 
 if __name__ == '__main__':
-    # data = collect_all_data(20)
+    #data = collect_all_data(20)
 
     for _ in range(20):
         data = collect_all_data(500)#(1000)
