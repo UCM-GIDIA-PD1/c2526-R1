@@ -11,6 +11,6 @@ with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
     claves = json.load(archivo)
 
 
-    df = download_dataframe_minio("pd1", "grupo1/df_videos_2026-02-25_09-54-10",claves=claves,file_format="parquet")
-    #print(df.columns)
+    df = download_dataframe_minio("pd1", "grupo1/df_videos_2026-02-25_17-33-15",claves=claves,file_format="parquet")
+    print(df['Tags'])
     #print(df[df["Made for kids"] == True].head())

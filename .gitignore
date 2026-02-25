@@ -13,3 +13,9 @@ data
 
 # Logs
 *.log
+
+# Imagenes 
+"Images readme"
+
+# Archivos ejecutables
+__pycache__
