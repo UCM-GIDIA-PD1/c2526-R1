@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 import time
 import re
 
@@ -18,8 +19,19 @@ def get_vkids_ids(query=None, rango="0-4"):
     - video_ids: lista con los ids de los videos obtenidos
     '''
     rangos = {"0-4": 0, "5-8": 1, "9-12": 2}
-    driver = webdriver.Chrome()
+
+    options = Options()
+    # Set window size (half of 1920x1080 screen)
+    options.add_argument("--window-size=960,1080")
+
+    # Move window to right side of screen
+    options.add_argument("--window-position=1300,0")
+
+    
+    driver = webdriver.Chrome(options=options)
+    # #driver.minimize_window()
     driver.get(f"https://www.youtubekids.com/search")
+    
     try:
         #Selección del modo padre para poder configurar youtube kids con el rango de edad deseado
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "parent-button")))
@@ -108,7 +120,7 @@ def get_vkids_ids(query=None, rango="0-4"):
         return video_ids
     
     finally:
-        time.sleep(2)
+        time.sleep(1)
         driver.quit()
 
-# get_vkids_ids("cat")
+# print(get_vkids_ids("cat"))

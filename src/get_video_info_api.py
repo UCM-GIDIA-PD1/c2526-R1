@@ -111,7 +111,8 @@ def get_info(id_video):
         "Titulo_canal": video["snippet"]["channelTitle"],
         "Subtitulos": cleant_sub if has_captions and cleant_sub else "None",
         "Generos": generos_str,
-        "Made for kids": video["status"]["madeForKids"]
+        "Made for kids": video["status"]["madeForKids"],
+        "Rango_edad": "Adult"
     }, index=[0])
 
     return df_video

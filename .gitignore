@@ -10,3 +10,6 @@ subs
 # Datos
 *.csv
 data
+
+# Logs
+*.log
