@@ -34,7 +34,7 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
     
     - Podemos hacerlo desde el explorador de archivos de nuestro equipo y en la dirección escribir cmd para abrir la terminal desde esa dirección.
 
-    
+        ![Logo](https://github.com/UCM-GIDIA-PD1/c2526-R1/blob/main/Images%20readme/Direccion%20para%20replicar%20entorno.png)
 
     - O mediante el siguiente comando desde terminal.
 
