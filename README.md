@@ -3,8 +3,16 @@
 ## **Índice**
 
 1. [Descripción de los objetivos](#1-descripción-de-los-objetivos)
+
 2. [Estructura del repositorio](#2-estructura-del-repositorio)
+
 3. [Iniciar el entorno de desarrollo y sus dependecias](#3-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
+
+4. 
+
+5. 
+
+6. 
 
 ### 1. Descripción de los objetivos
 
@@ -12,18 +20,21 @@ El objetivo principal de este proyecto desarrollar un sistema de aprendizaje aut
 
 ### 2. Estructura del repositorio
 
-- La carpeta **src** contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
+- La carpeta `src` contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
 
 ### 3. Iniciar el entorno de desarrollo y sus dependencias
+
 Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependencias [uv](https://github.com/astral-sh/uv), que simplifica en gran medida la configuración del entorno de desarrollo.
 Para poder iniciar el entorno hay que seguir una serie de pasos:
 
 > [!IMPORTANT]
-> Antes de replicar el entorno asegurate de tener instalado uv. Puede encontrar instrucciones en el reporitorio oficial de [uv](https://github.com/astral-sh/uv).
+> Antes de iniciar el entorno asegurate de tener instalado uv en tu sistema. Puedes encontrar instrucciones en el reporitorio oficial de [uv](https://github.com/astral-sh/uv).
 
 1. Nos vamos a la carpeta donde queremos guardar el repositorio.
     
-    - Podemos hacerlo desde el explorador de archivos y en la dirección escribir cmd para abrir la terminal desde esa dirección.
+    - Podemos hacerlo desde el explorador de archivos de nuestro equipo y en la dirección escribir cmd para abrir la terminal desde esa dirección.
+
+    
 
     - O mediante el siguiente comando desde terminal.
 
