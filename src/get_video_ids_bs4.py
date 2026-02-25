@@ -97,24 +97,21 @@ def get_random_ids_kids(num_ids=25, after_date=None, before_date=None, rango="0-
     ##Habría que añadir algo que controle que la fecha de inicio no sea posterior a la de fin, o que no se introduzcan fechas futuras, etc. 
     # Porque si no se mete en un bucle infinito.
     lista_palabras_aleatorias = []
-    lista_ids_aleatorios = []
-    w = RandomWord()
-
-    pbar = tqdm(total=num_ids)
-    while len(lista_ids_aleatorios) < num_ids:
-        try: 
-            random_word = w.word()
-            query = f'\"{random_word}\" intitle:{random_word}'
-            # if after_date:
-            #     query += f' after:' + str(after_date)
-            # if before_date:
-            #     query += f' before:' + str(before_date)
-            #print("running query", query)
-            lista_ids_aleatorios.append(random.choice(get_vkids_ids(query, rango)))
-            lista_palabras_aleatorias.append(random_word)
-            time.sleep(0.2) #para no hacer muchas queries seguidas
-            pbar.update(1)
-        except Exception as e: pass #print("Ran into exception", e, "for word", random_word) #happens quite often when no videos found for a word in the last day
-
-    pbar.close()
+    lista_ids_aleatorios = get_vkids_ids(rango=rango,num_random_ids=num_ids)
     return lista_palabras_aleatorias, lista_ids_aleatorios
+
+# pbar = tqdm(total=num_ids)
+#    while len(lista_ids_aleatorios) < num_ids:
+#       try: 
+#           random_word = w.word()
+#           query = f'\"{random_word}\" intitle:{random_word}'
+#           # if after_date:
+#           #     query += f' after:' + str(after_date)
+#           # if before_date:
+#           #     query += f' before:' + str(before_date)
+#          #print("running query", query)
+#           lista_ids_aleatorios.append(random.choice(get_vkids_ids(query, rango)))
+#           lista_palabras_aleatorias.append(random_word)
+#           time.sleep(0.2) #para no hacer muchas queries seguidas
+#           pbar.update(1)
+#       except Exception as e: pass #print("Ran into exception", e, "for word", random_word) #happens quite often when no videos found for a word in the last day

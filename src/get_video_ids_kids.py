@@ -8,9 +8,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import time
 import re
+from wonderwords import RandomWord
+import random
+from tqdm import tqdm
 
 
-def get_vkids_ids(query=None, rango="0-4"):
+def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
     '''
     input:
     - query: string con la query a buscar en youtube kids, si no se introduce ninguna query de obtienen los videos de la página principal de youtube kids, para el rango de edad seleccionado.
@@ -97,30 +100,51 @@ def get_vkids_ids(query=None, rango="0-4"):
         button = driver.find_element(By.ID, "done-button")
         button.click()
 
-        #Si se desea realizar una búsqueda, se introduce la query en el buscador y se pulsa enter
-        if query:
-            WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "input")))
-            input_element = driver.find_element(By.ID, "input")
-            input_element.send_keys(query + Keys.ENTER)
+        video_ids = set()
+        if num_random_ids:
+            word = RandomWord()
+            pbar = tqdm(total=num_random_ids)
+            while len(video_ids) < num_random_ids:
+                try:
+                    WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "input")))
+                    input_element = driver.find_element(By.ID, "input")
+                    input_element.send_keys(word.word() + Keys.ENTER)
+                    driver.refresh()
+                    time.sleep(1)
+                    soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        #Se actualiza la página ya que si no hay veces en las que no aparecen los vídeos en el html, y se espera 1 segundo a que cargue
-        driver.refresh()
-        time.sleep(1)
-        # Se obtiene el código fuente de la página y se parsea con BeautifulSoup para obtener los ids de los vídeos
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        video_ids = []
+                    # Buscar todos los enlaces que contienen watch?v=
+                    links = soup.find_all("a", href=re.compile(r"watch\?v="))
+                    video_ids.add(random.choice(links)["href".split("v="[-1])])
+                    pbar.update(1)
+                except Exception as e: pass
+            pbar.close()
 
-        # Buscar todos los enlaces que contienen watch?v=
-        links = soup.find_all("a", href=re.compile(r"watch\?v="))
+                
+        else:
+            #Si se desea realizar una búsqueda, se introduce la query en el buscador y se pulsa enter
+            if query:
+                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "input")))
+                input_element = driver.find_element(By.ID, "input")
+                input_element.send_keys(query + Keys.ENTER)
 
-        for link in links:
-            href = link["href"]
-            video_id = href.split("v=")[-1]
-            video_ids.append(video_id)
-        return video_ids
+            #Se actualiza la página ya que si no hay veces en las que no aparecen los vídeos en el html, y se espera 1 segundo a que cargue
+            driver.refresh()
+            time.sleep(1)
+            # Se obtiene el código fuente de la página y se parsea con BeautifulSoup para obtener los ids de los vídeos
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+            # Buscar todos los enlaces que contienen watch?v=
+            links = soup.find_all("a", href=re.compile(r"watch\?v="))
+
+            for link in links:
+                href = link["href"]
+                video_id = href.split("v=")[-1]
+                video_ids.add(video_id)
+        return list(video_ids)
     
     finally:
         time.sleep(1)
         driver.quit()
 
-# print(get_vkids_ids("cat"))
+print(get_vkids_ids(num_random_ids=20))

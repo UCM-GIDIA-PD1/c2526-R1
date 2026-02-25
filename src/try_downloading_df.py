@@ -8,7 +8,9 @@ import datetime
 from Server_PD import download_dataframe_minio
 
 with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
-         claves = json.load(archivo)
-df = download_dataframe_minio("pd1", "grupo1/df_videos_2026-02-25_09-54-10",claves=claves,file_format="parquet")
+    claves = json.load(archivo)
 
-print(df[df["Made for kids"] == True].head())
+
+    df = download_dataframe_minio("pd1", "grupo1/df_videos_2026-02-25_09-54-10",claves=claves,file_format="parquet")
+    #print(df.columns)
+    #print(df[df["Made for kids"] == True].head())
