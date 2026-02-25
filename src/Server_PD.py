@@ -53,7 +53,7 @@ def upload_dataframe_minio(
 
 #Descargar los datos y devolver un dataframe
 def download_dataframe_minio(
-    bucket: str, #Dirección que queremos descargar, "pd1/grupo1/"
+    bucket: str, #Dirección que queremos descargar, "pd1"
     object_name: str, #Nombre del archivo que queremos ponerle
     claves:dict, #Diccionario con las claves
     file_format: str = "csv" #Formato
