@@ -6,9 +6,9 @@
 
 2. [Estructura del repositorio](#2-estructura-del-repositorio)
 
-3. [Iniciar el entorno de desarrollo y sus dependecias](#3-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
+3. [Instalación del entorno de desarrollo y sus dependecias](#3-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
 
-4. 
+4. [Descarga de la base de datos](#4-descarga-de-la-base-de-datos)
 
 5. 
 
@@ -22,7 +22,7 @@ El objetivo principal de este proyecto desarrollar un sistema de aprendizaje aut
 
 - La carpeta `src` contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
 
-### 3. Iniciar el entorno de desarrollo y sus dependencias
+### 3. 🛠️ Iniciar el entorno de desarrollo y sus dependencias
 
 Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependencias [uv](https://github.com/astral-sh/uv), que simplifica en gran medida la configuración del entorno de desarrollo.
 Para poder iniciar el entorno hay que seguir una serie de pasos:
@@ -55,4 +55,14 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
     uv sync
     ````
 
-    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias en nuestro 
+    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto.
+
+4. Se pueden ejecutar scripts dentro del entorno usando:
+    ````
+    uv run <nombre del script>.py
+    ````
+
+    Esto asegura que el script se ejecuta con al versión correcta de python y las dependencias necesarias sin necesidad de activar nada manualmente.
+
+### 4. Descarga de la base de datos
+
