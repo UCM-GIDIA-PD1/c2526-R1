@@ -97,7 +97,11 @@ def get_random_ids_kids(num_ids=25, after_date=None, before_date=None, rango="0-
     ##Habría que añadir algo que controle que la fecha de inicio no sea posterior a la de fin, o que no se introduzcan fechas futuras, etc. 
     # Porque si no se mete en un bucle infinito.
     lista_palabras_aleatorias = []
-    lista_ids_aleatorios = get_vkids_ids(rango=rango,num_random_ids=num_ids)
+    lista_ids_aleatorios = []
+    while len(lista_ids_aleatorios)<num_ids:
+        try: lista_ids_aleatorios = get_vkids_ids(rango=rango,num_random_ids=num_ids)
+        except: pass
+
     return lista_palabras_aleatorias, lista_ids_aleatorios
 
 # pbar = tqdm(total=num_ids)
