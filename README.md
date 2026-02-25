@@ -20,7 +20,20 @@ En paralelo, este sistema busca  asignar una categoría princpal y diversas subc
 
 ### **2. Estructura del repositorio**
 
-- La carpeta `src` contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
+**Archivos:**
+
+- `.gitignore`: contiene los archivos que no se deben subir al git desde el repositorio local.
+
+- `.python-version`: contiene la version de python usada en el proyecto.
+
+- `pyproyect.toml` y `uv.lock`: contiene la configuración del entorno, con las dependencias y las versiones correspondientes.
+
+**Carpetas:**
+
+- Carpeta `src`: contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
+
+- Carpeta `Images readme`: contiene las imágenes de este archivo.
+
 
 ### **3. 🛠️ Iniciar el entorno de desarrollo y sus dependencias**
 
