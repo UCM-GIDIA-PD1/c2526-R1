@@ -10,6 +10,7 @@ import time
 import re
 from wonderwords import RandomWord
 import random
+from tqdm import tqdm
 
 
 def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
@@ -102,17 +103,22 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
         video_ids = set()
         if num_random_ids:
             word = RandomWord()
+            pbar = tqdm(total=num_random_ids)
             while len(video_ids) < num_random_ids:
-                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "input")))
-                input_element = driver.find_element(By.ID, "input")
-                input_element.send_keys(word.word() + Keys.ENTER)
-                driver.refresh()
-                time.sleep(1)
-                soup = BeautifulSoup(driver.page_source, 'html.parser')
+                try:
+                    WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "input")))
+                    input_element = driver.find_element(By.ID, "input")
+                    input_element.send_keys(word.word() + Keys.ENTER)
+                    driver.refresh()
+                    time.sleep(1)
+                    soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-                # Buscar todos los enlaces que contienen watch?v=
-                links = soup.find_all("a", href=re.compile(r"watch\?v="))
-                video_ids.add(random.choice(links)["href".split("v="[-1])])
+                    # Buscar todos los enlaces que contienen watch?v=
+                    links = soup.find_all("a", href=re.compile(r"watch\?v="))
+                    video_ids.add(random.choice(links)["href".split("v="[-1])])
+                    pbar.update(1)
+                except Exception as e: pass
+            pbar.close()
 
                 
         else:
@@ -134,8 +140,8 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
             for link in links:
                 href = link["href"]
                 video_id = href.split("v=")[-1]
-                video_ids.append(video_id)
-        return video_ids
+                video_ids.add(video_id)
+        return list(video_ids)
     
     finally:
         time.sleep(1)
