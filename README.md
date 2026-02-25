@@ -1,8 +1,10 @@
 # **SAFE FOR KIDS (SFKids)**
 
+![Imagen portada](./Images%20readme/imagen%20portada.png)
+
 ## **Índice**
 
-1. [Descripción de los objetivos](#1-descripción-de-los-objetivos)
+1. [Descripción del proyecto](#1-descripción-de-los-objetivos)
 
 2. [Estructura del repositorio](#2-estructura-del-repositorio)
 
@@ -10,19 +12,17 @@
 
 4. [Descarga de la base de datos](#4-descarga-de-la-base-de-datos)
 
-5. 
+### **1. Descripción proyecto**
 
-6. 
+En este proyecto principal de este proyecto es desarrollar una herramienta capar de determinar de manera autónoma si un video va a ser apto o no para un nivel de madurez determinado. El objetivo es facilitar al usuario un filtrado selectivo de la información que considere inadecuada.
 
-### 1. Descripción de los objetivos
+En paralelo, este sistema busca  asignar una categoría princpal y diversas subcategorías, proporcionando una organización más detallada y precisa.
 
-El objetivo principal de este proyecto desarrollar un sistema de aprendizaje automático.
-
-### 2. Estructura del repositorio
+### **2. Estructura del repositorio**
 
 - La carpeta `src` contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
 
-### 3. 🛠️ Iniciar el entorno de desarrollo y sus dependencias
+### **3. 🛠️ Iniciar el entorno de desarrollo y sus dependencias**
 
 Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependencias [uv](https://github.com/astral-sh/uv), que simplifica en gran medida la configuración del entorno de desarrollo.
 Para poder iniciar el entorno hay que seguir una serie de pasos:
@@ -34,7 +34,7 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
     
     - Podemos hacerlo desde el explorador de archivos de nuestro equipo y en la dirección escribir cmd para abrir la terminal desde esa dirección.
 
-        ![Logo](https://github.com/UCM-GIDIA-PD1/c2526-R1/blob/main/Images%20readme/Direccion%20para%20replicar%20entorno.png)
+        ![Imagen de ayuda](./Images%20readme/Direccion%20para%20replicar%20entorno.png)
 
     - O mediante el siguiente comando desde terminal.
 
@@ -42,10 +42,15 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
         cd <dirección donde queremos guardar el repositorio>
         ````
 
-2. Clonamos este repositorio:
+2. Dentro de la terminal clonamos este repositorio con los siguientes comandos:
 
+    Este clona el repositorio.
     ````
     git clone https://github.com/UCM-GIDIA-PD1/c2526-R1.git
+    ````
+
+    Una vez clonado, nos movemos a la carpeta del repostorio.
+    ````
     cd c2526-R1
     ````
 
@@ -59,10 +64,10 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
 
 4. Se pueden ejecutar scripts dentro del entorno usando:
     ````
-    uv run <nombre del script>.py
+    uv run nombre_script.py
     ````
 
     Esto asegura que el script se ejecuta con al versión correcta de python y las dependencias necesarias sin necesidad de activar nada manualmente.
 
-### 4. Descarga de la base de datos
+### **4. Descarga de la base de datos**
 
