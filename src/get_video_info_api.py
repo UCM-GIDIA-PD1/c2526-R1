@@ -105,7 +105,6 @@ def get_info(id_video):
         "Titulo": video["snippet"]["title"],
         "Descripcion": video["snippet"]["description"],
         "Visualizaciones": video["statistics"]["viewCount"],
-        "Numero_likes": video["statistics"].get("likeCount", None),
         "Tags":", ".join(video["snippet"].get("tags", [])),
         "Duracion": video["contentDetails"]["duration"],
         "Fecha_publicacion": video["snippet"]["publishedAt"],
