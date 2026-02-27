@@ -28,7 +28,7 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
     options.add_argument("--window-size=960,1080")
 
     # Move window to right side of screen
-    options.add_argument("--window-position=1300,0")
+    options.add_argument("--window-position=1400,0")
 
     
     driver = webdriver.Chrome(options=options)
