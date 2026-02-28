@@ -9,6 +9,7 @@ subs
 
 # Datos
 *.csv
+*.parquet
 data
 
 # Logs
@@ -18,3 +19,4 @@ data
 
 # Archivos ejecutables
 __pycache__
+*.pyc
