@@ -52,16 +52,16 @@ def limpiar_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     print("\n--- VALORES NULOS POR COLUMNA ---")
     print(df.isnull().sum())
 
-    # 1️⃣ Eliminar filas completamente vacías
+    #Elimina filas completamente vacías
     df = df.dropna(how="all")
     print("Después de eliminar filas totalmente vacías:", len(df))
 
-    # 2️⃣ Eliminar duplicados por ID
+    #Elimina duplicados por ID
     if "ID" in df.columns:
         df = df.drop_duplicates(subset=["ID"])
     print("Después de eliminar duplicados por ID:", len(df))
 
-    # 3️⃣ Convertir columnas numéricas sin eliminar filas
+    #Convierte columnas numéricas sin eliminar filas
     for col in ["Visualizaciones", "Numero_likes"]:
         if col in df.columns:
             df[col] = (
@@ -73,14 +73,14 @@ def limpiar_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors="coerce")
             df[col] = df[col].fillna(0)
 
-    # 4️⃣ Convertir fecha
+    #Convierte fecha
     if "Fecha_publicacion" in df.columns:
         df["Fecha_publicacion"] = pd.to_datetime(
             df["Fecha_publicacion"],
             errors="coerce"
         )
 
-    # 5️⃣ Eliminar SOLO registros sin información textual clave REAL
+    # Elimina SOLO registros sin información textual clave REAL
     columnas_clave = ["Titulo", "Descripcion"]
 
     columnas_existentes = [c for c in columnas_clave if c in df.columns]
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         claves = json.load(archivo)
 
     bucket = "pd1"
-    prefix = "grupo1/"  # cambia si es necesario
+    prefix = "grupo1/"
 
     df_final = unir_parquets_minio(bucket, prefix, claves)
 
