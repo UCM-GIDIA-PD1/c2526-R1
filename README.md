@@ -4,7 +4,7 @@
 
 ## **Índice**
 
-1. [Descripción del proyecto](#1-descripción-proyecto)
+1. [Descripción del proyecto](#1-descripción-del-proyecto)
 
 2. [Estructura del repositorio](#2-estructura-del-repositorio)
 
@@ -12,11 +12,13 @@
 
 4. [Descarga de la base de datos](#4-descarga-de-la-base-de-datos)
 
-### **1. Descripción proyecto**
+5. [Equipo de desarrollo]()
 
-En este proyecto principal de este proyecto es desarrollar una herramienta capar de determinar de manera autónoma si un video va a ser apto o no para un nivel de madurez determinado. El objetivo es facilitar al usuario un filtrado selectivo de la información que considere inadecuada.
+### **1. Descripción del proyecto**
 
-En paralelo, este sistema busca  asignar una categoría princpal y diversas subcategorías, proporcionando una organización más detallada y precisa.
+El objetivo principal de este proyecto es desarrollar una herramienta capar de determinar de manera autónoma si un video de Youtube va a ser apto o no para un nivel de madurez determinado. Para ello se usará un modelo de aprendizaje autónomo al que entrenaremos para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
+
+Al mismo tiempo, este sistema será capaz de asignar una categoría principal y diversas subcategorías a un mismo video, proporcionando una organización más detallada y precisa en la clasificación del video. Esto otorga al cliente una búsqueda más específica y eficiente en base a sus intereses.
 
 ### **2. Estructura del repositorio**
 
@@ -30,7 +32,13 @@ En paralelo, este sistema busca  asignar una categoría princpal y diversas subc
 
 **Carpetas:**
 
-- Carpeta `src`: contiene todo el código. En esta carpeta encontramos procesos utilizados para realizar este proyecto.
+- Carpeta `src`: contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
+
+    - Extracción y transformación:
+
+        - `collect_all_data.py`: archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
+
+        - `get_all_dfs.py`: archivo que une todos los dataframes de los videos extraidos.
 
 - Carpeta `Images readme`: contiene las imágenes de este archivo.
 
@@ -57,12 +65,12 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
 
 2. Dentro de la terminal clonamos este repositorio con los siguientes comandos:
 
-    Este clona el repositorio.
+    Para clonar el repositorio:
     ````
     git clone https://github.com/UCM-GIDIA-PD1/c2526-R1.git
     ````
 
-    Una vez clonado, nos movemos a la carpeta del repostorio.
+    Una vez clonado, nos movemos a la carpeta del repostorio:
     ````
     cd c2526-R1
     ````
@@ -84,3 +92,15 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
 
 ### **4. Descarga de la base de datos**
 
+### **5. Equipo de desarrollo**
+- Alejo Muñoz Pinilla
+
+- Andrea Yu García Gómez
+
+- Luis López Rodríguez
+
+- María Martín Portal
+
+- Marina Gurova
+
+- Angie Tatiana Ruiz Martínez
