@@ -84,7 +84,7 @@ def get_info(id_video):
             cleant_sub = clean_vtt_smart(clean_sub)
 
             # Borramos el archivo de subtítulos descargado tras limpiarlo
-            # os.remove(vtt_file)
+            os.remove(vtt_file)
     # --- GENERO  ---
     youtube_categories = {
     "1": "Film & Animation",
