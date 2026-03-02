@@ -15,10 +15,16 @@ from tqdm import tqdm
 
 def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
     '''
+    Obtiene un id de un video de youtube kids aleatorio en funcion de la query introducida y el rango de edad.
+    Si no se introduce nincún rango de edad se tomara el valor por defecto 0-4.
+    Si se introduce un valor para num_random_ids se devolverá una lista de ids aleatorios ignorando la query.
+    
     input:
     - query: string con la query a buscar en youtube kids, si no se introduce ninguna query de obtienen los videos de la página principal de youtube kids, para el rango de edad seleccionado.
     - rango: string con el rango de edad para configurar youtube kids, puede ser "0-4", "5-8" o "9-12". Por defecto es "0-4".
+    - num_random_ids: int, indica la longitud del array de ids aleatorias que devuelve
     output: 
+    - lista_palabras: lista de las palabras con las que se han hecho búsquedas de ids aleatorios
     - video_ids: lista con los ids de los videos obtenidos
     '''
     rangos = {"0-4": 0, "5-8": 1, "9-12": 2}
@@ -101,7 +107,9 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
         button.click()
 
         video_ids = set()
+        lista_palabras = []
         if num_random_ids:
+            num_vids = 0
             word = RandomWord()
             pbar = tqdm(total=num_random_ids)
             while len(video_ids) < num_random_ids:
@@ -109,7 +117,8 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
                     WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "input")))
                     input_element = driver.find_element(By.ID, "input")
                     input_element.clear()
-                    input_element.send_keys(word.word() + Keys.ENTER)
+                    palabra = word.word()
+                    input_element.send_keys(palabra + Keys.ENTER)
                     driver.refresh()
                     time.sleep(2.5)
                     soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -119,7 +128,10 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
                     link = random.choice(links)["href"].split("v=")[-1]
                     #print(link)
                     video_ids.add(link)
-                    pbar.update(1)
+                    if len(video_ids)>num_vids:
+                        lista_palabras.append(palabra)
+                        num_vids += 1
+                        pbar.update(1)
                 except Exception as e: 
                     #print("Error")
                     pass
@@ -141,15 +153,13 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
 
             # Buscar todos los enlaces que contienen watch?v=
             links = soup.find_all("a", href=re.compile(r"watch\?v="))
-
-            for link in links:
-                href = link["href"]
-                video_id = href.split("v=")[-1]
-                video_ids.add(video_id)
-        return list(video_ids)
+            link = random.choice(links)["href"].split("v=")[-1]
+            #print(link)
+            video_ids.add(link)
+        return lista_palabras, list(video_ids)
     
     finally:
         time.sleep(1)
         driver.quit()
 
-#print(get_vkids_ids(num_random_ids=20))
+    #print(get_vkids_ids(num_random_ids=20))

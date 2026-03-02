@@ -9,14 +9,14 @@ from get_video_info_api import get_info
 from get_video_ids_bs4 import get_random_ids, get_random_ids_kids
 from Server_PD import upload_dataframe_minio
 
-def collect_all_data(num_videos):
+def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
     '''
     Elegimos y descargamos n videos random, donde n es el parámetro num_videos de la función. 
     Dividimos los datos, para que aproximadamente 80% de los videos recopilados sean de adultos y 20% de niños 
     Los videos para niños se dividen de manera equitativa entre videos para niños de 0-4 años, 5-8 años y 9-12 años.
     '''
 
-    num_adults = int(num_videos * 0.8)
+    num_adults = int(num_videos * proporcion_adults)
     num_kids = num_videos - num_adults
     num_rango_kids = [num_kids // 3, num_kids // 3, num_kids - 2 * (num_kids // 3)]
 
@@ -62,13 +62,14 @@ def collect_all_data(num_videos):
                 claves = json.load(archivo)
             upload_dataframe_minio(df = df_data, bucket = "pd1", object_name=f"grupo1/df_videos_{timestamp}", claves=claves, file_format="parquet") 
         except Exception:
-            DataFrame(df_data).to_parquet(path=f"data/df_videos_{timestamp}", index=False)
+
+            DataFrame(df_data).to_parquet(path=f"src/data/df_videos_{timestamp}", index=False)
         return df_data
 
-if __name__ == '__main__':
-    #data = collect_all_data(20)
-    for _ in range(20):
-        data = collect_all_data(500)#(1000)
+# if __name__ == '__main__':
+#     #data = collect_all_data(20)
+#     for _ in range(20):
+#         data = collect_all_data(500) #(1000)
 
     #Para probar el trabajo con MinIO
     # data = pd.read_csv("src\data\data_videos_2026-02-24_14-06-23.csv")
