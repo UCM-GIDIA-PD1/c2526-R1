@@ -166,3 +166,28 @@ def graficar_top_generos(df, titulo_grafica, ax_obj, paleta):
         ax_obj.set_ylabel('Género')
     else:
         ax_obj.set_title(f"{titulo_grafica} (Sin Datos)")
+
+
+def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj):
+    # Lista de generos (Adultos)
+    gen_adult = df_adult['Generos'].astype(str).str.split(', ').explode()
+    gen_adult = set(gen_adult[gen_adult != 'nan'].unique())
+    
+    # Lista de generos (Kids) 
+    gen_kids = df_Kids['Generos'].astype(str).str.split(', ').explode()
+    gen_kids = set(gen_kids[gen_kids != 'nan'].unique())
+    
+    # Géneros que están en Adultos pero no en Kids
+    ausentes = list(gen_adult - gen_kids)
+    
+    # Gráfica
+    if ausentes:
+        conteo_adult = df_adult['Generos'].astype(str).str.split(', ').explode()
+        datos_grafica = conteo_adult[conteo_adult.isin(ausentes)].value_counts()
+        
+        sns.barplot(x=datos_grafica.values, y=datos_grafica.index, palette='rocket', ax=ax_obj)
+        ax_obj.set_title('Géneros Exclusivos de Adultos')
+        ax_obj.set_xlabel('Frecuencia en Dataset Adulto')
+        ax_obj.set_ylabel('Género')
+    else:
+        ax_obj.set_title("No hay géneros con presencia cero en Kids")
