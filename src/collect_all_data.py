@@ -36,35 +36,37 @@ def collect_all_data(num_videos):
         palabras.extend(palabras_kids)
         for id in ids_kids:
             ids_ages.append([id, rango])
+    try:
+        print("PART 2 - PROCESSING VIDEOS")
+        df_videos = []
 
-    print("PART 2 - PROCESSING VIDEOS")
-    df_videos = []
-
-    for id in tqdm(ids_ages): #tqdm
-        try:
-            row = get_info(id[0])
-            row["Rango_edad"] = id[1]
-            df_videos.append(row)
-            #print(df_videos)
-            time.sleep(0.2) #to not get too many requests error
-        except Exception as e: print("Ran into exception", e, "for video", id) #for some videos the downloader does not work for some reason
-
-    df_data = pd.concat(df_videos, ignore_index=True)
-
+        for id in tqdm(ids_ages): #tqdm
+            try:
+                row = get_info(id[0])
+                row["Rango_edad"] = id[1]
+                df_videos.append(row)
+                #print(df_videos)
+                time.sleep(0.2) #to not get too many requests error
+            except Exception as e: print("Ran into exception", e, "for video", id) #for some videos the downloader does not work for some reason
+    #Si en algún momento de la ejecución ocurre algo que haga que termine, los datos que se hayan extraido se guardan autométicamente en Minio o en local
+    finally:
+        df_data = pd.concat(df_videos, ignore_index=True)
     #Guardar en local en formato .parquet o .csv con la fecha
     #data_csv = df_data.to_csv(f"src/data/data_videos_ranges.csv", index=False)
 
     #Guardar en MinIO
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
-         claves = json.load(archivo)
-    upload_dataframe_minio(df = df_data, bucket = "pd1", object_name=f"grupo1/df_videos_{timestamp}", claves=claves, file_format="parquet") 
-
-    return df_data
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        #Si no se puede guardar en Minio se guarda en local, para no perder todas las llamadas a la API
+        try:
+            with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+                claves = json.load(archivo)
+            upload_dataframe_minio(df = df_data, bucket = "pd1", object_name=f"grupo1/df_videos_{timestamp}", claves=claves, file_format="parquet") 
+        except Exception:
+            DataFrame(df_data).to_parquet(path=f"data/df_videos_{timestamp}", index=False)
+        return df_data
 
 if __name__ == '__main__':
     #data = collect_all_data(20)
-
     for _ in range(20):
         data = collect_all_data(500)#(1000)
 

@@ -84,8 +84,42 @@ def get_info(id_video):
             cleant_sub = clean_vtt_smart(clean_sub)
 
             # Borramos el archivo de subtítulos descargado tras limpiarlo
-            # os.remove(vtt_file)
-    
+            os.remove(vtt_file)
+    # --- GENERO  ---
+    youtube_categories = {
+    "1": "Film & Animation",
+    "2": "Autos & Vehicles",
+    "10": "Music",
+    "15": "Pets & Animals",
+    "17": "Sports",
+    "18": "Short Movies",
+    "19": "Travel & Events",
+    "20": "Gaming",
+    "21": "Videoblogging",
+    "22": "People & Blogs",
+    "23": "Comedy",
+    "24": "Entertainment",
+    "25": "News & Politics",
+    "26": "Howto & Style",
+    "27": "Education",
+    "28": "Science & Technology",
+    "29": "Nonprofits & Activism",
+    "30": "Movies",
+    "31": "Anime/Animation",
+    "32": "Action/Adventure",
+    "33": "Classics",
+    "34": "Comedy",
+    "35": "Documentary",
+    "36": "Drama",
+    "37": "Family",
+    "38": "Foreign",
+    "39": "Horror",
+    "40": "Sci-Fi/Fantasy",
+    "41": "Thriller",
+    "42": "Shorts",
+    "43": "Shows",
+    "44": "Trailers"
+}
     # --- GENEROS ---
     generos = video.get("topicDetails", {}).get("topicCategories", [])
 
@@ -110,10 +144,11 @@ def get_info(id_video):
         "Fecha_publicacion": video["snippet"]["publishedAt"],
         "Titulo_canal": video["snippet"]["channelTitle"],
         "Subtitulos": cleant_sub if has_captions and cleant_sub else "None",
+        "Genero": youtube_categories[video["snippet"]["categoryId"]], 
         "Generos": generos_str,
+        #"ContentRating": content_rating_str,
         "Made for kids": video["status"]["madeForKids"],
         "Rango_edad": "Adult"
     }, index=[0])
 
     return df_video
-
