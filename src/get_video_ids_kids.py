@@ -24,6 +24,7 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
     - rango: string con el rango de edad para configurar youtube kids, puede ser "0-4", "5-8" o "9-12". Por defecto es "0-4".
     - num_random_ids: int, indica la longitud del array de ids aleatorias que devuelve
     output: 
+    - lista_palabras: lista de las palabras con las que se han hecho búsquedas de ids aleatorios
     - video_ids: lista con los ids de los videos obtenidos
     '''
     rangos = {"0-4": 0, "5-8": 1, "9-12": 2}
@@ -33,7 +34,7 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
     options.add_argument("--window-size=960,1080")
 
     # Move window to right side of screen
-    options.add_argument("--window-position=1400,0")
+    options.add_argument("--window-position=1300,0")
 
     
     driver = webdriver.Chrome(options=options)
@@ -161,4 +162,4 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
         time.sleep(1)
         driver.quit()
 
-print(get_vkids_ids(num_random_ids=20))
+#print(get_vkids_ids(num_random_ids=20))
