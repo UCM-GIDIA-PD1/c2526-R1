@@ -62,7 +62,8 @@ def collect_all_data(num_videos):
                 claves = json.load(archivo)
             upload_dataframe_minio(df = df_data, bucket = "pd1", object_name=f"grupo1/df_videos_{timestamp}", claves=claves, file_format="parquet") 
         except Exception:
-            DataFrame(df_data).to_parquet(path=f"data/df_videos_{timestamp}", index=False)
+
+            DataFrame(df_data).to_parquet(path=f"src/data/df_videos_{timestamp}", index=False)
         return df_data
 
 if __name__ == '__main__':
