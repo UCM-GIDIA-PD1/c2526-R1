@@ -144,8 +144,8 @@ def get_info(id_video):
         "Fecha_publicacion": video["snippet"]["publishedAt"],
         "Titulo_canal": video["snippet"]["channelTitle"],
         "Subtitulos": cleant_sub if has_captions and cleant_sub else "None",
-        "Genero": youtube_categories[video["snippet"]["categoryId"]], 
-        "Generos": generos_str,
+        "Generos": youtube_categories[video["snippet"]["categoryId"]], 
+        "Subgeneros": generos_str,
         #"ContentRating": content_rating_str,
         "Made for kids": video["status"]["madeForKids"],
         "Rango_edad": "Adult"
