@@ -72,24 +72,31 @@ def get_random_ids(num_ids=25, after_date=None, before_date=None):
     lista_palabras_aleatorias = []
     lista_ids_aleatorios = []
     w = RandomWord()
-
     pbar = tqdm(total=num_ids)
-    while len(lista_ids_aleatorios) < num_ids:
-        try: 
-            random_word = w.word()
-            query = f'\"{random_word}\" intitle:{random_word}'
-            if after_date:
-                query += f' after:' + str(after_date)
-            if before_date:
-                query += f' before:' + str(before_date)
-            #print("running query", query)
-            lista_ids_aleatorios.append(random.choice(get_video_ids(query)))
-            lista_palabras_aleatorias.append(random_word)
-            time.sleep(0.2) #para no hacer muchas queries seguidas
-            pbar.update(1)
-        except Exception as e: pass #print("Ran into exception", e, "for word", random_word) #happens quite often when no videos found for a word in the last day
-
-    pbar.close()
+    try:
+        while len(lista_ids_aleatorios) < num_ids:
+            try: 
+                random_word = w.word()
+                query = f'\"{random_word}\" intitle:{random_word}'
+                if after_date:
+                    query += f' after:' + str(after_date)
+                if before_date:
+                    query += f' before:' + str(before_date)
+                #print("running query", query)
+                lista_ids_aleatorios.append(random.choice(get_video_ids(query)))
+                lista_palabras_aleatorias.append(random_word)
+                time.sleep(0.2) #para no hacer muchas queries seguidas
+                pbar.update(1)
+            except Exception as e: 
+                pass #print("Ran into exception", e, "for word", random_word) #happens quite often when no videos found for a word in the last day     
+    except KeyboardInterrupt:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        with open(f"data/lista_ids_adultos{timestamp}.json", "w", encoding="utf-8") as f:
+            json.dump(lista_ids_aleatorios, f)
+            print("Ejecucion finalizada, guardada la lista de ids en local")
+        raise KeyboardInterrupt
+    finally:
+        pbar.close()
     return lista_palabras_aleatorias, lista_ids_aleatorios
 
 def get_random_ids_kids(num_ids=25, after_date=None, before_date=None, rango="0-4"):
@@ -103,6 +110,8 @@ def get_random_ids_kids(num_ids=25, after_date=None, before_date=None, rango="0-
     lista_ids_aleatorios = []
     while len(lista_ids_aleatorios)<num_ids:
         try: lista_palabras_aleatorias, lista_ids_aleatorios = get_vkids_ids(rango=rango,num_random_ids=num_ids)
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
         except: pass
 
     return lista_palabras_aleatorias, lista_ids_aleatorios

@@ -20,7 +20,7 @@ def main():
     parser.add_argument(
         "-n", "--num_videos", 
         type=int, 
-        default= 500, 
+        default= 20, 
         help="Número de videos a extraer"
     
     )
@@ -36,21 +36,33 @@ def main():
         help="Proporción de videos para adultos (entre 0 y 1)"
     ) #opcional, por defecto 0.8
 
+    parser.add_argument(
+        "-i","--iteraciones", 
+        type=int, default=1, 
+        help="Numero de veces que se va a ejecutar el código"
+    )
+
     # 3. Parseo los argumentos
     args = parser.parse_args()
     print("Iniciando recolección de datos con los siguientes parámetros:")
     print(f"   - Videos por iteración: {args.num_videos}")
     print(f"   - Proporción adultos:   {args.proporcion_adults}")
-    print(f"   - Fecha de extracción:  {args.fecha}\n")
+    print(f"   - Fecha de extracción:  {args.fecha}")
+    print(f"   - Número de iteraciones:  {args.iteraciones}\n")
 
     # Llamo a la función de extracción de datos con los argumentos indicados
-    data = collect_all_data.collect_all_data(
-        num_videos=args.num_videos,
-        fecha=args.fecha,
-        proporcion_adults=args.proporcion_adults
-    )
-
-    print("Proceso finalizado")
+    try:
+        for i in range(args.iteraciones):
+            print(f'Iteracion numero {i+1} de {args.iteraciones}')
+            data = collect_all_data.collect_all_data(
+                num_videos=args.num_videos,
+                fecha=args.fecha,
+                proporcion_adults=args.proporcion_adults
+            )
+    except KeyboardInterrupt:
+        print("Se paró manualmente el programa")
+    finally:
+        print("Proceso finalizado")
 
 
 if __name__ == "__main__":

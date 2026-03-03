@@ -31,7 +31,15 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
 
     print("PART 1.2 - GETTING RANDOM IDS FOR KIDS VIDEOS")
     for i, rango in enumerate(["0-4", "5-8", "9-12"]):
-        palabras_kids, ids_kids = get_random_ids_kids(num_ids=num_rango_kids[i], after_date=str(datetime.date.today()-datetime.timedelta(days=1)), rango=rango)
+        try:
+            palabras_kids, ids_kids = get_random_ids_kids(num_ids=num_rango_kids[i], after_date=str(datetime.date.today()-datetime.timedelta(days=1)), rango=rango)
+            print('ola')
+        except KeyboardInterrupt:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            with open(f"data/lista_ids_ages{timestamp}.json", "w", encoding="utf-8") as f:
+                json.dump(ids_ages, f)
+                print("Ejecucion finalizada, guardada la lista de ids en local")
+            raise KeyboardInterrupt
         print(list(zip(palabras_kids,ids_kids)))
         palabras.extend(palabras_kids)
         for id in ids_kids:

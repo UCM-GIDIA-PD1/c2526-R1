@@ -11,6 +11,8 @@ import re
 from wonderwords import RandomWord
 import random
 from tqdm import tqdm
+import json
+import datetime
 
 
 def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
@@ -132,6 +134,12 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
                         lista_palabras.append(palabra)
                         num_vids += 1
                         pbar.update(1)
+                except KeyboardInterrupt:
+                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    with open(f"data/lista_ids_ninios_{rango}_{timestamp}.json", "w", encoding="utf-8") as f:
+                        json.dump(list(video_ids), f)
+                    print("Ejecucion finalizada, guardada la lista de ids en local")
+                    raise KeyboardInterrupt
                 except Exception as e: 
                     #print("Error")
                     pass
@@ -157,7 +165,6 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
             #print(link)
             video_ids.add(link)
         return lista_palabras, list(video_ids)
-    
     finally:
         time.sleep(1)
         driver.quit()
