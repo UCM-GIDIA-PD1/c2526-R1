@@ -5,18 +5,21 @@ import os
 import tempfile
 from Server_PD import get_minio_client
 from Server_PD import upload_dataframe_minio
-
+#   bucket = "pd1"
+#   prefix = "grupo1/"
+#   with open("Private/claves.json", "r", encoding="utf-8") as archivo:
+#   claves = json.load(archivo)
 def unir_parquets_minio(bucket: str, prefix: str, claves: dict) -> pd.DataFrame:
 
-    client = get_minio_client(claves)
+    client = get_minio_client(claves) #Iniciamos el server
 
-    objects = client.list_objects(
+    objects = client.list_objects( #Obtenemos todos los objetos
         bucket_name=bucket,
         prefix=prefix,
         recursive=True
     )
 
-    dfs = []
+    dfs = [] #Creamos la lista de datasets
 
     for obj in objects:
         if obj.object_name.endswith(".parquet") and "union_dfs" not in obj.object_name:
@@ -24,26 +27,26 @@ def unir_parquets_minio(bucket: str, prefix: str, claves: dict) -> pd.DataFrame:
             with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
                 temp_path = tmp.name
 
-            client.fget_object(
+            client.fget_object( #Accedemos al objeto
                 bucket_name=bucket,
                 object_name=obj.object_name,
                 file_path=temp_path
             )
 
             df = pd.read_parquet(temp_path)
-            dfs.append(df)
+            dfs.append(df) #Unimos el df a la lista de df
 
             os.remove(temp_path)
 
-    if not dfs:
+    if not dfs: #Si no hay archivos parquet lanzamos error
         raise ValueError("No se encontraron archivos parquet.")
 
-    df_final = pd.concat(dfs, ignore_index=True)
+    df_final = pd.concat(dfs, ignore_index=True) #Unimos los dfs en uno final
 
     print("Columnas encontradas:")
     print(df_final.columns)
 
-    return df_final
+    return df_final #Devolvemos la unión
 
 def limpiar_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
@@ -146,7 +149,7 @@ if __name__ == "__main__":
 #Para unir los dfs y subirlo al minio
 if __name__ == "__main__":
 
-    with open("Private/claves.json", "r", encoding="utf-8") as archivo:
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
 
     bucket = "pd1"
