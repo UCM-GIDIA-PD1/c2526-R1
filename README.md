@@ -90,7 +90,11 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
 
     Esto asegura que el script se ejecuta con al versión correcta de python y las dependencias necesarias sin necesidad de activar nada manualmente.
 
-### **4. Descarga de la base de datos**
+### **4. Descarga de datos**
+Para descargar nuevos videos de YouTube y YouTube Kids para la base de datos, se debe ejecutar el archivo parametrizacion.py, llamándolo como uv run python src/parametrizacion.py.
+Por defecto, al ejecutar el código de este archivo se guardarán 500 videos nuevos, de los cuales aproximadamente 80% están destinados a adultos y 20% a niños.
+Se pueden proporcionar parámetros para el número de videos a guardar, la fecha a partir de la cuál se van a guardar los videos y la proporción de videos para adultos.
+Por ejemplo: uv run python src/parametrizacion.py -n 1000 -p 0.5.   
 
 ### **5. Equipo de desarrollo**
 - Alejo Muñoz Pinilla
