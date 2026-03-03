@@ -152,8 +152,8 @@ def graficar_histograma_duracion(df, titulo, ax_obj, color):
 
 def graficar_top_generos(df, titulo_grafica, ax_obj, paleta):
     #  Limpiamos los datos
-    generos = df['Generos'].astype(str).str.split(', ').explode()
-    generos = generos[generos != 'nan']
+    generos = df['Subgeneros'].astype(str).str.split(', ').explode()
+    generos = generos[generos != 'None']
     
     # top 10
     top_generos = generos.value_counts().head(10)
@@ -170,19 +170,19 @@ def graficar_top_generos(df, titulo_grafica, ax_obj, paleta):
 
 def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj):
     # Lista de generos (Adultos)
-    gen_adult = df_adult['Generos'].astype(str).str.split(', ').explode()
-    gen_adult = set(gen_adult[gen_adult != 'nan'].unique())
+    gen_adult = df_adult['Subgeneros'].astype(str).str.split(', ').explode()
+    gen_adult = set(gen_adult[gen_adult != 'None'].unique())
     
     # Lista de generos (Kids) 
-    gen_kids = df_Kids['Generos'].astype(str).str.split(', ').explode()
-    gen_kids = set(gen_kids[gen_kids != 'nan'].unique())
+    gen_kids = df_Kids['Subgeneros'].astype(str).str.split(', ').explode()
+    gen_kids = set(gen_kids[gen_kids != 'None'].unique())
     
     # Géneros que están en Adultos pero no en Kids
     ausentes = list(gen_adult - gen_kids)
     
     # Gráfica
     if ausentes:
-        conteo_adult = df_adult['Generos'].astype(str).str.split(', ').explode()
+        conteo_adult = df_adult['Subgeneros'].astype(str).str.split(', ').explode()
         datos_grafica = conteo_adult[conteo_adult.isin(ausentes)].value_counts()
         
         sns.barplot(x=datos_grafica.values, y=datos_grafica.index, palette='rocket', ax=ax_obj)
