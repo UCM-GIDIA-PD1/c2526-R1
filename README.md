@@ -35,6 +35,7 @@ Al mismo tiempo, este sistema será capaz de asignar una categoría principal y 
 - Carpeta `src`: contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
 
     - Extracción y transformación:
+        - `parametrizacion.py`: archivo que se puede llamar desde la consola para iniciar la extracción de datos
 
         - `collect_all_data.py`: archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
 
@@ -90,9 +91,22 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
 
     Esto asegura que el script se ejecuta con al versión correcta de python y las dependencias necesarias sin necesidad de activar nada manualmente.
 
-### **4. Descarga de la base de datos**
+### **4. Descarga de datos**
+Para descargar nuevos videos de YouTube y YouTube Kids para la base de datos, se debe ejecutar el archivo parametrizacion.py, llamándolo como 
+````
+uv run python src/parametrizacion.py.
+````
+Por defecto, al ejecutar el código de este archivo se guardarán 500 videos nuevos, de los cuales aproximadamente 80% están destinados a adultos y 20% a niños.
+Se pueden proporcionar parámetros para el número de videos a guardar, la fecha a partir de la cuál se van a guardar los videos y la proporción de videos para adultos.
+Por ejemplo: 
+````
+uv run python src/parametrizacion.py -n 1000 -p 0.5.   
+````
 
-### **5. Equipo de desarrollo**
+### **5. Análisis de datos**
+Para el análisis de datos se pueden ejecutar los notebooks analisis_kids.ipynb y analisis_subgeneros.ipynb.  
+
+### **6. Equipo de desarrollo**
 - Alejo Muñoz Pinilla
 
 - Andrea Yu García Gómez
