@@ -188,7 +188,7 @@ def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj, columna):
         datos_grafica = conteo_adult[conteo_adult.isin(ausentes)].value_counts()
         
         sns.barplot(x=datos_grafica.values, y=datos_grafica.index, palette='rocket', ax=ax_obj)
-        ax_obj.set_title(columna + 'Exclusivos de Adultos')
+        ax_obj.set_title(columna + ' Exclusivos de Adultos')
         ax_obj.set_xlabel('Frecuencia en Dataset Adulto')
         ax_obj.set_ylabel(columna)
     else:
