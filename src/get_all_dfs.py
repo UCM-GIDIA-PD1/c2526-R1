@@ -153,7 +153,7 @@ if __name__ == "__main__":
         claves = json.load(archivo)
 
     bucket = "pd1"
-    prefix = "grupo1/"
+    prefix = "grupo1/raw/"
 
     df_final = unir_parquets_minio(bucket, prefix, claves)
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     df_limpio = limpiar_dataframe(df_final)
 
     print("\nFilas eliminadas en limpieza:", total_filas - len(df_limpio))
-
+    prefix = "grupo1/clean/"
     subir_union(df_limpio, bucket, prefix, claves)
 
     print("Proceso finalizado correctamente")

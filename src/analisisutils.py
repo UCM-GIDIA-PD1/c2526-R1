@@ -149,10 +149,11 @@ def graficar_histograma_duracion(df, titulo, ax_obj, color):
 
 
 #Géneros
-
-def graficar_top_generos(df, titulo_grafica, ax_obj, paleta):
+#Ahora funciona con una columna seleccionable
+#Entre Generos y Subgeneros
+def graficar_top_generos(df, titulo_grafica, ax_obj, paleta, columna):
     #  Limpiamos los datos
-    generos = df['Subgeneros'].astype(str).str.split(', ').explode()
+    generos = df[columna].astype(str).str.split(', ').explode()
     generos = generos[generos != 'None']
     
     # top 10
@@ -163,18 +164,19 @@ def graficar_top_generos(df, titulo_grafica, ax_obj, paleta):
         sns.barplot(x=top_generos.values, y=top_generos.index, palette=paleta, ax=ax_obj)
         ax_obj.set_title(titulo_grafica)
         ax_obj.set_xlabel('Frecuencia')
-        ax_obj.set_ylabel('Género')
+        ax_obj.set_ylabel(columna)
     else:
         ax_obj.set_title(f"{titulo_grafica} (Sin Datos)")
 
-
-def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj):
+#Ahora funciona con una columna seleccionable
+#Entre Generos y Subgeneros
+def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj, columna):
     # Lista de generos (Adultos)
-    gen_adult = df_adult['Subgeneros'].astype(str).str.split(', ').explode()
+    gen_adult = df_adult[columna].astype(str).str.split(', ').explode()
     gen_adult = set(gen_adult[gen_adult != 'None'].unique())
     
     # Lista de generos (Kids) 
-    gen_kids = df_Kids['Subgeneros'].astype(str).str.split(', ').explode()
+    gen_kids = df_Kids[columna].astype(str).str.split(', ').explode()
     gen_kids = set(gen_kids[gen_kids != 'None'].unique())
     
     # Géneros que están en Adultos pero no en Kids
@@ -182,12 +184,12 @@ def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj):
     
     # Gráfica
     if ausentes:
-        conteo_adult = df_adult['Subgeneros'].astype(str).str.split(', ').explode()
+        conteo_adult = df_adult[columna].astype(str).str.split(', ').explode()
         datos_grafica = conteo_adult[conteo_adult.isin(ausentes)].value_counts()
         
         sns.barplot(x=datos_grafica.values, y=datos_grafica.index, palette='rocket', ax=ax_obj)
-        ax_obj.set_title('Géneros Exclusivos de Adultos')
+        ax_obj.set_title(columna + 'Exclusivos de Adultos')
         ax_obj.set_xlabel('Frecuencia en Dataset Adulto')
-        ax_obj.set_ylabel('Género')
+        ax_obj.set_ylabel(columna)
     else:
         ax_obj.set_title("No hay géneros con presencia cero en Kids")
