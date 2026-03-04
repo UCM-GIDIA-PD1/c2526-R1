@@ -75,36 +75,34 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
 
         #Skip del tutorial
         WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.ID, "skip-button")))
-
         botones = driver.find_elements(By.ID, "skip-button")
         boton_visible = [b for b in botones if b.is_displayed()][0]
         boton_visible.click()
 
         #Next para pasar a la pantalla de selección ddel rango de edad
         WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "next-button")))
-
         botones = driver.find_elements(By.ID, "next-button")
         boton_visible = [b for b in botones if b.is_displayed()][0]
         boton_visible.click()
 
         # En esta parte hay 3 card container que es para seleccionar entre 3 rangos de edades diferentes
         # el primero es para niños menores de 5 años, el segundo para niños entre 6 y 8 años y el tercero para niños entre 9 y 12 años. Para este caso se selecciona el segundo rango de edad.
-        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "card-container")))
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "card-container")))        
         buttons = driver.find_elements(By.ID, "card-container")
         buttons[rangos[rango]].click()
 
         #Aceptar el rango de edad seleccionado
-        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "select-link")))
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "select-link")))        
         button = driver.find_element(By.ID, "select-link")
         button.click()
 
         #Permitir la búsqueda de videos
-        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "search-on-button")))
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "search-on-button")))      
         button = driver.find_element(By.ID, "search-on-button")
         button.click()
 
         #Finalizar la configuración
-        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "done-button")))
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "done-button")))        
         button = driver.find_element(By.ID, "done-button")
         button.click()
 
@@ -121,7 +119,7 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
                     input_element.clear()
                     palabra = word.word()
                     input_element.send_keys(palabra + Keys.ENTER)
-                    driver.refresh()
+                    #driver.refresh()
                     time.sleep(2.5)
                     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
@@ -169,4 +167,5 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
         time.sleep(1)
         driver.quit()
 
-    #print(get_vkids_ids(num_random_ids=20))
+
+print(get_vkids_ids(num_random_ids=20))

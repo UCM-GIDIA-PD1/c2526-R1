@@ -20,7 +20,7 @@ def main():
     parser.add_argument(
         "-n", "--num_videos", 
         type=int, 
-        default= 20, 
+        default= 500, 
         help="Número de videos a extraer"
     
     )
