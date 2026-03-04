@@ -168,4 +168,4 @@ def get_vkids_ids(query=None, rango="0-4",num_random_ids=None):
         driver.quit()
 
 
-print(get_vkids_ids(num_random_ids=20))
+#print(get_vkids_ids(num_random_ids=20))
