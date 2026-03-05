@@ -152,7 +152,29 @@ def graficar_histograma_duracion(df, titulo, ax_obj, color):
 #Géneros
 #Ahora funciona con una columna seleccionable
 #Entre Generos y Subgeneros
-def graficar_top_generos(df, titulo_grafica, ax_obj, paleta, columna):
+def graficar_top_10(df, titulo_grafica, ax_obj, paleta, columna):
+    """
+    Selecciona los top 10 valores de una columna de un df
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame que contiene la columna
+
+    título_gráfica : string
+        El título que aparecerá en la gráfica
+
+    ax : matplotlib.axes.Axes
+        Eje donde se representará el resultado.
+    
+    columna: string
+        Columnas por la cual se va a hacer el top
+
+    Returns
+    -------
+    None
+        La función no retorna ningún valor.
+    """
     #  Limpiamos los datos
     generos = df[columna].astype(str).str.split(', ').explode()
     generos = generos[generos != 'None']
@@ -171,21 +193,44 @@ def graficar_top_generos(df, titulo_grafica, ax_obj, paleta, columna):
 
 #Ahora funciona con una columna seleccionable
 #Entre Generos y Subgeneros
-def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj, columna):
-    # Lista de generos (Adultos)
-    gen_adult = df_adult[columna].astype(str).str.split(', ').explode()
+def graficar_generos_ausentes(df_1, df_2, ax_obj, columna):
+    """
+    Localiza qué valores de las columnas **género** y **subgéneros**
+    aparecen en `df_1` pero no en `df_2`.
+
+    Parameters
+    ----------
+    df_1 : pandas.DataFrame
+        DataFrame que contiene los valores de referencia.
+
+    df_2 : pandas.DataFrame
+        DataFrame contra el cual se comparan los valores.
+
+    ax : matplotlib.axes.Axes
+        Eje donde se representará el resultado.
+    
+    columna: string
+        Columnas por la cual se va a hacer la comparación
+
+    Returns
+    -------
+    None
+        La función no retorna ningún valor.
+    """
+    # Lista de df1
+    gen_adult = df_1[columna].astype(str).str.split(', ').explode()
     gen_adult = set(gen_adult[gen_adult != 'None'].unique())
     
-    # Lista de generos (Kids) 
-    gen_kids = df_Kids[columna].astype(str).str.split(', ').explode()
+    # Lista de df2
+    gen_kids = df_2[columna].astype(str).str.split(', ').explode()
     gen_kids = set(gen_kids[gen_kids != 'None'].unique())
     
-    # Géneros que están en Adultos pero no en Kids
+    # Géneros que están en df1 pero no en df2
     ausentes = list(gen_adult - gen_kids)
     
     # Gráfica
     if ausentes:
-        conteo_adult = df_adult[columna].astype(str).str.split(', ').explode()
+        conteo_adult = df_1[columna].astype(str).str.split(', ').explode()
         datos_grafica = conteo_adult[conteo_adult.isin(ausentes)].value_counts()
         
         sns.barplot(x=datos_grafica.values, y=datos_grafica.index, palette='rocket', ax=ax_obj)
@@ -204,8 +249,10 @@ def analizar_descripciones_bertopic(df, columna="descripcion", idioma="english")
     topic_model : modelo BERTopic entrenado
     df_resultado : DataFrame con el tema asignado a cada fila
     Topic: Temática asignada al texto ---> -1 implica outliers
+    Información extra --->
     Probabilidad: Como de seguro está con la asignación de topicos 
     temas_info : información resumida de los temas
+    -------
     """
 
     # eliminar nulos
