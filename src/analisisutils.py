@@ -3,7 +3,8 @@ import pandas as pd
 import json
 import numpy as np
 from Server_PD import download_dataframe_minio
-
+from bertopic import BERTopic 
+from sentence_transformers import SentenceTransformer
 from collections import Counter
 import re
 
@@ -193,3 +194,40 @@ def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj, columna):
         ax_obj.set_ylabel(columna)
     else:
         ax_obj.set_title("No hay géneros con presencia cero en Kids")
+
+def analizar_descripciones_bertopic(df, columna="descripcion", idioma="english"):
+    """
+    Analiza textos de un DataFrame usando BERTopic.
+
+    Retorna
+    -------
+    topic_model : modelo BERTopic entrenado
+    df_resultado : DataFrame con el tema asignado a cada fila
+    Topic: Temática asignada al texto ---> -1 implica outliers
+    Probabilidad: Como de seguro está con la asignación de topicos 
+    temas_info : información resumida de los temas
+    """
+
+    # eliminar nulos
+    textos = df[columna].dropna().astype(str).tolist()
+
+    # crear modelo
+    embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+
+    topic_model = BERTopic(
+    embedding_model=embedding_model,
+    language=idioma
+    )
+
+    # entrenar modelo
+    topics, probs = topic_model.fit_transform(textos)
+
+    # dataframe con resultados
+    df_resultado = df.loc[df[columna].notna()].copy()
+    df_resultado["topic"] = topics
+    df_resultado["probabilidad"] = probs
+
+    # resumen de temas
+    temas_info = topic_model.get_topic_info()
+
+    return topic_model, df_resultado, temas_info
