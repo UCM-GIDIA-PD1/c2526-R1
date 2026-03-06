@@ -5,6 +5,8 @@ import numpy as np
 from Server_PD import download_dataframe_minio
 from bertopic import BERTopic 
 from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from collections import Counter
 import re
 
@@ -271,10 +273,125 @@ def analizar_descripciones_bertopic(df, columna="descripcion", idioma="english")
 
     # dataframe con resultados
     df_resultado = df.loc[df[columna].notna()].copy()
-    df_resultado["topic"] = topics
-    df_resultado["probabilidad"] = probs
+    df_resultado["Topic"] = topics
+    df_resultado["Probabilidad"] = probs
 
     # resumen de temas
     temas_info = topic_model.get_topic_info()
 
     return topic_model, df_resultado, temas_info
+
+def frecuencia_tags(df, columna="Tags"):
+    """
+    Obten los tags más frecuentes de un dataframe
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con el que vamos a trabajar.
+    
+    columna: string
+        Columnas por la cual se va a trabajar
+
+    Returns
+    -------
+    freq_df: pandas.Dataframe
+        Retorno un dataframe con columnas: Tags, Frecuencia.
+    """
+    # separar tags
+    tags = (
+        df[columna]
+        .dropna()
+        .str.split(",")
+        .explode()
+        .str.strip()
+    )
+
+    # contar frecuencia
+    freq = Counter(tags)
+
+    # convertir a dataframe
+    freq_df = pd.DataFrame(freq.items(), columns=["Tag", "Frecuencia"])
+    freq_df = freq_df.sort_values("Frecuencia", ascending=False)
+
+    return freq_df
+
+def tfidf_tags(df, columna="Tags"):
+    """
+    Obten los tags más importantes de un dataframe
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con el que vamos a trabajar.
+    
+    columna: string
+        Columnas por la cual se va a trabajar
+
+    Returns
+    -------
+    tfidf_df: pandas.Dataframe
+        Retorno un dataframe con columnas: Tags, Importancia.
+    """
+    # reemplazar comas por espacios
+    tags = (
+        df[columna]
+        .dropna()
+        .str.split(",")
+        .explode()
+        .str.strip()
+        .str.lower()
+    )
+
+    # cada tag será un "documento"
+    vectorizer = TfidfVectorizer(
+        stop_words="english",
+        token_pattern=r"(?u)\b\w+\b"
+    )
+
+    X = vectorizer.fit_transform(tags)
+
+    palabras = vectorizer.get_feature_names_out()
+    scores = X.sum(axis=0).A1
+
+    tfidf_df = pd.DataFrame({
+        "Tag": palabras,
+        "Score": scores
+    }).sort_values("Score", ascending=False)
+
+    return tfidf_df
+
+def ngramas_tags(df, columna="Tags", n=2):
+    """
+    Obten los tags más importantes de un dataframe
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con el que vamos a trabajar.
+    
+    columna: string
+        Columnas por la cual se va a trabajar
+    
+    n: int
+        Número de combinaciones de tags más frecuentes
+
+    Returns
+    -------
+    ngram_df: pandas.Dataframe
+        Retorno un dataframe con columnas: Tags, Frecuencias.
+    """
+    textos = df[columna].fillna("").str.replace(",", " ")
+
+    vectorizer = CountVectorizer(ngram_range=(n, n))
+    X = vectorizer.fit_transform(textos)
+
+    ngrams = vectorizer.get_feature_names_out()
+    counts = X.sum(axis=0).A1
+
+    ngram_df = pd.DataFrame({
+        "Ngram": ngrams,
+        "Frecuencia": counts
+    }).sort_values("Frecuencia", ascending=False)
+
+    return ngram_df
