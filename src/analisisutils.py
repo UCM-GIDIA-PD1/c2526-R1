@@ -281,7 +281,7 @@ def analizar_descripciones_bertopic(df, columna="descripcion", idioma="english")
 
     return topic_model, df_resultado, temas_info
 
-def frecuencia_tags(df, columna="Tags"):
+def frecuencia_tags(df, columna="Tags"): #Bastante util
     """
     Obten los tags más frecuentes de un dataframe
 
@@ -316,7 +316,7 @@ def frecuencia_tags(df, columna="Tags"):
 
     return freq_df
 
-def tfidf_tags(df, columna="Tags"):
+def tfidf_tags(df, columna="Tags"): #Bastante util
     """
     Obten los tags más importantes de un dataframe
 
@@ -361,7 +361,7 @@ def tfidf_tags(df, columna="Tags"):
 
     return tfidf_df
 
-def ngramas_tags(df, columna="Tags", n=2):
+def ngramas_tags(df, columna="Tags", n=2): #No muy util
     """
     Obten los tags más importantes de un dataframe
 
