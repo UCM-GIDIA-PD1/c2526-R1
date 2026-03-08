@@ -7,6 +7,7 @@ from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.cluster import KMeans
 from collections import Counter
 import re
 
@@ -33,7 +34,9 @@ def iso_a_minutos(iso_duration):
 
 
 def limpieza_final(dato):
-    
+    """"
+    Funcion que limpia texto, encorchetado y en comillado
+    """
     limpio = str(dato).replace('[', '').replace(']', '').replace("'", "").replace('"', '')
     
     partes = limpio.split(',')
@@ -46,50 +49,7 @@ def limpieza_final(dato):
             
     return list(set(resultado)) 
 
-
-#keywords
-
-# Lista extendida de stopwords en inglés
-stopwords_en = {
-    # Tus originales
-    'the', 'and', 'a', 'to', 'of', 'in', 'is', 'it', 'you', 'that', 'he', 'was', 'for', 'on', 'are', 
-    'with', 'as', 'i', 'his', 'they', 'be', 'at', 'one', 'have', 'this', 'from', 'or', 'had', 'by', 
-    'hot', 'word', 'but', 'what', 'some', 'we', 'can', 'out', 'other', 'were', 'all', 'there', 
-    'when', 'up', 'use', 'your', 'how', 'said', 'an', 'each', 'she', 'which', 'do', 'their', 
-    'if', 'will', 'about', 'many', 'then', 'them', 'these', 'so', 'her', 'would', 'make', 
-    'like', 'him', 'into', 'time', 'has', 'look', 'two', 'more', 'write', 'go', 'see', 
-    'number', 'no', 'way', 'could', 'people', 'my', 'than', 'first', 'water', 'been', 
-    'called', 'who', 'am', 'its', 'now', 'find', 'get', 'none', 'full', 'nbsp',
-    'because', 'because', 'so', 'yet', 'unless', 'while', 'although', 'since', 'also',
-    'just', 'very', 'really', 'even', 'still', 'maybe', 'actually', 'well', 'too', 'only',
-    'never', 'always', 'sometimes', 'ever', 'again', 'back', 'here', 'there', 'where',
-    'know', 'think', 'want', 'take', 'tell', 'come', 'give', 'mean', 'need', 'should',
-    'right', 'let', 'may', 'must', 'keep', 'put', 'seem', 'look', 'much', 'many',
-    'me', 'us', 'our', 'mine', 'ours', 'yourself', 'something', 'anything', 'everything',
-    'another', 'every', 'own', 'same', 'such', 'very', 'next', 'right', 'okay', 'why', 'here'
-    'not', 'yeah', 'kind', 'going', 'today', 'those', 'good', 'thank'
-}
-
-
-def obtener_keywords_en(columna, top_n=20):
-    """"
-    Funcion que devuelve el top n de palabras más comunes de un columna (título o subtitulos)
-    """
-    todas_las_palabras = []
-    
-    for texto in columna:
-        texto_limpio = str(texto).lower()
-        # Solo extraemos letras
-        palabras = re.findall(r'[a-z]+', texto_limpio)
-        
-        # Filtrar por longitud y stopwords
-        palabras_filtradas = [p for p in palabras if p not in stopwords_en and len(p) > 3]
-        todas_las_palabras.extend(palabras_filtradas)
-    
-    return Counter(todas_las_palabras).most_common(top_n)
-
-
-
+#Desfasada --> Eliminable 
 def graficar_palabras_comunes(df, columna, titulo_grafica, ax_obj, color):
     
     """"
@@ -154,29 +114,7 @@ def graficar_histograma_duracion(df, titulo, ax_obj, color):
 #Géneros
 #Ahora funciona con una columna seleccionable
 #Entre Generos y Subgeneros
-def graficar_top_10(df, titulo_grafica, ax_obj, paleta, columna):
-    """
-    Selecciona los top 10 valores de una columna de un df
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        DataFrame que contiene la columna
-
-    título_gráfica : string
-        El título que aparecerá en la gráfica
-
-    ax : matplotlib.axes.Axes
-        Eje donde se representará el resultado.
-    
-    columna: string
-        Columnas por la cual se va a hacer el top
-
-    Returns
-    -------
-    None
-        La función no retorna ningún valor.
-    """
+def graficar_top_generos(df, titulo_grafica, ax_obj, paleta, columna):
     #  Limpiamos los datos
     generos = df[columna].astype(str).str.split(', ').explode()
     generos = generos[generos != 'None']
@@ -195,44 +133,21 @@ def graficar_top_10(df, titulo_grafica, ax_obj, paleta, columna):
 
 #Ahora funciona con una columna seleccionable
 #Entre Generos y Subgeneros
-def graficar_generos_ausentes(df_1, df_2, ax_obj, columna):
-    """
-    Localiza qué valores de las columnas **género** y **subgéneros**
-    aparecen en `df_1` pero no en `df_2`.
-
-    Parameters
-    ----------
-    df_1 : pandas.DataFrame
-        DataFrame que contiene los valores de referencia.
-
-    df_2 : pandas.DataFrame
-        DataFrame contra el cual se comparan los valores.
-
-    ax : matplotlib.axes.Axes
-        Eje donde se representará el resultado.
-    
-    columna: string
-        Columnas por la cual se va a hacer la comparación
-
-    Returns
-    -------
-    None
-        La función no retorna ningún valor.
-    """
-    # Lista de df1
-    gen_adult = df_1[columna].astype(str).str.split(', ').explode()
+def graficar_generos_ausentes_kids(df_adult, df_Kids, ax_obj, columna):
+    # Lista de generos (Adultos)
+    gen_adult = df_adult[columna].astype(str).str.split(', ').explode()
     gen_adult = set(gen_adult[gen_adult != 'None'].unique())
     
-    # Lista de df2
-    gen_kids = df_2[columna].astype(str).str.split(', ').explode()
+    # Lista de generos (Kids) 
+    gen_kids = df_Kids[columna].astype(str).str.split(', ').explode()
     gen_kids = set(gen_kids[gen_kids != 'None'].unique())
     
-    # Géneros que están en df1 pero no en df2
+    # Géneros que están en Adultos pero no en Kids
     ausentes = list(gen_adult - gen_kids)
     
     # Gráfica
     if ausentes:
-        conteo_adult = df_1[columna].astype(str).str.split(', ').explode()
+        conteo_adult = df_adult[columna].astype(str).str.split(', ').explode()
         datos_grafica = conteo_adult[conteo_adult.isin(ausentes)].value_counts()
         
         sns.barplot(x=datos_grafica.values, y=datos_grafica.index, palette='rocket', ax=ax_obj)
@@ -242,7 +157,7 @@ def graficar_generos_ausentes(df_1, df_2, ax_obj, columna):
     else:
         ax_obj.set_title("No hay géneros con presencia cero en Kids")
 
-def analizar_descripciones_bertopic(df, columna="descripcion", idioma="english"):
+def analizar_bertopic(df, columna="descripcion", idioma="english"): #Funciona con todo tipo de textos
     """
     Analiza textos de un DataFrame usando BERTopic.
 
@@ -273,30 +188,21 @@ def analizar_descripciones_bertopic(df, columna="descripcion", idioma="english")
 
     # dataframe con resultados
     df_resultado = df.loc[df[columna].notna()].copy()
-    df_resultado["Topic"] = topics
-    df_resultado["Probabilidad"] = probs
+    df_resultado["topic"] = topics
+    df_resultado["probabilidad"] = probs
 
     # resumen de temas
     temas_info = topic_model.get_topic_info()
 
     return topic_model, df_resultado, temas_info
 
-def frecuencia_tags(df, columna="Tags"): #Bastante util
+def frecuencia_tags(df, columna="Tags"):
     """
-    Obten los tags más frecuentes de un dataframe
+    Localiza las frecuencias de los tags.
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Dataframe con el que vamos a trabajar.
-    
-    columna: string
-        Columnas por la cual se va a trabajar
-
-    Returns
+    Retorna
     -------
-    freq_df: pandas.Dataframe
-        Retorno un dataframe con columnas: Tags, Frecuencia.
+    
     """
     # separar tags
     tags = (
@@ -305,14 +211,16 @@ def frecuencia_tags(df, columna="Tags"): #Bastante util
         .str.split(",")
         .explode()
         .str.strip()
+        .str.lower()
+
     )
 
     # contar frecuencia
     freq = Counter(tags)
 
     # convertir a dataframe
-    freq_df = pd.DataFrame(freq.items(), columns=["Tag", "Frecuencia"])
-    freq_df = freq_df.sort_values("Frecuencia", ascending=False)
+    freq_df = pd.DataFrame(freq.items(), columns=["tag", "frecuencia"])
+    freq_df = freq_df.sort_values("frecuencia", ascending=False)
 
     return freq_df
 
@@ -395,3 +303,111 @@ def ngramas_tags(df, columna="Tags", n=2): #No muy util
     }).sort_values("Frecuencia", ascending=False)
 
     return ngram_df
+
+def frecuencia_titulos(df, columna="Titulo"):
+    """
+    Calcula la frecuencia de palabras en los títulos.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con los datos.
+    
+    columna : str
+        Columna que contiene los títulos.
+
+    Returns
+    -------
+    freq_df : pandas.DataFrame
+        Dataframe con columnas: Palabra, Frecuencia.
+    """
+
+    # separar palabras
+    palabras = (
+        df[columna]
+        .dropna()
+        .str.lower()
+        .str.split()
+        .explode()
+        .str.strip()
+    )
+
+    # contar frecuencia
+    freq = Counter(palabras)
+
+    # convertir a dataframe
+    freq_df = pd.DataFrame(freq.items(), columns=["Palabra", "Frecuencia"])
+    freq_df = freq_df.sort_values("Frecuencia", ascending=False)
+
+    return freq_df
+
+def tfidf_ngrams_titles(df, columna="Titulo", ngram_range=(1,3), min_df=2):
+    """
+    Obten los títulso más importantes de un dataframe, en pares y tríos
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con el que vamos a trabajar.
+    
+    columna: string
+        Columnas por la cual se va a trabajar
+    
+    n: int
+        Número de combinaciones de tags más frecuentes
+
+    Returns
+    -------
+    ngram_df: pandas.Dataframe
+        Retorno un dataframe con columnas: Tags, Frecuencias.
+    """
+    textos = df[columna].fillna("").str.lower()
+
+    vectorizer = TfidfVectorizer(
+        stop_words="english",
+        ngram_range=ngram_range,
+        min_df=min_df
+    )
+
+    X = vectorizer.fit_transform(textos)
+
+    terms = vectorizer.get_feature_names_out()
+    scores = X.sum(axis=0).A1
+
+    tfidf_df = pd.DataFrame({
+        "Titulo": terms,
+        "Score": scores
+    }).sort_values("Score", ascending=False)
+
+    return tfidf_df
+
+def channel_embeddings_clustering(df, columna="Titulo_canal", n_clusters=5): #Embedding + Clustering
+
+    # limpiar datos
+    textos = df[columna].dropna().tolist()
+
+    # modelo de embeddings
+    model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+
+    # generar embeddings
+    embeddings = model.encode(textos, show_progress_bar=True)
+
+    # clustering
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    clusters = kmeans.fit_predict(embeddings)
+
+    # dataframe resultado
+    result_df = pd.DataFrame({
+        "ChannelTitle": textos,
+        "Cluster": clusters
+    })
+
+    return result_df, kmeans
+
+def show_clusters(result_df): 
+
+    clusters = result_df["Cluster"].unique()
+
+    for c in clusters:
+        print(f"\nCluster {c}")
+        print(result_df[result_df["Cluster"] == c]["ChannelTitle"].head(10))
