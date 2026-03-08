@@ -49,28 +49,6 @@ def limpieza_final(dato):
             
     return list(set(resultado)) 
 
-#Desfasada --> Eliminable 
-def graficar_palabras_comunes(df, columna, titulo_grafica, ax_obj, color):
-    
-    """"
-    Funcion que genera un barplot de las top 10 palabras más comunes del título por cada grupo. 
-    """
-
-    keywords = obtener_keywords_en(df[columna], top_n=10)
-    
-    if not keywords:
-        ax_obj.set_title(f"{titulo_grafica} (Sin datos)")
-        return 
-
-    # Desempaquetamos los resultados
-    palabras_lista, conteos = zip(*keywords)
-    
-    # Dibujar grafica
-    sns.barplot(x=list(conteos), y=list(palabras_lista), ax=ax_obj, color=color)
-    ax_obj.set_title(titulo_grafica)
-    ax_obj.set_xlabel('Frecuencia')
-    ax_obj.set_ylabel('Palabra')
-
 
 #Densidad de habla
 def calcular_wpm(row):
@@ -94,19 +72,16 @@ def graficar_histograma_duracion(df, titulo, ax_obj, color):
     """"
     Funcion que genera un histograma comparativo de la duración de los vídeos
     """
-    limite_sugerido = df['Duracion'].quantile(0.98)
-    limite_final = int(np.ceil(limite_sugerido / 5) * 5)
-    limite_final = max(min(limite_final, 90), 15)
 
-    sns.histplot(df['Duracion'], bins=limite_final, kde=True, color=color, ax=ax_obj, edgecolor='white', alpha=0.7)
+    sns.histplot(df['Duracion'], bins=np.arange(0,105,5), kde=True, color=color, ax=ax_obj, edgecolor='white', alpha=0.7)
     
     ax_obj.set_title(titulo)
     ax_obj.set_xlabel('Minutos')
     ax_obj.set_ylabel('Cantidad de Vídeos')
     
-    ax_obj.set_xlim(0, limite_final)
+    ax_obj.set_xlim(0, 100)
 
-    ticks = np.arange(0, limite_final + 1, 5)
+    ticks = np.arange(0, 100, 5)
     ax_obj.set_xticks(ticks)
     ax_obj.set_xticklabels([f"{int(t)}" for t in ticks])
 
@@ -188,8 +163,8 @@ def analizar_bertopic(df, columna="descripcion", idioma="english"): #Funciona co
 
     # dataframe con resultados
     df_resultado = df.loc[df[columna].notna()].copy()
-    df_resultado["topic"] = topics
-    df_resultado["probabilidad"] = probs
+    df_resultado["Topic"] = topics
+    df_resultado["Probabilidad"] = probs
 
     # resumen de temas
     temas_info = topic_model.get_topic_info()
@@ -219,8 +194,8 @@ def frecuencia_tags(df, columna="Tags"):
     freq = Counter(tags)
 
     # convertir a dataframe
-    freq_df = pd.DataFrame(freq.items(), columns=["tag", "frecuencia"])
-    freq_df = freq_df.sort_values("frecuencia", ascending=False)
+    freq_df = pd.DataFrame(freq.items(), columns=["Tag", "Frecuencia"])
+    freq_df = freq_df.sort_values("Frecuencia", ascending=False)
 
     return freq_df
 
@@ -271,7 +246,7 @@ def tfidf_tags(df, columna="Tags"): #Bastante util
 
 def ngramas_tags(df, columna="Tags", n=2): #No muy util
     """
-    Obten los tags más importantes de un dataframe
+    Obten los tags más importantes de un dataframe, en pares o tríos
 
     Parameters
     ----------
@@ -343,7 +318,7 @@ def frecuencia_titulos(df, columna="Titulo"):
 
 def tfidf_ngrams_titles(df, columna="Titulo", ngram_range=(1,3), min_df=2):
     """
-    Obten los títulso más importantes de un dataframe, en pares y tríos
+    Obten los títulos más importantes de un dataframe, en pares y tríos
 
     Parameters
     ----------
@@ -352,9 +327,12 @@ def tfidf_ngrams_titles(df, columna="Titulo", ngram_range=(1,3), min_df=2):
     
     columna: string
         Columnas por la cual se va a trabajar
+
+    ngram_range: vector
+        Rango de valores para combinaciones de palabras (desde 1 a 3 de base)
     
     n: int
-        Número de combinaciones de tags más frecuentes
+        Mínimo de frecuencia para ser considerado
 
     Returns
     -------
@@ -375,14 +353,34 @@ def tfidf_ngrams_titles(df, columna="Titulo", ngram_range=(1,3), min_df=2):
     scores = X.sum(axis=0).A1
 
     tfidf_df = pd.DataFrame({
-        "Titulo": terms,
+        columna: terms,
         "Score": scores
     }).sort_values("Score", ascending=False)
 
     return tfidf_df
 
 def channel_embeddings_clustering(df, columna="Titulo_canal", n_clusters=5): #Embedding + Clustering
+    """
+    Divide en clusters ("Categorías") los títulos
 
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con el que vamos a trabajar.
+    
+    columna: string
+        Columnas por la cual se va a trabajar
+
+    n_clusters: int
+        Numero de clusters con los que vamos a trabajar
+
+    Returns
+    -------
+    result_df: pandas.Dataframe
+        Retorno un dataframe con columnas: Texto, Cluster.
+    kmenas: Modelo
+        Retorna el modelo sin entrenar
+    """
     # limpiar datos
     textos = df[columna].dropna().tolist()
 
@@ -405,8 +403,11 @@ def channel_embeddings_clustering(df, columna="Titulo_canal", n_clusters=5): #Em
     return result_df, kmeans
 
 def show_clusters(result_df): 
-
+    """
+    Muestra todos los clusters generados
+    """
     clusters = result_df["Cluster"].unique()
+    
 
     for c in clusters:
         print(f"\nCluster {c}")
