@@ -32,6 +32,74 @@ def iso_a_minutos(iso_duration):
     except:
         return 0
 
+def division_edad(df): 
+    """
+    Divide un dataframe en un diccionario de dataframes,
+    uno por cada género de YouTube.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con una columna llamada 'generos'.
+
+    Returns
+    -------
+    dict_generos : dict
+        Diccionario donde:
+        - key: nombre del género
+        - value: dataframe con los vídeos de ese género
+    """
+    rangos_kids = ['0-4', '5-8', '9-12']
+    df_Kids = df[df["Rango_edad"].isin(rangos_kids)].copy()
+    df_Adult = df[df["Rango_edad"] == "Adult"].copy()
+
+    return df_Adult, df_Kids
+def division_generos(df): 
+    """"
+    Dado un dataframe te un diccionario de 32 dataframes, uno por cada genero
+    """
+    youtube_categories = {
+    "1": "Film & Animation",
+    "2": "Autos & Vehicles",
+    "10": "Music",
+    "15": "Pets & Animals",
+    "17": "Sports",
+    "18": "Short Movies",
+    "19": "Travel & Events",
+    "20": "Gaming",
+    "21": "Videoblogging",
+    "22": "People & Blogs",
+    "23": "Comedy",
+    "24": "Entertainment",
+    "25": "News & Politics",
+    "26": "Howto & Style",
+    "27": "Education",
+    "28": "Science & Technology",
+    "29": "Nonprofits & Activism",
+    "30": "Movies",
+    "31": "Anime/Animation",
+    "32": "Action/Adventure",
+    "33": "Classics",
+    "34": "Comedy",
+    "35": "Documentary",
+    "36": "Drama",
+    "37": "Family",
+    "38": "Foreign",
+    "39": "Horror",
+    "40": "Sci-Fi/Fantasy",
+    "41": "Thriller",
+    "42": "Shorts",
+    "43": "Shows",
+    "44": "Trailers"
+}
+    dict_generos = {}
+
+    for genero in youtube_categories.values():
+        df_genero = df[df["generos"] == genero].copy()
+        dict_generos[genero] = df_genero
+    
+    return dict_generos
+
 
 def limpieza_final(dato):
     """"
@@ -396,7 +464,7 @@ def channel_embeddings_clustering(df, columna="Titulo_canal", n_clusters=5): #Em
 
     # dataframe resultado
     result_df = pd.DataFrame({
-        "ChannelTitle": textos,
+        columna: textos,
         "Cluster": clusters
     })
 
