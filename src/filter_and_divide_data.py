@@ -37,17 +37,21 @@ def informacion_vacia(df):
         dicc[col] = conteo_null
     return dicc
 
-def filtrado(df): 
+def filtrado(df_original):
+    df = df_original.copy()
     numero_pre_filtrado = len(df)
     max = df["Duracion"].quantile(0.95)
     min = df["Duracion"].quantile(0.05)
     bool_duracion = df[(df["duracion"] < min) | (df["duracion"] > max)].index
     valores = ["Descripcion","Tags", "Subtitulos"]
-    for col in valores
-    bool = df[df["Descripcion"].str.lower().eq("none")]
-    bool
-    
+    bool_text = df[df["Titulo"] != ""] #Filtro completamente positivo
+    for col in valores:
+        bool1 = df[df[col].str.lower().eq("none")]
+        bool2 = df[df[col].str.lower().eq("")]
+        bool_text = bool_text or (bool1 and bool2)   
+    bool_final = bool_duracion and bool_text
+    df = df[bool_final]
     numero_pos_filtrado = len(df)
     diff = numero_pre_filtrado - numero_pos_filtrado
     print(f'Partiendo de {numero_pre_filtrado}, se han eliminado {diff}, resultando en: {numero_pos_filtrado} columnas')
-
+    return df
