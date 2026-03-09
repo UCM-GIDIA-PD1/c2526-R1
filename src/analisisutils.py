@@ -34,6 +34,29 @@ def iso_a_minutos(iso_duration):
 
 def division_edad(df): 
     """
+    Divide un dataframe en dos dataframes, uno de niños y otro de adultos
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe con una columna llamada "Rango_edad"
+
+    Returns
+    -------
+    df_Adult: Pandas.dataframe
+        Dataframe de niños
+    df_Kids: Pandas.dataframe
+        Dataframe de adultos
+
+    """
+    rangos_kids = ['0-4', '5-8', '9-12']
+    df_Kids = df[df["Rango_edad"].isin(rangos_kids)].copy()
+    df_Adult = df[df["Rango_edad"] == "Adult"].copy()
+
+    return df_Adult, df_Kids
+
+def division_generos(df): 
+    """
     Divide un dataframe en un diccionario de dataframes,
     uno por cada género de YouTube.
 
@@ -48,15 +71,6 @@ def division_edad(df):
         Diccionario donde:
         - key: nombre del género
         - value: dataframe con los vídeos de ese género
-    """
-    rangos_kids = ['0-4', '5-8', '9-12']
-    df_Kids = df[df["Rango_edad"].isin(rangos_kids)].copy()
-    df_Adult = df[df["Rango_edad"] == "Adult"].copy()
-
-    return df_Adult, df_Kids
-def division_generos(df): 
-    """"
-    Dado un dataframe te un diccionario de 32 dataframes, uno por cada genero
     """
     youtube_categories = {
     "1": "Film & Animation",
@@ -480,3 +494,60 @@ def show_clusters(result_df):
     for c in clusters:
         print(f"\nCluster {c}")
         print(result_df[result_df["Cluster"] == c]["ChannelTitle"].head(10))
+
+def common_terms (df_1, df_2, columna): 
+    """
+    Agrupa los terminos comunes de df1 y df2 y da una diferencia de score si la hay
+
+    Parameters
+    ----------
+    df_1 : pandas.DataFrame
+        Dataframe 1
+
+    df_2 : pandas.DataFrame
+        Dataframe 2
+    
+    columna: String
+        Nombre de la columna original 
+
+    Returns
+    -------
+    common_terms: pandas.Dataframe
+        Retorno un dataframe con columnas: columna, Score_kids, Score_adults, Diff
+    """ 
+
+    common_terms = (
+    df_1
+    .merge(df_2, on= columna, suffixes=("_kids", "_adults"))
+)
+    if "Score_kids" in common_terms: 
+        common_terms["Diff"] = common_terms["Score_kids"] - common_terms["Score_adults"]
+    
+    return common_terms
+
+def exclusive_terms (df_1, df_2, columna): 
+    """
+    Separa los terminos exclusivos de df1 y df2
+
+    Parameters
+    ----------
+    df_1 : pandas.DataFrame
+        Dataframe 1
+
+    df_2 : pandas.DataFrame
+        Dataframe 2
+    
+    columna: String
+        Nombre de la columna original 
+
+    Returns
+    -------
+    result_df_1: pandas.Dataframe
+        Retorno un dataframe con columnas: columna, Score
+    result_df_2: pandas.Dataframe
+        Retorno un dataframe con columnas: columna, Score
+    """ 
+    result_df_1 = df_1[~df_1[columna].isin(df_2[columna])]
+    result_df_2 = df_2[~df_2[columna].isin(df_1[columna])]
+
+    return result_df_1, result_df_2
