@@ -361,7 +361,7 @@ def ngramas_tags(df, columna="Tags", n=2): #No muy util
 
     return ngram_df
 
-def frecuencia_titulos(df, columna="Titulo"):
+def frecuencia_titulos(df, columna="Titulo"): #Caca
     """
     Calcula la frecuencia de palabras en los títulos.
 
