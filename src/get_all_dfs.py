@@ -55,6 +55,13 @@ def limpiar_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     print("\n--- VALORES NULOS POR COLUMNA ---")
     print(df.isnull().sum())
 
+    print("\n--- CONTEO DE 'None' o 'none' o (vacío) EN COLUMNAS STRING ---")
+    columnas_string = df.select_dtypes(include=["object", "string"]).columns
+
+    for col in columnas_string:
+        conteo_none = df[col].astype(str).str.lower().eq("none").sum() + df[col].astype(str).eq("").sum()
+        print(f"{col}: {conteo_none}")
+
     #Elimina filas completamente vacías
     df = df.dropna(how="all")
     print("Después de eliminar filas totalmente vacías:", len(df))
