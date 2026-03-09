@@ -109,7 +109,7 @@ def division_generos(df):
     dict_generos = {}
 
     for genero in youtube_categories.values():
-        df_genero = df[df["generos"] == genero].copy()
+        df_genero = df[df["Generos"] == genero].copy()
         dict_generos[genero] = df_genero
     
     return dict_generos
@@ -551,3 +551,44 @@ def exclusive_terms (df_1, df_2, columna):
     result_df_2 = df_2[~df_2[columna].isin(df_1[columna])]
 
     return result_df_1, result_df_2
+
+
+def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
+    # contar topics
+    top_1 = df_1[columna].value_counts()
+    top_2=  df_2[columna].value_counts()
+
+    # eliminar outliers
+    top_1 = top_1[top_1.index != -1]
+    top_2 = top_2[top_2.index != -1]
+
+    # convertir a dataframe
+    df_1 = top_1.reset_index()
+    df_1.columns = [columna, "Count"]
+    df_1["Grupo"] = nombre1
+
+    df_2 = top_2.reset_index()
+    df_2.columns = [columna, "Count"]
+    df_2["Grupo"] = nombre2
+
+    # unir
+    df_plot = pd.concat([df_1, df_2])
+
+    # quedarnos con los topics más comunes
+    top_topics = (
+        df_plot.groupby(columna)["Count"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(20)
+        .index
+    )
+
+    df_plot = df_plot[df_plot[columna].isin(top_topics)]
+
+    # gráfico
+    plt.figure(figsize=(10,6))
+    sns.barplot(data=df_plot, x=columna, y="Count", hue="Grupo")
+
+    plt.title("Comparación de" + columna + "Topics en Descripción (Adults vs Kids)")
+    plt.ylabel("Número de videos")
+    plt.xlabel("Topic")    
