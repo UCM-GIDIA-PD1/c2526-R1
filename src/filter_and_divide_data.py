@@ -15,3 +15,4 @@ def divide_save_data(df):
     upload_dataframe_minio(df_train, "pd1", "grupo1/modelos/train", claves, "parquet")
     upload_dataframe_minio(df_test, "pd1", "grupo1/modelos/test", claves, "parquet")
     upload_dataframe_minio(df_val, "pd1", "grupo1/modelos/validation", claves, "parquet")
+
