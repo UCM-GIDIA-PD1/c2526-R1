@@ -553,10 +553,10 @@ def exclusive_terms (df_1, df_2, columna):
     return result_df_1, result_df_2
 
 
-def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
+def graficar_bertopic (df_1, df_2, nombre1, nombre2, columna):
     # contar topics
-    top_1 = df_1[columna].value_counts()
-    top_2=  df_2[columna].value_counts()
+    top_1 = df_1["Topic"].value_counts()
+    top_2=  df_2["Topic"].value_counts()
 
     # eliminar outliers
     top_1 = top_1[top_1.index != -1]
@@ -564,11 +564,11 @@ def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
 
     # convertir a dataframe
     df_1 = top_1.reset_index()
-    df_1.columns = [columna, "Count"]
+    df_1.columns = ["Topic", "Count"]
     df_1["Grupo"] = nombre1
 
     df_2 = top_2.reset_index()
-    df_2.columns = [columna, "Count"]
+    df_2.columns = ["Topic", "Count"]
     df_2["Grupo"] = nombre2
 
     # unir
@@ -576,19 +576,18 @@ def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
 
     # quedarnos con los topics más comunes
     top_topics = (
-        df_plot.groupby(columna)["Count"]
+        df_plot.groupby("Topic")["Count"]
         .sum()
         .sort_values(ascending=False)
         .head(20)
         .index
     )
 
-    df_plot = df_plot[df_plot[columna].isin(top_topics)]
+    df_plot = df_plot[df_plot["Topic"].isin(top_topics)]
 
     # gráfico
-    plt.figure(figsize=(10,6))
-    sns.barplot(data=df_plot, x=columna, y="Count", hue="Grupo")
+    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Grupo")
 
-    plt.title("Comparación de" + columna + "Topics en Descripción (Adults vs Kids)")
+    plt.title("Comparación de Topics -" + columna + "(" + nombre1 + "vs" + nombre2 + ")") #se podria añadir si es titulo, descripicion etc
     plt.ylabel("Número de videos")
     plt.xlabel("Topic")    
