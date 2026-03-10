@@ -3,32 +3,106 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.decomposition import TruncatedSVD
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score, classification_report
 from Server_PD import download_dataframe_minio
+import pandas as pd
 import json
+import isodate
+
+def iso_a_minutos(iso_duration):
+    """"
+    Funcion que convierte la duracion a minutos
+    """
+    try:
+        duracion = isodate.parse_duration(iso_duration)
+        return duracion.total_seconds() / 60
+    except:
+        return 0
+    
+def download_model_dfs():
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+        df_train = download_dataframe_minio("pd1", "grupo1/modelos/train_no_filters", claves, "parquet")
+        df_validation = download_dataframe_minio("pd1", "grupo1/modelos/validation_no_filters", claves, "parquet")
+        df_test = download_dataframe_minio("pd1", "grupo1/modelos/test_no_filters", claves, "parquet")
+        df_train['Duracion'] = df_train['Duracion'].apply(iso_a_minutos)
+        df_validation['Duracion'] = df_validation['Duracion'].apply(iso_a_minutos)
+        df_test['Duracion'] = df_test['Duracion'].apply(iso_a_minutos)
+        return df_train, df_validation, df_test
 
 def entramiento_modelo_knn_generos(): 
 
     preprocess = ColumnTransformer(
     transformers=[
-        ("titulo", TfidfVectorizer(max_features=2000), "Titulo"),
-        ("descripcion", TfidfVectorizer(max_features=4000), "Descripcion"),
-        ("tags", TfidfVectorizer(max_features=2000), "Tags"),
-        ("edad", OneHotEncoder(), ["rango_edad"]),
-        ("duracion", StandardScaler(), ["duracion"])
+        ("Titulo", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Titulo"),
+        ("Descripcion", TfidfVectorizer(max_features=4000, ngram_range=(1,2)), "Descripcion"),
+        ("Tags", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Tags"),
+        ("Subtitulos", TfidfVectorizer(max_features=5000, ngram_range=(1,2)), "Subtitulos"),
+        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
+        ("Duracion", StandardScaler(), ["Duracion"])
     ]
     )
-    pipeline = Pipeline([
-    ("preprocess", preprocess),
-    ("model", KNeighborsClassifier(n_neighbors=5))
-    ])
-    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
-        claves = json.load(archivo)
-    df_train = download_dataframe_minio("pd1", "grupo1/modelos/train_no_filters", claves, "parquet")
-    df_test = download_dataframe_minio("pd1", "grupo1/modelos/test_no_filters", claves, "parquet")
+    best_k = None
+    best_acc = 0
+    best_model = None
+
+    df_train, df_validation, df_test = download_model_dfs()
+    #print(df_train.columns)
+    df_train = pd.concat([df_train, df_validation])
     X_train = df_train.drop(columns=["Generos"])
     y_train = df_train["Generos"]
+    #X_validation = df_validation.drop(columns=["Generos"])
+    #y_validation = df_validation["Generos"]
     X_test = df_test.drop(columns=["Generos"])
     y_test = df_test["Generos"]
 
-    pipeline.fit(X_test, y_test)
-    pred = pipeline.predict(X_test)
+    for k in [3,4,5,6,7,8,9,10,11,12,13,14,15]:
+
+        pipeline = Pipeline([
+            ("preprocess", preprocess),
+            ("svd", TruncatedSVD(n_components=300)),
+            ("model", KNeighborsClassifier(n_neighbors=k, metric="cosine"))
+        ])
+
+        scores = cross_val_score(
+            pipeline,
+            X_train,
+            y_train,
+            cv=5,
+            scoring="accuracy",
+            n_jobs=-1
+        )
+
+        acc = scores.mean()
+
+        print(f"K={k} -> CV accuracy: {acc:.4f}")
+
+        if acc > best_acc:
+            best_acc = acc
+            best_k = k
+
+        
+    best_model = Pipeline([
+    ("preprocess", preprocess),
+    ("svd", TruncatedSVD(n_components=300)),
+    ("model", KNeighborsClassifier(n_neighbors=best_k, metric="cosine"))
+    ])
+
+    best_model.fit(X_train, y_train)
+    print(f"\nMejor K encontrado: {best_k}")
+    print(f"Validation accuracy: {best_acc:.4f}")
+
+    # Evaluación final con test
+    pred_test = best_model.predict(X_test)
+
+    print("\n--- RESULTADOS EN TEST ---")
+    print("Accuracy:", accuracy_score(y_test, pred_test))
+    print("\nClassification Report:")
+    print(classification_report(y_test, pred_test))
+
+    return best_model
+
+if __name__ == '__main__':
+    entramiento_modelo_knn_generos()
