@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import isodate
 
 from itertools import combinations
+from functools import reduce
 from collections import Counter
 import ast
 
@@ -553,6 +554,8 @@ def exclusive_terms (df_1, df_2, columna):
     return result_df_1, result_df_2
 
 
+#A PARTIR DE AQUI HAY QUE AÑADIR DESCRIPCIONES
+
 def graficar_bertopic (df_1, df_2, nombre1, nombre2, columna):
     # contar topics
     top_1 = df_1["Topic"].value_counts()
@@ -591,3 +594,52 @@ def graficar_bertopic (df_1, df_2, nombre1, nombre2, columna):
     plt.title("Comparación de Topics -" + columna + "(" + nombre1 + "vs" + nombre2 + ")") #se podria añadir si es titulo, descripicion etc
     plt.ylabel("Número de videos")
     plt.xlabel("Topic")    
+
+
+def common_terms_dictionary(diccionario_dfs, columna):
+    """
+    Encuentra términos comunes en todos los DataFrames del diccionario y analiza su consistencia.
+    """
+
+    #Extraemos claves
+    generos = list(diccionario_dfs.keys())
+    
+    #Preparamos los dfs
+    listado_dfs = []
+    for genero in generos:
+        df_temp = diccionario_dfs[genero][[columna, 'Score']].copy()
+        df_temp = df_temp.rename(columns={'Score': f'Score_{genero}'})
+        listado_dfs.append(df_temp)
+
+    #Merge
+    df_comun = reduce(lambda left, right: pd.merge(left, right, on=columna), listado_dfs)
+
+    #Desviación Estándar entre Scores
+    score_cols = [col for col in df_comun.columns if col.startswith('Score_')]
+    df_comun['Score_Std'] = df_comun[score_cols].std(axis=1)
+    df_comun['Score_Total'] = df_comun[score_cols].sum(axis=1)
+
+    return df_comun.sort_values(by='Score_Total', ascending=False)
+
+
+def comparativa_terminos(generos_a_comparar, df):
+    lista_procesada = []
+
+    #Creamos un nuevo df con los 4 generos
+    for gen in generos_a_comparar:
+        df_aux = df[gen].copy()
+        df_aux.columns = ['Termino', 'Score'] 
+        lista_procesada.append(df_aux.assign(Genero=gen))
+
+    df_comparativa = pd.concat(lista_procesada)
+
+    #Seleccionamos los 15 terminos mas importantes a nivel global
+    top_15_global = df_comparativa.groupby('Termino')['Score'].sum().nlargest(15).index
+    df_final_plot = df_comparativa[df_comparativa['Termino'].isin(top_15_global)]
+
+    # Grafica
+    sns.barplot(data=df_final_plot, x='Score', y='Termino', hue='Genero', palette='muted')
+
+    plt.title('Comparativa de Términos TF-IDF')
+    plt.grid(axis='x', linestyle='--', alpha=0.3)
+    plt.legend(title='Género', bbox_to_anchor=(1.05, 1), loc='upper left')
