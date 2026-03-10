@@ -83,7 +83,7 @@ def filtrado(df_original):
         bool_text &= col_invalid  
 
     # Combinamos máscaras: duración fuera de rango OR texto inválido
-    print(f'Numero de videos sin información textual: {bool_duracion.sum()}')
+    print(f'Numero de videos sin información textual: {bool_text.sum()}')
     bool_final = ~(bool_duracion | bool_text)  # seleccionamos los válidos
 
     df_filtrado = df[bool_final]
@@ -118,7 +118,7 @@ def divide_save_data(df, name):
     df_train = df.sample(frac=0.7, random_state=1)
     df_test = df.drop(df_train.index)
     df_val = df_test.sample(frac=0.5, random_state=1)
-    df_test = df.drop(df_val.index)
+    df_test = df_test.drop(df_val.index)
     
     df_train = df_train.reset_index(drop=True)
     df_val = df_val.reset_index(drop=True)
