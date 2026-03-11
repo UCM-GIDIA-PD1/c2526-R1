@@ -12,7 +12,7 @@ with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
     claves = json.load(archivo)
 
 
-    df = download_dataframe_minio("pd1", "grupo1/df_videos_2026-02-25_17-33-15",claves=claves,file_format="parquet")
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309",claves=claves,file_format="parquet")
     for i in df["ID"]: 
         df = get_info(i)
         print(df["ContentRating"])

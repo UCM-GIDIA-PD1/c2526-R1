@@ -60,6 +60,9 @@ if __name__ == '__main__':
         claves = json.load(archivo)
     
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet")
+    
+    print("descargado", df.head())
+    
     informacion_vacia(df)
     df_filtered = filtrado(df)
     divide_save_data(df, "no_filters")
