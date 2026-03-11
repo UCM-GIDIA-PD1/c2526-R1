@@ -17,8 +17,10 @@ import matplotlib.pyplot as plt
 import isodate
 
 from itertools import combinations
+from functools import reduce
 from collections import Counter
 import ast
+
 
 #transformaciones
 
@@ -252,6 +254,37 @@ def analizar_bertopic(df, columna="descripcion", idioma="english"): #Funciona co
     temas_info = topic_model.get_topic_info()
 
     return topic_model, df_resultado, temas_info
+
+def analizar_bertopic_dict(diccionario_dfs, columna="Titulo", idioma="english"):
+    """
+    COMPLETAR
+    """
+  
+    # unificamos los dfs del diccionario
+    df_unificado = pd.concat([df.assign(Genero_Origen=k) for k, df in diccionario_dfs.items()])
+    
+    # limpieza
+    df_clean = df_unificado.dropna(subset=[columna]).copy()
+    df_clean[columna] = df_clean[columna].astype(str).str.strip()
+    df_clean = df_clean[df_clean[columna] != ""].reset_index(drop=True)
+
+    textos = df_clean[columna].tolist()
+
+    # crear modelo
+    embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+    topic_model = BERTopic(embedding_model=embedding_model, language=idioma)
+
+    # entrenar modelo
+    topics, probs = topic_model.fit_transform(textos)
+
+    # dataframe con resultados
+    df_clean["Topic"] = topics
+    df_clean["Probabilidad"] = probs
+
+    # resumen de temas
+    temas_info = topic_model.get_topic_info()
+    
+    return topic_model, df_clean, temas_info
 
 def frecuencia_tags(df, columna="Tags"):
     """
@@ -553,10 +586,12 @@ def exclusive_terms (df_1, df_2, columna):
     return result_df_1, result_df_2
 
 
-def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
+#A PARTIR DE AQUI HAY QUE AÑADIR DESCRIPCIONES
+
+def graficar_bertopic (df_1, df_2, nombre1, nombre2, columna):
     # contar topics
-    top_1 = df_1[columna].value_counts()
-    top_2=  df_2[columna].value_counts()
+    top_1 = df_1["Topic"].value_counts()
+    top_2=  df_2["Topic"].value_counts()
 
     # eliminar outliers
     top_1 = top_1[top_1.index != -1]
@@ -564,11 +599,11 @@ def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
 
     # convertir a dataframe
     df_1 = top_1.reset_index()
-    df_1.columns = [columna, "Count"]
+    df_1.columns = ["Topic", "Count"]
     df_1["Grupo"] = nombre1
 
     df_2 = top_2.reset_index()
-    df_2.columns = [columna, "Count"]
+    df_2.columns = ["Topic", "Count"]
     df_2["Grupo"] = nombre2
 
     # unir
@@ -576,19 +611,130 @@ def graficar_bertopic (df_1, df_2, columna, nombre1, nombre2):
 
     # quedarnos con los topics más comunes
     top_topics = (
-        df_plot.groupby(columna)["Count"]
+        df_plot.groupby("Topic")["Count"]
         .sum()
         .sort_values(ascending=False)
         .head(20)
         .index
     )
 
-    df_plot = df_plot[df_plot[columna].isin(top_topics)]
+    df_plot = df_plot[df_plot["Topic"].isin(top_topics)]
 
     # gráfico
-    plt.figure(figsize=(10,6))
-    sns.barplot(data=df_plot, x=columna, y="Count", hue="Grupo")
+    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Grupo")
 
-    plt.title("Comparación de" + columna + "Topics en Descripción (Adults vs Kids)")
+    plt.title("Comparación de Topics -" + columna + "(" + nombre1 + "vs" + nombre2 + ")") #se podria añadir si es titulo, descripicion etc
     plt.ylabel("Número de videos")
     plt.xlabel("Topic")    
+
+
+def common_terms_dictionary(diccionario_dfs, columna_id):
+    """
+    Encuentra términos comunes adaptándose al nombre de la métrica (Score o Frecuencia).
+    """
+    from functools import reduce
+    import pandas as pd
+
+    generos = list(diccionario_dfs.keys())
+    listado_dfs = []
+    
+    for genero in generos:
+        df_temp = diccionario_dfs[genero].copy()
+        
+        # 1. Detectamos cuál es la columna de valores (que no sea la de ID como 'Tag' o 'ngram')
+        # Buscamos 'Score' o 'Frecuencia'
+        col_valor = [c for c in df_temp.columns if c != columna_id][0] 
+        
+        # 2. Renombramos dinámicamente: 'Frecuencia' -> 'Frecuencia_Education'
+        df_temp = df_temp[[columna_id, col_valor]]
+        df_temp = df_temp.rename(columns={col_valor: f"{col_valor}_{genero}"})
+        
+        listado_dfs.append(df_temp)
+
+    # 3. Merge sucesivo
+    df_comun = reduce(lambda left, right: pd.merge(left, right, on=columna_id), listado_dfs)
+
+    # 4. Cálculos finales basados en las columnas que se han creado
+    # Buscamos todas las que empiecen por Score_ o Frecuencia_
+    metric_cols = [c for c in df_comun.columns if c != columna_id]
+    
+    df_comun['Score_Std'] = df_comun[metric_cols].std(axis=1)
+    df_comun['Score_Total'] = df_comun[metric_cols].sum(axis=1)
+
+    return df_comun.sort_values(by='Score_Total', ascending=False)
+
+def comparativa_terminos(generos_a_comparar, df):
+    lista_procesada = []
+
+    #Creamos un nuevo df con los 4 generos
+    for gen in generos_a_comparar:
+        df_aux = df[gen].copy()
+        df_aux.columns = ['Termino', 'Score'] 
+        lista_procesada.append(df_aux.assign(Genero=gen))
+
+    df_comparativa = pd.concat(lista_procesada)
+
+    #Seleccionamos los 15 terminos mas importantes a nivel global
+    top_15_global = df_comparativa.groupby('Termino')['Score'].sum().nlargest(15).index
+    df_final_plot = df_comparativa[df_comparativa['Termino'].isin(top_15_global)]
+
+    # Grafica
+    sns.barplot(data=df_final_plot, x='Score', y='Termino', hue='Genero', palette='muted')
+
+    plt.title('Comparativa de Términos TF-IDF')
+    plt.grid(axis='x', linestyle='--', alpha=0.3)
+    plt.legend(title='Género', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
+def graficar_bertopic_multiple(df_bertopic, lista_generos, columna_analizada):
+    """
+    Compara la distribución de tópicos entre varios géneros (2, 3, 4 o más).
+    
+    Parameters:
+    -----------
+    df_bertopic : DataFrame resultante de analizar_bertopic_dict (el unificado)
+    lista_generos : Lista con los nombres de los géneros a comparar (ej: ['Music', 'Society'])
+    columna_analizada : String indicando si es 'Titulo', 'Descripcion', etc.
+    """
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    # 1. Filtramos solo los géneros que queremos comparar
+    df_filtrado = df_bertopic[df_bertopic['Genero_Origen'].isin(lista_generos)].copy()
+
+    # 2. Contamos tópicos por género (excluyendo outliers -1)
+    # Agrupamos por género y tópico y contamos
+    df_counts = (
+        df_filtrado[df_filtrado["Topic"] != -1]
+        .groupby(["Genero_Origen", "Topic"])
+        .size()
+        .reset_index(name="Count")
+    )
+
+    # 3. Identificamos los 20 topics más frecuentes en TOTAL para que la gráfica no sature
+    top_topics = (
+        df_counts.groupby("Topic")["Count"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(20)
+        .index
+    )
+
+    df_plot = df_counts[df_counts["Topic"].isin(top_topics)]
+
+    # 4. Gráfico
+    plt.figure(figsize=(15, 7))
+    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Genero_Origen", palette="viridis")
+
+    # 5. Estética (siguiendo tu estilo)
+    nombres_vs = " vs ".join(lista_generos)
+    plt.title(f"Comparación de Topics - {columna_analizada} ({nombres_vs})")
+    plt.ylabel("Número de vídeos")
+    plt.xlabel("ID del Topic (Tema)")
+    
+    # Colocamos la leyenda fuera para que no tape las barras
+    plt.legend(title="Género", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(axis='y', linestyle='--', alpha=0.3)
+    
+    plt.show() 
