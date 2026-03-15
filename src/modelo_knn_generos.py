@@ -1,6 +1,3 @@
-from sklearn.compose import ColumnTransformer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.decomposition import TruncatedSVD
@@ -12,7 +9,7 @@ from modelos_utils import download_model_dfs, preprocess_tfidf
 def entramiento_modelo_knn_generos(): 
 
     preprocess = preprocess_tfidf
-    
+
     best_k = None
     best_acc = 0
     best_model = None
