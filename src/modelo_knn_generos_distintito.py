@@ -7,20 +7,12 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score, classification_report
 import pandas as pd
-from modelos_utils import download_model_dfs
+from modelos_utils import download_model_dfs, preprocess_tfidf 
 
 def entramiento_modelo_knn_generos(): 
 
-    preprocess = ColumnTransformer(
-    transformers=[
-        ("Titulo", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Titulo"),
-        ("Descripcion", TfidfVectorizer(max_features=4000, ngram_range=(1,2)), "Descripcion"),
-        ("Tags", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Tags"),
-        ("Subtitulos", TfidfVectorizer(max_features=5000, ngram_range=(1,2)), "Subtitulos"),
-        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
-        ("Duracion", StandardScaler(), ["Duracion"])
-    ]
-    )
+    preprocess = preprocess_tfidf
+    
     best_k = None
     best_acc = 0
     best_model = None

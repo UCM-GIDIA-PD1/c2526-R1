@@ -7,6 +7,10 @@ Private
 # Carpeta de los subtitulos (no necesario subirlo a Git)
 subs
 
+#Modelos 
+wandb 
+*.joblib
+
 # Datos
 *.csv
 *.parquet

@@ -1,8 +1,7 @@
 #Carga de datos
 import pandas as pd
-import json
 import numpy as np
-from Server_PD import download_dataframe_minio
+from comun.Server_PD import download_dataframe_minio
 from bertopic import BERTopic 
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -257,7 +256,24 @@ def analizar_bertopic(df, columna="descripcion", idioma="english"): #Funciona co
 
 def analizar_bertopic_dict(diccionario_dfs, columna="Titulo", idioma="english"):
     """
-    COMPLETAR
+    Unifica varios DataFrames y analiza sus textos de un DataFrame usando BERTopic.
+
+    Args
+    -------
+        diccionario_dfs (dict): Diccionario donde las llaves son categorías y los valores son DataFrames de Pandas.
+        columna (str): Nombre de la columna que contiene el texto a analizar.
+        idioma (str): Idioma principal de los textos para el modelo. Por defecto "english".
+
+    Retorna
+    -------
+    topic_model : modelo BERTopic entrenado
+    df_resultado : DataFrame con el tema asignado a cada fila
+    Topic: Temática asignada al texto ---> -1 implica outliers
+    Información extra --->
+    Probabilidad: Como de seguro está con la asignación de topicos 
+    temas_info : información resumida de los temas
+    -------
+
     """
   
     # unificamos los dfs del diccionario
@@ -589,6 +605,23 @@ def exclusive_terms (df_1, df_2, columna):
 #A PARTIR DE AQUI HAY QUE AÑADIR DESCRIPCIONES
 
 def graficar_bertopic (df_1, df_2, nombre1, nombre2, columna):
+    """
+    Compara la distribución de tópicos entre dos dfs (adults vs kids).
+    
+    Parameters:
+    -----------
+    df_1 : pandas.DataFrame
+        Dataframe 1
+
+    df_2 : pandas.DataFrame
+        Dataframe 2
+
+    nombre 1 : Nombre del grupo 1 
+
+    nombre 2 : Nombre del grupo  2
+
+    columna : String
+    """
     # contar topics
     top_1 = df_1["Topic"].value_counts()
     top_2=  df_2["Topic"].value_counts()
@@ -627,13 +660,23 @@ def graficar_bertopic (df_1, df_2, nombre1, nombre2, columna):
     plt.ylabel("Número de videos")
     plt.xlabel("Topic")    
 
-
+#COMPROBAR
 def common_terms_dictionary(diccionario_dfs, columna_id):
     """
-    Encuentra términos comunes adaptándose al nombre de la métrica (Score o Frecuencia).
-    """
-    from functools import reduce
-    import pandas as pd
+    Agrupa los terminos comunes de los dfs del diciconario y da una diferencia de score si la hay
+
+    Parameters
+    ----------
+    diccionario_dfs : dicionario con los nombres de los generos como claves y pandas.DataFrame como valores
+    
+    columna_id: String
+        Nombre de la columna original 
+
+    Returns
+    -------
+    common_terms: pandas.Dataframe
+        Retorno un dataframe con columnas: columna, Score_genero1, Score_genero2, ..., Diff
+    """ 
 
     generos = list(diccionario_dfs.keys())
     listado_dfs = []
@@ -664,6 +707,17 @@ def common_terms_dictionary(diccionario_dfs, columna_id):
     return df_comun.sort_values(by='Score_Total', ascending=False)
 
 def comparativa_terminos(generos_a_comparar, df):
+    """
+    Genera un gráfico de barras comparativo de los términos más relevantes 
+    entre varios géneros utilizando sus puntuaciones de importancia.
+    
+    Args:
+        generos_a_comparar (list): Lista de nombres de las columnas a comparar.
+        df : pandas.DataFrame (contiene los términos y sus scores por género).
+        
+    Returns:
+        None: Despliega un gráfico de Seaborn.
+    """
     lista_procesada = []
 
     #Creamos un nuevo df con los 4 generos
@@ -688,22 +742,20 @@ def comparativa_terminos(generos_a_comparar, df):
 
 def graficar_bertopic_multiple(df_bertopic, lista_generos, columna_analizada):
     """
-    Compara la distribución de tópicos entre varios géneros (2, 3, 4 o más).
+    Compara la distribución de tópicos entre varios géneros.
     
     Parameters:
     -----------
-    df_bertopic : DataFrame resultante de analizar_bertopic_dict (el unificado)
-    lista_generos : Lista con los nombres de los géneros a comparar (ej: ['Music', 'Society'])
-    columna_analizada : String indicando si es 'Titulo', 'Descripcion', etc.
-    """
-    import pandas as pd
-    import seaborn as sns
-    import matplotlib.pyplot as plt
+    df_bertopic : DataFrame resultante de analizar_bertopic_dict
 
-    # 1. Filtramos solo los géneros que queremos comparar
+    lista_generos : Lista de strings con los nombres de los géneros a comparar
+
+    columna_analizada : String
+    """
+
+    # Filtramos los géneros que queremos analizar
     df_filtrado = df_bertopic[df_bertopic['Genero_Origen'].isin(lista_generos)].copy()
 
-    # 2. Contamos tópicos por género (excluyendo outliers -1)
     # Agrupamos por género y tópico y contamos
     df_counts = (
         df_filtrado[df_filtrado["Topic"] != -1]
@@ -712,7 +764,7 @@ def graficar_bertopic_multiple(df_bertopic, lista_generos, columna_analizada):
         .reset_index(name="Count")
     )
 
-    # 3. Identificamos los 20 topics más frecuentes en TOTAL para que la gráfica no sature
+    # Identificamos los 20 topics más frecuentes
     top_topics = (
         df_counts.groupby("Topic")["Count"]
         .sum()
@@ -723,18 +775,15 @@ def graficar_bertopic_multiple(df_bertopic, lista_generos, columna_analizada):
 
     df_plot = df_counts[df_counts["Topic"].isin(top_topics)]
 
-    # 4. Gráfico
+    # Gráfico
     plt.figure(figsize=(15, 7))
     sns.barplot(data=df_plot, x="Topic", y="Count", hue="Genero_Origen", palette="viridis")
 
-    # 5. Estética (siguiendo tu estilo)
     nombres_vs = " vs ".join(lista_generos)
     plt.title(f"Comparación de Topics - {columna_analizada} ({nombres_vs})")
     plt.ylabel("Número de vídeos")
     plt.xlabel("ID del Topic (Tema)")
     
-    # Colocamos la leyenda fuera para que no tape las barras
     plt.legend(title="Género", bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(axis='y', linestyle='--', alpha=0.3)
     
-    plt.show() 
