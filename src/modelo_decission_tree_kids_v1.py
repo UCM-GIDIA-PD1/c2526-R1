@@ -4,7 +4,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import TruncatedSVD
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, KFold
 from sklearn.metrics import accuracy_score, classification_report, recall_score, make_scorer
 import wandb
 import joblib
@@ -45,58 +45,67 @@ def entramiento_modelo_decission_tree_kids():
             ("Duracion", StandardScaler(), ["Duracion"])
         ]
     )
-
-    svd = TruncatedSVD(n_components=config["svd_components"])
+    pipe = Pipeline([
+            ("preprocess", preprocess),
+            ("svd", TruncatedSVD(n_components=config.svd_components))
+        ])
+    
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
     best_depth = None
-    best_rec = 0
+    best_rec = -1
     best_model = None
 
     df_train, df_validation, df_test = download_model_dfs()
     df_train = pd.concat([df_train, df_validation])
 
-    print('Starting preprocess of data frame')
-    x_train_prep = preprocess.fit_transform(df_train.drop(columns=["Rango_edad"]))
-    x_test_prep = preprocess.fit_transform(df_test.drop(columns=["Rango_edad"]))
-    print('Preprocess completed')
+    x_train = df_train.drop(columns=["Rango_edad"])
+    x_test = df_test.drop(columns=["Rango_edad"])
 
-    print('Starting svd')
-    x_train =   svd.fit_transform()
-    x_test =    svd.fit_transform()
-    print('svd completed')
-    
     y_train = df_train["Rango_edad"] != 'Adult'
     y_test = df_test["Rango_edad"] != 'Adult'
 
     results_table = wandb.Table(columns=['depth','cv_recall', 'cv_std'])
+    scores_dict = {k: [] for k in config.depth_values}
 
-    for i in config.depth_values:
-        print(f"Comenzando entrenamiento para el modelo con profundidad: {i}")
-        model = DecisionTreeClassifier(
-            max_depth=i, 
-            criterion=config.criterion, 
-            random_state=42
-        )
-        scores = cross_val_score(
-                model,
-                x_train,
-                y_train,
-                cv=config["cv_folds"],
-                scoring='recall',
-                n_jobs=-1
+    iteration = 1
+    for train_idx, val_idx in kf.split(x_train):
+        x_tr, x_val = x_train.iloc[train_idx], x_train.iloc[val_idx]
+        y_train_final, y_val_final = y_train.iloc[train_idx], y_train.iloc[val_idx]
+
+        print(f'Starting preprocess and svd to data frame, iteration: {iteration}')
+        x_train_final = pipe.fit_transform(x_tr, y_train_final)
+        x_val_final = pipe.transform(x_val)
+        print('Preprocess completed')
+
+        for i in config.depth_values:
+            print(f"{iteration}: Comenzando entrenamiento para el modelo con profundidad: {i}")
+            model = DecisionTreeClassifier(
+                max_depth=i, 
+                criterion=config.criterion, 
+                random_state=42
             )
-        rec_mean = scores.mean()
-        rec_std = scores.std()
+            model.fit(x_train_final, y_train_final)
 
-        print(f"Depth = {i} -> CV recall_mean: {rec_mean:.4f}")
+            preds = model.predict(x_val_final)
+            rec = recall_score(y_val_final, preds)
+            print(f'Recall: {rec}')
+
+            scores_dict[i].append(rec)
+            
+        iteration += 1
+
+    for depth, recalls in scores_dict:
+        rec_mean = recalls.mean()
+        rec_std = recalls.std()
+        print(f"Depth = {depth} -> CV recall_mean: {rec_mean:.4f}")
         print(f"          -> CV recall_std: {rec_std:.4f}")
 
         results_table.add_data(i,rec_mean, rec_std)
 
         if rec_mean > best_rec:
             best_rec = rec_mean
-            best_depth = i
-            #best_model = pipeline
+            best_depth = depth
     
     wandb.log({"cv_results":results_table})
 
@@ -126,7 +135,7 @@ def entramiento_modelo_decission_tree_kids():
         "test_recall": test_rec
     })
 
-    # Matriz de confusión
+    # Matriz de confusión fea
     wandb.log({
         f"confusion_matrix_{version}_depth{best_depth}": wandb.plot.confusion_matrix(
         y_true=y_test,
@@ -136,7 +145,6 @@ def entramiento_modelo_decission_tree_kids():
     # Guardar modelo
     joblib.dump(best_model, "dt_kids_model.joblib")
     joblib.dump(preprocess, "preprocess.joblib")
-    joblib.dump(svd, "svd.joblib")
     wandb.save("dt_kids_model.joblib")
 
     wandb.finish()
