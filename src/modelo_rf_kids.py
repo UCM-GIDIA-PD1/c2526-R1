@@ -2,21 +2,20 @@ from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import TruncatedSVD
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score, classification_report, recall_score
+from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.metrics import classification_report, recall_score
 import wandb
 import joblib
 import pandas as pd
 from modelos_utils import download_model_dfs
 
-
 def entramiento_modelo_decission_tree_kids():
     wandb.init(
         entity="pd1-c2526-team1",
-        project="clasificacion_kids_dt",
-        name="dt_kids_v0.1",
+        project="clasificacion_kids_rf",
+        name="rf_kids_v0",
         config={
             "tfidf_titulo_max_features": 2000,
             "tfidf_descripcion_max_features": 4000,
@@ -24,7 +23,7 @@ def entramiento_modelo_decission_tree_kids():
             "tfidf_subtitulos_max_features": 5000,
             "ngram_range": (1,2),
             "svd_components": 300,
-            "depth_values": range(1,25),
+            "depth_values": range(1,50),
             'criterion': 'gini',
             "cv_folds": 5
         }
@@ -82,18 +81,16 @@ def entramiento_modelo_decission_tree_kids():
         if rec_mean > best_rec:
             best_rec = rec_mean
             best_depth = i
-            best_model = pipeline
     
     wandb.log({"cv_results":results_table})
 
-    #best_model = Pipeline([
-    #    ("preprocess", preprocess),
-    #    ("svd", TruncatedSVD(n_components=config["svd_components"])),
-    #    ("model", DecisionTreeClassifier(max_depth=best_depth, criterion='gini'))
-    #])
+    best_model = Pipeline([
+        ("preprocess", preprocess),
+        ("svd", TruncatedSVD(n_components=config["svd_components"])),
+        ("model", DecisionTreeClassifier(max_depth=best_depth, criterion='gini'))
+    ])
 
-    #best_model.fit(x_train, y_train)
-    
+    best_model.fit(x_train, y_train)
     print(f"\nMejor depth encontrada: {best_depth}")
     print(f"Validation recall: {best_rec:.4f}")
 
