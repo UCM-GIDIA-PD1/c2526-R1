@@ -216,7 +216,7 @@ wheels = [
 [[package]]
 name = "c2526-r1"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "asttokens" },
     { name = "beautifulsoup4" },
