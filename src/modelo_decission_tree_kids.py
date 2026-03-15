@@ -87,7 +87,7 @@ def entramiento_modelo_decission_tree_kids():
     best_model = Pipeline([
         ("preprocess", preprocess),
         ("svd", TruncatedSVD(n_components=config["svd_components"])),
-        ("model", DecisionTreeClassifier(max_depth=50, criterion='gini'))
+        ("model", DecisionTreeClassifier(max_depth=best_depth, criterion='gini'))
     ])
 
     best_model.fit(x_train, y_train)
