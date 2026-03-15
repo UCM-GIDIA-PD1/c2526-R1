@@ -1,8 +1,7 @@
 #Carga de datos
 import pandas as pd
-import json
 import numpy as np
-from Server_PD import download_dataframe_minio
+from comun.Server_PD import download_dataframe_minio
 from bertopic import BERTopic 
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer

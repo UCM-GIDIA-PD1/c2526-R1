@@ -32,10 +32,10 @@ def entramiento_modelo_knn_generos(): #Sin parametrizar
 
     preprocess = ColumnTransformer(
         transformers=[
-            ("Titulo", TfidfVectorizer(max_features=config.tfidf_titulo_max_features, ngram_range=config.ngram_range), "Titulo"),
-            ("Descripcion", TfidfVectorizer(max_features=config.tfidf_descripcion_max_features, ngram_range=config.ngram_range), "Descripcion"),
-            ("Tags", TfidfVectorizer(max_features=config.tfidf_tags_max_features, ngram_range=config.ngram_range), "Tags"),
-            ("Subtitulos", TfidfVectorizer(max_features=config.tfidf_subtitulos_max_features, ngram_range=config.ngram_range), "Subtitulos"),
+            ("Titulo", TfidfVectorizer(max_features=config.tfidf_titulo_max_features, ngram_range=tuple(config.ngram_range)), "Titulo"),
+            ("Descripcion", TfidfVectorizer(max_features=config.tfidf_descripcion_max_features, ngram_range=tuple(config.ngram_range)), "Descripcion"),
+            ("Tags", TfidfVectorizer(max_features=config.tfidf_tags_max_features, ngram_range=tuple(config.ngram_range)), "Tags"),
+            ("Subtitulos", TfidfVectorizer(max_features=config.tfidf_subtitulos_max_features, ngram_range=tuple(config.ngram_range)), "Subtitulos"),
             ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
             ("Duracion", StandardScaler(), ["Duracion"])
         ]

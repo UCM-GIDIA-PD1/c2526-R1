@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "c2526-r1"
 version = "0.1.0"
@@ -97,3 +101,6 @@ dependencies = [
     "xyzservices==2025.11.0",
     "yt-dlp==2026.1.31",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/comun"]
