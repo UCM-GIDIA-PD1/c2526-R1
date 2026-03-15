@@ -103,4 +103,7 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/comun"]
+packages = [
+    "src/comun",
+    "src/extraccion"
+    ]
