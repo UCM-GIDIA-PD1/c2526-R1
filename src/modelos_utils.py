@@ -49,3 +49,5 @@ preprocess_tfidf = ColumnTransformer(
     ]
     )
 
+#https://www.kaggle.com/code/siddhvr/introduction-to-word-embeddings-with-word2vec
+preprocess_word2vec = []

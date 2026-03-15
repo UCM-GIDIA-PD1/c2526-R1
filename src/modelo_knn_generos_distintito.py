@@ -9,11 +9,11 @@ from sklearn.metrics import accuracy_score, classification_report
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from modelos_utils import download_model_dfs, preprocess_tfidf 
+from modelos_utils import download_model_dfs, preprocess_tfidf, preprocess_bag_of_words 
 
 def entramiento_modelo_knn_generos(): 
 
-    preprocess = preprocess_tfidf
+    preprocess = preprocess_bag_of_words #preprocess_tfidf
     
     best_k = None
     best_acc = 0
@@ -29,9 +29,9 @@ def entramiento_modelo_knn_generos():
     X_test = df_test.drop(columns=["Generos"])
     y_test = df_test["Generos"]
 
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=2, shuffle=True, random_state=42) #n splits 5
 
-    k_values = [3,4,5,6,7,8,9,10,11,12,13,14,15]
+    k_values = [3,4,5]#,6,7,8,9,10,11,12,13,14,15] 
     scores_dict = {k: [] for k in k_values}
 
     for train_idx, val_idx in tqdm(kf.split(X_train)):
