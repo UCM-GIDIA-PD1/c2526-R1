@@ -27,7 +27,7 @@ def entramiento_modelo_decission_tree_kids():
             "tfidf_subtitulos_max_features": 5000,
             "ngram_range": (1,2),
             "svd_components": 300,
-            "depth_values": range(25,25),
+            "depth_values": range(1,25),
             'criterion': 'gini',
             "cv_folds": 5
         }
@@ -46,7 +46,7 @@ def entramiento_modelo_decission_tree_kids():
         ]
     )
 
-    best_depth = 9#None
+    best_depth = None
     best_rec = 0
     best_model = None
 
