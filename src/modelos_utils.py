@@ -1,6 +1,6 @@
 import isodate
 import json
-from Server_PD import download_dataframe_minio
+from comun.Server_PD import download_dataframe_minio
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.compose import ColumnTransformer
