@@ -1,10 +1,13 @@
 import isodate
 import json
-from Server_PD import download_dataframe_minio
+from comun.Server_PD import download_dataframe_minio
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.base import BaseEstimator, TransformerMixin
+from gensim.utils import simple_preprocess
+import numpy as np
 
 def iso_a_minutos(iso_duration):
     """"
@@ -49,3 +52,39 @@ preprocess_tfidf = ColumnTransformer(
     ]
     )
 
+#https://www.kaggle.com/code/siddhvr/introduction-to-word-embeddings-with-word2vec
+class Word2VecVectorizer(BaseEstimator, TransformerMixin):
+    
+    def __init__(self, model):
+        self.model = model
+        self.dim = model.vector_size
+
+    def fit(self, X, y=None):
+        return self  # nothing to learn
+
+    def transform(self, X):
+        return np.array([self.vectorize_text(text) for text in X])
+
+    def vectorize_text(self, text):
+        words = simple_preprocess(text)
+        vectors = [self.model.wv[word] for word in words if word in self.model.wv]
+
+        if vectors:
+            return np.mean(vectors, axis=0)
+        else:
+            return np.zeros(self.dim)
+        
+def build_preprocess_word2vec(model):
+    
+    preprocess_word2vec = ColumnTransformer(
+        transformers=[
+            ("Titulo", Word2VecVectorizer(model), "Titulo"),
+            ("Descripcion", Word2VecVectorizer(model), "Descripcion"),
+            ("Tags", Word2VecVectorizer(model), "Tags"),
+            ("Subtitulos", Word2VecVectorizer(model), "Subtitulos"),
+            ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
+            ("Duracion", StandardScaler(), ["Duracion"])
+        ]
+    )
+
+    return preprocess_word2vec

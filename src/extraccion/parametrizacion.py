@@ -3,7 +3,7 @@ Este archivo contiene la funcion para llamar al script mediante
 argumentos insertados desde consola.
 '''
 import argparse
-import collect_all_data
+import extraccion.collect_all_data as collect_all_data
 
 def main():
     '''
