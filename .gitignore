@@ -19,6 +19,9 @@ data
 # Logs
 *.log
 
+#Modelos 
+*.joblib
+wandb
 
 
 # Archivos ejecutables
