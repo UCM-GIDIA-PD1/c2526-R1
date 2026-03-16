@@ -10,7 +10,7 @@ import wandb
 import joblib
 import pandas as pd
 import numpy as np
-from modelos_utils import download_model_dfs
+from preprocess_utils import download_model_dfs
 
 def entrenamiento_modelo_naive_bayes_kids():
 

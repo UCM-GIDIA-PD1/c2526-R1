@@ -9,7 +9,7 @@ from sklearn.metrics import classification_report, recall_score
 import wandb
 import joblib
 import pandas as pd
-from modelos_utils import download_model_dfs
+from preprocess_utils import download_model_dfs
 
 def entramiento_modelo_decission_tree_kids():
     wandb.init(

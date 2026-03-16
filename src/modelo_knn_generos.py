@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score, classification_report
 import wandb
 import joblib
 import pandas as pd
-from modelos_utils import download_model_dfs, preprocess_tfidf
+from preprocess_utils import download_model_dfs, preprocess_tfidf
 
 def entramiento_modelo_knn_generos(): #Sin parametrizar 
     wandb.init(
