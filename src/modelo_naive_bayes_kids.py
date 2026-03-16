@@ -14,7 +14,7 @@ from modelos_utils import download_model_dfs
 
 def entrenamiento_modelo_naive_bayes_kids():
 
-    version = "v1.0"  # Cambiar en cada ejecución
+    version = "v1.0"
 
     wandb.init(
         entity="pd1-c2526-team1",
@@ -51,7 +51,7 @@ def entrenamiento_modelo_naive_bayes_kids():
             ("Tags", TfidfVectorizer(max_features=config["tfidf_tags_max_features"], ngram_range=tuple(config.ngram_range)), "Tags"),
             ("Subtitulos", TfidfVectorizer(max_features=config["tfidf_subtitulos_max_features"], ngram_range=tuple(config.ngram_range)), "Subtitulos"),
             ("Generos", OneHotEncoder(), ["Generos"]),
-            ("Duracion", "passthrough", ["Duracion"])  # <- no usamos StandardScaler
+            ("Duracion", "passthrough", ["Duracion"])  # NB no maneja bien features negativas, así que se deja "Duracion" sin escalar
         ]
     )
 
@@ -116,7 +116,6 @@ def entrenamiento_modelo_naive_bayes_kids():
     # Entrenar el modelo final con todo el train
     best_model = Pipeline([
         ("preprocess", preprocess),
-        ("svd", TruncatedSVD(n_components=config.svd_components)),
         ("model", MultinomialNB(alpha=best_alpha))
     ])
 
