@@ -10,6 +10,7 @@ import wandb
 import joblib
 import pandas as pd
 from modelos_utils import download_model_dfs
+import numpy as np
 
 
 def entramiento_modelo_decission_tree_kids():
@@ -27,13 +28,21 @@ def entramiento_modelo_decission_tree_kids():
             "tfidf_subtitulos_max_features": 5000,
             "ngram_range": (1,2),
             "svd_components": 300,
-            "depth_values": range(1,25),
+            "depth_values": range(7,10),
             'criterion': 'gini',
-            "cv_folds": 5
+            "cv_folds": 2
         }
     )
 
     config = wandb.config
+
+    feature_cols = [
+    "Titulo",
+    "Descripcion",
+    "Tags",
+    "Subtitulos",
+    "Generos",
+    "Duracion"]
 
     preprocess = ColumnTransformer(
         transformers=[
@@ -50,17 +59,19 @@ def entramiento_modelo_decission_tree_kids():
             ("svd", TruncatedSVD(n_components=config.svd_components))
         ])
     
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=config.cv_folds, shuffle=True, random_state=42)
 
     best_depth = None
     best_rec = -1
     best_model = None
 
+    print('Downloading dataframes')
     df_train, df_validation, df_test = download_model_dfs()
     df_train = pd.concat([df_train, df_validation])
+    print('Dataframes downloaded')
 
-    x_train = df_train.drop(columns=["Rango_edad"])
-    x_test = df_test.drop(columns=["Rango_edad"])
+    x_train = df_train.drop(columns=["Rango_edad"])[feature_cols]
+    x_test = df_test.drop(columns=["Rango_edad"])[feature_cols]
 
     y_train = df_train["Rango_edad"] != 'Adult'
     y_test = df_test["Rango_edad"] != 'Adult'
@@ -92,16 +103,16 @@ def entramiento_modelo_decission_tree_kids():
             print(f'Recall: {rec}')
 
             scores_dict[i].append(rec)
-            
+
         iteration += 1
 
-    for depth, recalls in scores_dict:
-        rec_mean = recalls.mean()
-        rec_std = recalls.std()
+    for depth, recalls in scores_dict.items():
+        rec_mean = np.mean(recalls)
+        rec_std = np.std(recalls)
         print(f"Depth = {depth} -> CV recall_mean: {rec_mean:.4f}")
         print(f"          -> CV recall_std: {rec_std:.4f}")
 
-        results_table.add_data(i,rec_mean, rec_std)
+        results_table.add_data(depth, rec_mean, rec_std)
 
         if rec_mean > best_rec:
             best_rec = rec_mean
@@ -109,11 +120,11 @@ def entramiento_modelo_decission_tree_kids():
     
     wandb.log({"cv_results":results_table})
 
-    best_model = DecisionTreeClassifier(
-        max_depth=best_depth, 
-        criterion=config.criterion,
-        random_state=42
-        )
+    best_model = Pipeline([
+        ("preprocess", preprocess),
+        ("svd", TruncatedSVD(n_components=300)),
+        ("model",DecisionTreeClassifier(max_depth=best_depth, criterion=config.criterion))
+    ])
 
     best_model.fit(x_train, y_train)
     
