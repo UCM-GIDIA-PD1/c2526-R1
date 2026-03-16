@@ -5,9 +5,9 @@ from pandas import DataFrame
 import json
 import datetime
 
-from get_video_info_api import get_info
-from get_video_ids_bs4 import get_random_ids, get_random_ids_kids
-from Server_PD import upload_dataframe_minio
+from extraccion.get_video_info_api import get_info
+from extraccion.get_video_ids_bs4 import get_random_ids, get_random_ids_kids
+from comun.Server_PD import upload_dataframe_minio
 
 def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
     '''
