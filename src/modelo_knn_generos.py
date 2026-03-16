@@ -8,31 +8,45 @@ import joblib
 import pandas as pd
 from modelos_utils import download_model_dfs, preprocess_tfidf
 
-def entramiento_modelo_knn_generos(): #Sin parametrizar 
+def entramiento_modelo_knn_generos(
+        df_train, df_validation, df_test,
+        project_ = "Clasificacion_generos_knn",
+        name_ = "knn_generos_v0",
+        titulo_ = 2000, 
+        descripcion_ = 4000, 
+        tags_ = 2000, 
+        subtitulos_ = 5000, 
+        ngram_range_ = (1,2), 
+        svd_ = 300, 
+        metric_ = "cosine", 
+        k_values_ = [3,5,7,11],
+        cv_folds_ = 5, 
+        preprocess = preprocess_tfidf
+
+): #Sin parametrizar 
     wandb.init(
-        project="clasificacion_generos_knn",
-        name="knn_generos_v0",
+        project= project_,
+        name= name_,
         config={
-            "tfidf_titulo_max_features": 2000,
-            "tfidf_descripcion_max_features": 4000,
-            "tfidf_tags_max_features": 2000,
-            "tfidf_subtitulos_max_features": 5000,
-            "ngram_range": (1,2),
-            "svd_components": 300,
-            "metric": "cosine",
-            "k_values": list(range(3,16,2)),
-            "cv_folds": 5
+            "tfidf_titulo_max_features": titulo_,
+            "tfidf_descripcion_max_features": descripcion_,
+            "tfidf_tags_max_features": tags_,
+            "tfidf_subtitulos_max_features": subtitulos_,
+            "ngram_range": ngram_range_,
+            "svd_components": svd_,
+            "metric": metric_,
+            "k_values": k_values_,
+            "cv_folds": cv_folds_
         }
     )
 
     config = wandb.config
 
-    preprocess = preprocess_tfidf
     best_k = None
     best_acc = 0
     best_model = None
 
-    df_train, df_validation, df_test = download_model_dfs()
+    #df_train, df_validation, df_test = download_model_dfs()
     #print(df_train.columns)
     df_train = pd.concat([df_train, df_validation])
     X_train = df_train.drop(columns=["Generos"])
