@@ -11,7 +11,7 @@ import joblib
 import pandas as pd
 from modelos_utils import download_model_dfs
 
-#Por ahora probamos gini (probar tambien entropy)
+
 def entramiento_modelo_randomForest_generos(): 
     wandb.init(
         project="clasificacion_generos_rf",
@@ -24,9 +24,10 @@ def entramiento_modelo_randomForest_generos():
             "ngram_range": (1,2),
             "svd_components": 300,
             "cv_folds": 5,
-            "criterion": ["entropy", "gini"],
-            "n_estimators": [250, 500],
-            "max_depth":[10, 12, 14]
+            "criterion": "entropy",
+            "n_estimators": [22, 25, 30, 35],
+            "max_depth":[20, 24, 27, 30, 34, 40],
+            "max_features":	['sqrt', None]
         }
     )
 
@@ -44,6 +45,7 @@ def entramiento_modelo_randomForest_generos():
     )
     best_md = None
     best_ne = None
+    best_mf = None
     best_acc = 0
     best_model = None
 
@@ -56,17 +58,15 @@ def entramiento_modelo_randomForest_generos():
     X_test = df_test.drop(columns=["Generos"])
     y_test = df_test["Generos"]
 
-    results_table = wandb.Table(columns=["n_estimators", "max_depth", "cv_accuracy"])
+    results_table = wandb.Table(columns=["n_estimators", "max_depth", "max_features", "cv_accuracy"])
 
-    for c in config.criterion:
-        print(c)
-        print("--------------------")
-        for md in config.max_depth:
-            for ne in config.n_estimators:
+    for md in config.max_depth:
+        for ne in config.n_estimators:
+            for mf in config.max_features:
                 pipeline = Pipeline([
                     ("preprocess", preprocess),
                     ("svd", TruncatedSVD(n_components=config.svd_components)),
-                    ("model", RandomForestClassifier(n_estimators= ne, max_depth = md, criterion=c))
+                    ("model", RandomForestClassifier(n_estimators= ne, max_depth = md, criterion=config.criterion, max_features = mf))
                 ])
 
                 scores = cross_val_score(
@@ -80,30 +80,33 @@ def entramiento_modelo_randomForest_generos():
 
                 acc = scores.mean()
 
-                print(f"max_depth={md}, n_estimators={ne} -> CV accuracy: {acc:.4f}")
+                print(f"max_depth={md}, n_estimators={ne}, max_features{mf} -> CV accuracy: {acc:.4f}")
 
-                results_table.add_data(ne, md, acc)
+                results_table.add_data(ne, md, mf, acc)
 
                 if acc > best_acc:
                     best_acc = acc
                     best_ne = ne
                     best_md = md
+                    best_mf = mf
 
     wandb.log({"cv_results": results_table})
 
     best_model = Pipeline([
         ("preprocess", preprocess),
         ("svd", TruncatedSVD(n_components=config.svd_components)),
-        ("model", RandomForestClassifier(n_estimators= best_ne, max_depth= best_md, criterion=config.criterion))
+        ("model", RandomForestClassifier(n_estimators= best_ne, max_depth= best_md, criterion=config.criterion, max_features= best_mf))
     ])
 
     best_model.fit(X_train, y_train)
     print(f"\nMejor 'n_estimators' encontrado: {best_ne}")
     print(f"\nMejor 'max_depth' encontrado: {best_md}")
+    print(f"\nMejor 'max_features' encontrado: {best_mf}")
     print(f"Validation accuracy: {best_acc:.4f}")
 
     wandb.summary["best_ne"] = best_ne
     wandb.summary["best_md"] = best_md
+    wandb.summary["best_mf"] = best_mf
     wandb.summary["best_cv_accuracy"] = best_acc
     # Evaluación final con test
     pred_test = best_model.predict(X_test)
