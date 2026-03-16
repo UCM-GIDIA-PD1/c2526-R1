@@ -51,7 +51,7 @@ def build_preprocess_bow(columns):
         if types_of_prepro[col] == "text":
             transformers.append((col, CountVectorizer(max_features=5000, ngram_range=(1,2)), col))
         else:
-            transformers.append((col, types_of_prepro[col], col))
+            transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
  
 def build_preprocess_tfidf(columns):
@@ -60,7 +60,7 @@ def build_preprocess_tfidf(columns):
         if types_of_prepro[col] == "text":
             transformers.append((col, TfidfVectorizer(max_features=5000, ngram_range=(1,2)), col))
         else:
-            transformers.append((col, types_of_prepro[col], col))
+            transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
 
 #https://www.kaggle.com/code/siddhvr/introduction-to-word-embeddings-with-word2vec
@@ -109,7 +109,7 @@ def build_preprocess_word2vec(X_tr, columns):
         if types_of_prepro[col] == "text":
             transformers.append((col, Word2VecVectorizer(model), col))
         else:
-            transformers.append((col, types_of_prepro[col], col))
+            transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
 
 def build_preprocess(type, columns, X_tr):

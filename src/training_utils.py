@@ -5,6 +5,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics import accuracy_score, classification_report
 from preprocess_utils import build_preprocess, download_and_divide
 import numpy as np
+import pandas as pd
 
 def run_cross_validation(X_train, y_train, preprocess_type, columns, parameter_name, parameter_vals, modelo, n_splits=5):
     best_param = None
@@ -69,5 +70,11 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
 
 def entrenamiento(modelo, to_predict, preprocess_type, columns, param_name, param_vals, metric_val, n_splits):
     X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
-    best_acc, best_param = run_cross_validation(X_train, y_train, preprocess_type=preprocess_type, columns=columns, parameter_name=param_name, parameter_vals=param_vals, modelo=modelo, n_splits=n_splits)
+
+    best_acc, best_param = run_cross_validation(X_train, y_train, 
+                                                preprocess_type=preprocess_type, 
+                                                columns=columns, parameter_name=param_name, 
+                                                parameter_vals=param_vals, 
+                                                modelo=modelo, n_splits=n_splits)
+
     run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, param_name, best_param, metric_val)
