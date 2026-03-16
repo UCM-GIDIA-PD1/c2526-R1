@@ -47,29 +47,27 @@ def entrenamiento_modelo_naive_bayes_kids():
             ("Titulo",
              TfidfVectorizer(
                  max_features=config.tfidf_titulo_max_features,
-                 ngram_range=tuple(config.ngram_range)
+                 ngram_range=tuple(config.ngram_range), min_df=3, #ignora palabras que aparecen en menos de 3 archivos
+                 max_df=0.9, #ignora palabras que aparecen en más del 90% de los archivos
              ),
              "Titulo"),
 
             ("Descripcion",
              TfidfVectorizer(
                  max_features=config.tfidf_descripcion_max_features,
-                 ngram_range=tuple(config.ngram_range)
-             ),
+                 ngram_range=tuple(config.ngram_range), min_df=3),
              "Descripcion"),
 
             ("Tags",
              TfidfVectorizer(
                  max_features=config.tfidf_tags_max_features,
-                 ngram_range=tuple(config.ngram_range)
-             ),
+                 ngram_range=tuple(config.ngram_range), min_df=3, max_df=0.9),
              "Tags"),
 
             ("Subtitulos",
              TfidfVectorizer(
                  max_features=config.tfidf_subtitulos_max_features,
-                 ngram_range=tuple(config.ngram_range)
-             ),
+                 ngram_range=tuple(config.ngram_range), min_df=3),
              "Subtitulos"),
 
             ("Generos", OneHotEncoder(handle_unknown="ignore"), ["Generos"])
@@ -159,9 +157,9 @@ def entrenamiento_modelo_naive_bayes_kids():
 
     test_rec = recall_score(y_test, pred_test)
 
-    print("\nTEST RESULTS:")
+    print("\nResultados en test:")
     print("Recall:", test_rec)
-    print("\nClassification Report:")
+    print("\nReporte de clasificación:")
     print(classification_report(y_test, pred_test))
 
     wandb.log({
