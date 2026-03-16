@@ -52,7 +52,7 @@ preprocess_bag_of_words = ColumnTransformer(
         ("Descripcion", CountVectorizer(max_features=4000, ngram_range=(1,2)), "Descripcion"),
         ("Tags", CountVectorizer(max_features=2000, ngram_range=(1,2)), "Tags"),
         ("Subtitulos", CountVectorizer(max_features=5000, ngram_range=(1,2)), "Subtitulos"),
-        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
+        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]), ##parametrizar
         ("Duracion", StandardScaler(), ["Duracion"])
     ]
     )
@@ -63,7 +63,7 @@ preprocess_tfidf = ColumnTransformer(
         ("Descripcion", TfidfVectorizer(max_features=4000, ngram_range=(1,2)), "Descripcion"),
         ("Tags", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Tags"),
         ("Subtitulos", TfidfVectorizer(max_features=5000, ngram_range=(1,2)), "Subtitulos"),
-        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
+        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]), ##parametrizar
         ("Duracion", StandardScaler(), ["Duracion"])
     ]
     )
@@ -115,7 +115,7 @@ def build_preprocess_word2vec(X_tr):
             ("Descripcion", Word2VecVectorizer(model), "Descripcion"),
             ("Tags", Word2VecVectorizer(model), "Tags"),
             ("Subtitulos", Word2VecVectorizer(model), "Subtitulos"),
-            ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
+            ("Rango_edad", OneHotEncoder(), ["Rango_edad"]), ##parametrizar
             ("Duracion", StandardScaler(), ["Duracion"])
         ]
     )
@@ -195,3 +195,8 @@ def run_best_model(preprocess_type, X_train, y_train, X_test, y_test, modelo, pa
     print(classification_report(y_test, pred_test))
 
     return best_model
+
+def entrenamiento(modelo, to_predict, preprocess_type, param_name, param_vals, metric_val, n_splits):
+    X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
+    best_acc, best_param = run_cross_validation(X_train, y_train, preprocess_type=preprocess_type, parameter_name=param_name, parameter_vals=param_vals, modelo=modelo, n_splits=n_splits)
+    run_best_model("Word2Vec", X_train, y_train, X_test, y_test, modelo, param_name, best_param, metric_val)
