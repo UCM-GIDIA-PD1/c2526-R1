@@ -1,13 +1,14 @@
 import isodate
 import json
 from comun.Server_PD import download_dataframe_minio
-from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.base import BaseEstimator, TransformerMixin
 from gensim.utils import simple_preprocess
+from gensim.models import Word2Vec
 import numpy as np
+import pandas as pd
 
 def iso_a_minutos(iso_duration):
     """"
@@ -29,7 +30,7 @@ def download_model_dfs():
         df_validation['Duracion'] = df_validation['Duracion'].apply(iso_a_minutos)
         df_test['Duracion'] = df_test['Duracion'].apply(iso_a_minutos)
         return df_train, df_validation, df_test
-
+    
 def download_model_dfs_filtered():
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
@@ -42,27 +43,37 @@ def download_model_dfs_filtered():
         df_test_filtered['Duracion'] = df_test_filtered['Duracion'].apply(iso_a_minutos)
         return df_train_filtered, df_validation_filtered, df_test_filtered
 
-preprocess_bag_of_words = ColumnTransformer(
-    transformers=[
-        ("Titulo", CountVectorizer(max_features=2000, ngram_range=(1,2)), "Titulo"),
-        ("Descripcion", CountVectorizer(max_features=4000, ngram_range=(1,2)), "Descripcion"),
-        ("Tags", CountVectorizer(max_features=2000, ngram_range=(1,2)), "Tags"),
-        ("Subtitulos", CountVectorizer(max_features=5000, ngram_range=(1,2)), "Subtitulos"),
-        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
-        ("Duracion", StandardScaler(), ["Duracion"])
-    ]
-    )
+def download_and_divide(to_predict):
+    df_train, df_validation, df_test = download_model_dfs()
+    df_train = pd.concat([df_train, df_validation])
+    X_train = df_train.drop(columns=[to_predict])
+    y_train = df_train[to_predict]
+    
+    X_test = df_test.drop(columns=[to_predict])
+    y_test = df_test[to_predict]
+    return X_train, y_train, X_test, y_test
 
-preprocess_tfidf = ColumnTransformer(
-    transformers=[
-        ("Titulo", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Titulo"),
-        ("Descripcion", TfidfVectorizer(max_features=4000, ngram_range=(1,2)), "Descripcion"),
-        ("Tags", TfidfVectorizer(max_features=2000, ngram_range=(1,2)), "Tags"),
-        ("Subtitulos", TfidfVectorizer(max_features=5000, ngram_range=(1,2)), "Subtitulos"),
-        ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
-        ("Duracion", StandardScaler(), ["Duracion"])
-    ]
-    )
+types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", 
+                   "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), 
+                   "Duracion": StandardScaler()}
+
+def build_preprocess_bow(columns):
+    transformers = []
+    for col in columns:
+        if types_of_prepro[col] == "text":
+            transformers.append((col, CountVectorizer(max_features=5000, ngram_range=(1,2)), col))
+        else:
+            transformers.append((col, types_of_prepro[col], [col]))
+    return ColumnTransformer(transformers = transformers)
+ 
+def build_preprocess_tfidf(columns):
+    transformers = []
+    for col in columns:
+        if types_of_prepro[col] == "text":
+            transformers.append((col, TfidfVectorizer(max_features=5000, ngram_range=(1,2)), col))
+        else:
+            transformers.append((col, types_of_prepro[col], [col]))
+    return ColumnTransformer(transformers = transformers)
 
 #https://www.kaggle.com/code/siddhvr/introduction-to-word-embeddings-with-word2vec
 class Word2VecVectorizer(BaseEstimator, TransformerMixin):
@@ -86,17 +97,40 @@ class Word2VecVectorizer(BaseEstimator, TransformerMixin):
         else:
             return np.zeros(self.dim)
         
-def build_preprocess_word2vec(model):
-    
-    preprocess_word2vec = ColumnTransformer(
-        transformers=[
-            ("Titulo", Word2VecVectorizer(model), "Titulo"),
-            ("Descripcion", Word2VecVectorizer(model), "Descripcion"),
-            ("Tags", Word2VecVectorizer(model), "Tags"),
-            ("Subtitulos", Word2VecVectorizer(model), "Subtitulos"),
-            ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
-            ("Duracion", StandardScaler(), ["Duracion"])
-        ]
-    )
+def build_preprocess_word2vec(X_tr, columns):
+    #preprocesamiento para word2vec
+    all_text = ( #asumiendo que estas cuatro columnas van a estar
+            X_tr["Titulo"].astype(str) + " " +
+            X_tr["Descripcion"].astype(str) + " " +
+            X_tr["Tags"].astype(str) + " " +
+            X_tr["Subtitulos"].astype(str)
+        )
 
-    return preprocess_word2vec
+    sentences = [simple_preprocess(text) for text in all_text]
+
+    model = Word2Vec(
+            sentences=sentences,
+            vector_size=300,
+            window=5,
+            min_count=2,
+            workers=4
+        )
+    
+    transformers = []
+    for col in columns:
+        if types_of_prepro[col] == "text":
+            transformers.append((col, Word2VecVectorizer(model), col))
+        else:
+            transformers.append((col, types_of_prepro[col], [col]))
+    return ColumnTransformer(transformers = transformers)
+
+def build_preprocess(type, columns, X_tr):
+    if (type == "Bag of words"):
+        return build_preprocess_bow(columns)
+    elif (type == "TF-IDF"):
+        return build_preprocess_tfidf(columns)
+    elif (type == "Word2Vec"):
+        return build_preprocess_word2vec(X_tr, columns)
+    else:
+        raise Exception("Preprocess type not valid. Valid types are Bag of words, TF-IDF and Word2Vec.")
+    

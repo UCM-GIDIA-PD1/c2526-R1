@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, classification_report
 import wandb
 import joblib
 import pandas as pd
-from modelos_utils import download_model_dfs
+from preprocess_utils import download_model_dfs
 
 
 def entramiento_modelo_randomForest_generos(): 
