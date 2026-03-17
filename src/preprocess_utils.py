@@ -7,6 +7,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.base import BaseEstimator, TransformerMixin
 from gensim.utils import simple_preprocess
 from gensim.models import Word2Vec
+from itertools import product
 import numpy as np
 import pandas as pd
 
@@ -19,7 +20,26 @@ def iso_a_minutos(iso_duration):
         return duracion.total_seconds() / 60
     except:
         return 0
-    
+def unzip_params(params): #Comprobar que ocurre cuando usas solo una clave
+    """
+    Dado un conjunto de parametros, hace todas las combinaciones posibles entre todos ellos
+
+    Parameters
+    ----------
+    params: diccionarios con listas o valores unicos
+        Ejemplo: {k: [3,4,5], metric: ["cosine", "normal"]} 
+
+    Returns
+    -------
+    unzip_params_: lista con diccionarios con todas las mezclas
+        Ejemplo: [{k: 3, metric: cosine}, k:3, {metric: normal}...]
+    """ 
+    keys = params.keys()
+    values = params.values()
+    unzip_params_ = [dict(zip(keys, v)) for v in product(*values)]
+    return unzip_params_
+
+
 def download_model_dfs():
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
