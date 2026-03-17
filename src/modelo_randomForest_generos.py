@@ -25,8 +25,8 @@ def entramiento_modelo_randomForest_generos():
             "svd_components": 300,
             "cv_folds": 5,
             "criterion": "entropy",
-            "n_estimators": [100],
-            "max_depth":[15, 25, 30],
+            "n_estimators": [50],
+            "max_depth":[30],
             "max_features":	[0.5]
         }
     )
@@ -51,6 +51,7 @@ def entramiento_modelo_randomForest_generos():
 
     df_train, df_validation, df_test = download_model_dfs()
 
+    
     #temporal
     generos_a_eliminar = [
         "Comedy", 
@@ -65,6 +66,7 @@ def entramiento_modelo_randomForest_generos():
     df_validation = df_validation[~df_validation["Generos"].isin(generos_a_eliminar)]
     df_test = df_test[~df_test["Generos"].isin(generos_a_eliminar)]
 
+    
 
     df_train = pd.concat([df_train, df_validation])
     X_train = df_train.drop(columns=["Generos"])
