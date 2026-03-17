@@ -14,5 +14,7 @@ if __name__ == '__main__':
 
     n_fold = 2
 
+    filtrado = False
+
     entrenamiento(KNeighborsClassifier, to_predict, preprocess_type, columns, 
-                  param_name, param_vals, metric, n_fold)
+                  param_name, param_vals, metric, n_fold, filtrado)

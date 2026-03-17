@@ -24,27 +24,50 @@ def made_for_kids(df):
     df["Made for kids"] = df["Rango_edad"] != 'Adult'
     
     return df
-def download_latest_extraction_correct():
+def download_latest_extraction_correct(filtrado = False):
+    """
+    Descarga el último dataframe de extracción (se pone a mano)
+
+    Parameters
+    ----------
+    Filtrado: bool
+        Marca si se quiere filtrar el dataframe
+
+    Returns
+    -------
+    df:
+        Datraframe descargado
+    """ 
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
+    if filtrado: 
+        df = filtrado(df) #Filtradomos el df
     df = made_for_kids(df) # Corregimos los kids
     return df
 
-def download_latest_extraction_filtered(): 
-    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
-        claves = json.load(archivo)
-    
-    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
-    df = made_for_kids(df) # Corregimos los kids
-    df = filtrado(df) #Filtramos el df
-    return df
 
-def get_data_models_kids(df_original = download_latest_extraction_correct()):
-    df = df_original.copy()
-    y = df["Made for kids"]
-    X = df.drop(["Made for kids", "Rango_edad"], axis=1)
+def get_data_models_train_test(filtrado = False, to_predict = "Made for kids"):
+    """
+    Obten un X_train, y_train, X_test, y_test más reciente posible.
+    Estratificado para niños o generos
+
+    Parameters
+    ----------
+    Filtrado: bool
+        Marca si se quiere utilizar datos filtrados o sin filtrar
+    to_predict: string
+        Dice que columna vamos a predecir: Generos o Made for kids
+
+    Returns
+    -------
+    X_train, X_test, y_train, y_test:
+        Datos descargados
+    """ 
+    df = download_latest_extraction_correct(filtrado).copy()
+    y = df[to_predict]
+    X = df.drop([to_predict], axis=1)
     
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
@@ -55,20 +78,6 @@ def get_data_models_kids(df_original = download_latest_extraction_correct()):
     
     return X_train, X_test, y_train, y_test
 
-
-def get_data_models_generos(df_original = download_latest_extraction_correct()): 
-    df = df_original.copy()
-    y = df["Generos"]
-    X = df.drop(["Generos"], axis=1)
-    
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y,
-        test_size=0.15,      
-        random_state=42,    
-        stratify=y          
-    )
-    
-    return X_train, X_test, y_train, y_test
 
 def informacion_vacia(df): 
     """
@@ -206,8 +215,7 @@ if __name__ == '__main__':
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     
-    df = download_latest_extraction_filtered()
-    X_train, X_test, y_train, y_test = get_data_models_generos(df)
+    X_train, X_test, y_train, y_test = get_data_models_train_test()
     print(X_train)
     print(y_train.value_counts())
     print(y_test.value_counts())

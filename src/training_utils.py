@@ -4,6 +4,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.metrics import accuracy_score, classification_report
 from preprocess_utils import build_preprocess, download_and_divide
+from filter_and_divide_data import get_data_models_train_test
 import numpy as np
 import pandas as pd
 
@@ -68,8 +69,13 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
 
     return best_model
 
-def entrenamiento(modelo, to_predict, preprocess_type, columns, param_name, param_vals, metric_val, n_splits):
-    X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
+#He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
+def entrenamiento(modelo, to_predict, preprocess_type, columns, param_name, param_vals, metric_val, n_splits, filtrado = False):
+    #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
+
+    X_train, y_train, X_test, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
+
+    #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
 
     best_acc, best_param = run_cross_validation(X_train, y_train, 
                                                 preprocess_type=preprocess_type, 
