@@ -3,10 +3,73 @@ from comun.Server_PD import download_dataframe_minio, upload_dataframe_minio
 import comun.analisisutils as utils
 import pandas as pd
 import json
-def columna_Kids(df): 
-    "Dado un dataframe actualiza el valor de Made for kids"
-    df["Made_for_kids"] = df["rango_edad"] != "Adult"
+from sklearn.model_selection import train_test_split
+
+def made_for_kids(df): 
+    """
+    Corrige los valores de la columna made for kids
+    Si es apto para niños == True
+    Si no es apto para niños == False
+
+    Parameters
+    ----------
+    df:
+        Dataframe a modificar
+
+    Returns
+    -------
+    df:
+        Datraframe modificado
+    """ 
+    df["Made for kids"] = df["Rango_edad"] != 'Adult'
+    
     return df
+def download_latest_extraction_correct():
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
+    df = made_for_kids(df) # Corregimos los kids
+    return df
+
+def download_latest_extraction_filtered(): 
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
+    df = made_for_kids(df) # Corregimos los kids
+    df = filtrado(df) #Filtramos el df
+    return df
+
+def get_data_models_kids(df_original = download_latest_extraction_correct()):
+    df = df_original.copy()
+    y = df["Made for kids"]
+    X = df.drop(["Made for kids", "Rango_edad"], axis=1)
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=0.15,      
+        random_state=42,    
+        stratify=y          
+    )
+    
+    return X_train, X_test, y_train, y_test
+
+
+def get_data_models_generos(df_original = download_latest_extraction_correct()): 
+    df = df_original.copy()
+    y = df["Generos"]
+    X = df.drop(["Generos"], axis=1)
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=0.15,      
+        random_state=42,    
+        stratify=y          
+    )
+    
+    return X_train, X_test, y_train, y_test
+
 def informacion_vacia(df): 
     """
     Informa sobre los valores nulos o vacíos de un dataframe
@@ -90,16 +153,25 @@ def filtrado(df_original):
     bool_final = ~(bool_duracion | bool_text)  # seleccionamos los válidos
 
     df_filtrado = df[bool_final]
+
+    #Ahora filtramos por generos poco representativos 
+    first = len(df_filtrado)
+    frecuencias = df_filtrado["Generos"].value_counts()
+    generos_validos = frecuencias[frecuencias >= 500].index
+    df_filtrado = df_filtrado[df_filtrado["Generos"].isin(generos_validos)]
+    print(f'Numero de videos con poca representación de generos: {first - len(df_filtrado)}')
+
     numero_pos_filtrado = len(df_filtrado)
     diff = numero_pre_filtrado - numero_pos_filtrado
     df_filtrado = df_filtrado.reset_index(drop=True)
     print(f'Partiendo de {numero_pre_filtrado}, se han eliminado {diff}, resultando en: {numero_pos_filtrado} filas')
 
+
     return df_filtrado
 
-def divide_save_data(df, name):
+def divide_save_data(df, name): #Deberíamos eliminarla
     """
-    Divide un df en datos de train, test y validation.
+    Divide un df en datos de train y test. 
     Los sube al minio con un name
 
     Parameters
@@ -134,10 +206,11 @@ if __name__ == '__main__':
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     
-    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet")
-    print("Archivo descargado")
-    informacion_vacia(df)
-    df_filtered = filtrado(df)
-    divide_save_data(df, "no_filters")
-    divide_save_data(df_filtered, "filtered")
-    informacion_vacia(df_filtered)
+    df = download_latest_extraction_filtered()
+    X_train, X_test, y_train, y_test = get_data_models_generos(df)
+    print(X_train)
+    print(y_train.value_counts())
+    print(y_test.value_counts())
+    #print(df_filtered.columns)
+    #print(df_filtered["Made for kids"].value_counts())
+    #print(df["Made for kids"].value_counts())
