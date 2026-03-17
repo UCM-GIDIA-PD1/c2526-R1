@@ -3,7 +3,10 @@ from comun.Server_PD import download_dataframe_minio, upload_dataframe_minio
 import comun.analisisutils as utils
 import pandas as pd
 import json
-
+def columna_Kids(df): 
+    "Dado un dataframe actualiza el valor de Made for kids"
+    df["Made_for_kids"] = df["rango_edad"] != "Adult"
+    return df
 def informacion_vacia(df): 
     """
     Informa sobre los valores nulos o vacíos de un dataframe
