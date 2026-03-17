@@ -39,8 +39,8 @@ def run_cross_validation(X_train, y_train, preprocess_type, columns, parameter_n
     for k in mean_acc_scores.keys():
         print(f"{parameter_name}={k} -> CV accuracy: {mean_acc_scores[k]:.4f}")
 
-        if acc > best_acc:
-            best_acc = acc
+        if mean_acc_scores[k] > best_acc:
+            best_acc = mean_acc_scores[k]
             best_param = k
 
     print(f"\nMejor {parameter_name} encontrado: {best_param}")
