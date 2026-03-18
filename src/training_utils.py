@@ -16,6 +16,7 @@ def run_cross_validation(X_train, y_train, preprocess_type, columns, params, mod
     params_ = unzip_params(params=params)
     scores_dict = [] #{k.keys()[0]: [] for k in params_} #Revisad
     for train_idx, val_idx in tqdm(kf.split(X_train)):
+        print("Iteracion")
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
         preprocess = build_preprocess(preprocess_type, columns, X_tr)
@@ -41,7 +42,7 @@ def run_cross_validation(X_train, y_train, preprocess_type, columns, params, mod
     #mean_acc_scores = {k: np.mean(v) for k, v in scores_dict.items()}
     mean_acc_scores = []
 
-    for i in range(len(scores_dict) / n_splits):
+    for i in range(len(scores_dict) // n_splits):
         total = 0
         paramset = scores_dict[i][0]
         total += scores_dict[i][1]
@@ -88,7 +89,7 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
 def entrenamiento(modelo, to_predict, preprocess_type, columns, params, n_splits, filtrado = False):
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
-    X_train, y_train, X_test, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
+    X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
 
     print("Finished data acquisition, starting crossvalidation")
 
@@ -99,6 +100,6 @@ def entrenamiento(modelo, to_predict, preprocess_type, columns, params, n_splits
                                                 modelo=modelo, n_splits=n_splits)
 
     print("Finished crossvalidation, starting evaluating best model")
-
+    #print(best_param)
     run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, best_param)
     print("Ready!")

@@ -1,5 +1,5 @@
+from sklearn.linear_model import LogisticRegression
 from training_utils import entrenamiento
-from xgboost import XGBClassifier
 
 if __name__ == '__main__':
     to_predict = "Generos"
@@ -12,14 +12,15 @@ if __name__ == '__main__':
     # metric = "cosine"
 
     params = {
-        "n_estimators": [3, 4, 5], 
-        "max_depth": range(1,15),
-        'learning_rate':[0.01, 0.1, 0.5, 1.0]
-        }
+        "C": [0.1, 1, 10],
+        "solver": ["lbfgs"],
+        "max_iter": [1000],
+        "multi_class": "multinomial"
+    }
 
-    n_fold = 5
+    n_fold = 2
 
     filtrado = False
 
-    entrenamiento(XGBClassifier, to_predict, preprocess_type, columns, 
+    entrenamiento(LogisticRegression, to_predict, preprocess_type, columns, 
                   params, n_fold, filtrado)
