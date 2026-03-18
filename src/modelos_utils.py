@@ -1,3 +1,4 @@
+# deprecated
 import isodate
 import json
 from comun.Server_PD import download_dataframe_minio
