@@ -25,8 +25,8 @@ def entramiento_modelo_randomForest_generos():
             "svd_components": 300,
             "cv_folds": 5,
             "criterion": "entropy",
-            "n_estimators": [50],
-            "max_depth":[30],
+            "n_estimators": [30],
+            "max_depth":[20],
             "max_features":	[0.5]
         }
     )
