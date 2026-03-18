@@ -27,35 +27,49 @@ def run_cross_validation(X_train, y_train, preprocess_type, columns, params, mod
         X_tr_trans = pipe.fit_transform(X_tr, y_tr)
         X_val_trans = pipe.transform(X_val)
 
-        for param_val in params_: #un array
-            model = modelo(**param_val)#parameter_name = param_val) #KNeighborsClassifier(n_neighbors=k, metric="cosine")
+        for paramset in params_: #un array
+            model = modelo(**paramset)#parameter_name = param_val) #KNeighborsClassifier(n_neighbors=k, metric="cosine")
             model.fit(X_tr_trans, y_tr)
 
             preds = model.predict(X_val_trans)
             acc = accuracy_score(y_val, preds)
 
-            scores_dict.append((param_val, acc))
+            scores_dict.append((paramset, acc))
             #scores_dict[param_val].append(acc)
 
-    mean_acc_scores = {k: np.mean(v) for k, v in scores_dict.items()}
-    for k in mean_acc_scores.keys():
-        print(f"{param_val}={k} -> CV accuracy: {mean_acc_scores[k]:.4f}")
 
-        if mean_acc_scores[k] > best_acc:
-            best_acc = mean_acc_scores[k]
-            best_param = k
+    #mean_acc_scores = {k: np.mean(v) for k, v in scores_dict.items()}
+    mean_acc_scores = []
 
-    print(f"\nMejor {param_val} encontrado: {best_param}")
+    for i in range(len(scores_dict) / n_splits):
+        total = 0
+        paramset = scores_dict[i][0]
+        total += scores_dict[i][1]
+        for j in range(i+1, len(scores_dict)):
+            if np.array_equal(scores_dict[j][0], paramset):
+                total += scores_dict[j][1]
+        total /= n_splits
+        mean_acc_scores.append((paramset, total))
+
+
+    for k in mean_acc_scores:
+        print(f"Parameters set as {k[0]} -> CV accuracy: {k[1]:.4f}")
+
+        if k[1] > best_acc:
+            best_acc = k[1]
+            best_param = k[0]
+
+    print(f"\nMejor combinación de parámetros encontrada: {best_param}")
     print(f"CrossVal accuracy: {best_acc:.4f}")
 
     return best_acc, best_param
     
-def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, param_name, param_value, metric_val):
+def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset):
     preprocess = build_preprocess(preprocess_type, columns, X_train)
     best_model = Pipeline([
     ("preprocess", preprocess),
     ("svd", TruncatedSVD(n_components=300)),
-    ("model", modelo(param_value, metric=metric_val))
+    ("model", modelo(**paramset))
     ])
 
     best_model.fit(X_train, y_train)
@@ -71,17 +85,20 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     return best_model
 
 #He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
-def entrenamiento(modelo, to_predict, preprocess_type, columns, param_name, param_vals, metric_val, n_splits, filtrado = False):
+def entrenamiento(modelo, to_predict, preprocess_type, columns, params, n_splits, filtrado = False):
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
-
+    print("Starting data acquisition")
     X_train, y_train, X_test, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
 
-    #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
+    print("Finished data acquisition, starting crossvalidation")
 
+    #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
     best_acc, best_param = run_cross_validation(X_train, y_train, 
                                                 preprocess_type=preprocess_type, 
-                                                columns=columns, parameter_name=param_name, 
-                                                parameter_vals=param_vals, 
+                                                columns=columns, params=params, 
                                                 modelo=modelo, n_splits=n_splits)
 
-    run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, param_name, best_param, metric_val)
+    print("Finished crossvalidation, starting evaluating best model")
+
+    run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, best_param)
+    print("Ready!")
