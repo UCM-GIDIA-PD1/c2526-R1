@@ -11,7 +11,7 @@ if __name__ == '__main__':
     # param_vals = range(3,5)
     # metric = "cosine"
 
-    params = {"n_neighbours": [3, 4, 5], "metric": "cosine"}
+    params = {"n_neighbors": [3, 4, 5], "metric": ["cosine"]}
 
     n_fold = 2
 

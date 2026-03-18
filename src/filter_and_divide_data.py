@@ -3,7 +3,19 @@ from comun.Server_PD import download_dataframe_minio, upload_dataframe_minio
 import comun.analisisutils as utils
 import pandas as pd
 import json
+import isodate
 from sklearn.model_selection import train_test_split
+
+def iso_a_minutos(iso_duration):
+    """"
+    Funcion que convierte la duracion a minutos
+    """
+    try:
+        duracion = isodate.parse_duration(iso_duration)
+        return duracion.total_seconds() / 60
+    except:
+        return 0
+    
 
 def made_for_kids(df): 
     """
@@ -42,7 +54,10 @@ def download_latest_extraction_correct(filtrado = False):
         claves = json.load(archivo)
     
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
+    df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
+
     if filtrado: 
+        print("Filtrando datos")
         df = filtrado(df) #Filtradomos el df
     df = made_for_kids(df) # Corregimos los kids
     return df
@@ -76,7 +91,11 @@ def get_data_models_train_test(filtrado = False, to_predict = "Made for kids"):
         stratify=y          
     )
     
-    return X_train, X_test, y_train, y_test
+    X_train = X_train.reset_index(drop=True)
+    y_train = y_train.reset_index(drop=True)
+    X_test = X_test.reset_index(drop = True)
+    y_test = y_test.reset_index(drop = True)
+    return pd.DataFrame(X_train), pd.DataFrame(X_test), (y_train), (y_test)
 
 
 def informacion_vacia(df): 
@@ -132,7 +151,6 @@ def filtrado(df_original):
     df = df_original.copy()
 
     # Convertir Duracion a minutos y asegurar tipo numérico
-    df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos)
     numero_pre_filtrado = len(df)
 
     # Calcular percentiles
