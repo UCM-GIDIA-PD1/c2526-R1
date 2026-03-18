@@ -40,6 +40,20 @@ Al mismo tiempo, este sistema será capaz de asignar una categoría principal y 
         - `collect_all_data.py`: archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
 
         - `get_all_dfs.py`: archivo que une todos los dataframes de los videos extraidos.
+    - Carpeta Private: _Importante_
+        - Dentro de la carpeta src, el usuario que desee utilizar este proyecto debe crear una carpeta llamada "*Private*".
+            En el interior de esa carpeta, es necesario añadir un archivo llamado `claves.json` donde se almacenarán las credenciales y configuraciones necesarias para el funcionamiento del proyecto (APIs y otros servicios externos).
+            
+            El archivo debe tener la siguiente estructura:
+                
+                {
+                    "Clave_API": "Clave de la API de YouTube",
+                    "Url": "minio.fdi.ucm.es",
+                    "Access_Key": "Credenciales de acceso a MINIO",
+                    "Secret_Key": "Clave secreta de acceso a MINIO"
+                }
+
+            *Nota importante:* _Este archivo contiene información sensible, por lo que no debe subirse al repositorio._
 
 - Carpeta `Images readme`: contiene las imágenes de este archivo.
 
