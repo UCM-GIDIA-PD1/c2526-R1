@@ -30,6 +30,18 @@ def download_model_dfs():
         df_test['Duracion'] = df_test['Duracion'].apply(iso_a_minutos)
         return df_train, df_validation, df_test
 
+def download_model_dfs_filtered():
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+        df_train_filtered = download_dataframe_minio("pd1", "grupo1/modelos/train_filtered", claves, "parquet")
+        df_validation_filtered = download_dataframe_minio("pd1", "grupo1/modelos/validation_filtered", claves, "parquet")
+        df_test_filtered = download_dataframe_minio("pd1", "grupo1/modelos/test_filtered", claves, "parquet")
+
+        df_train_filtered['Duracion'] = df_train_filtered['Duracion'].apply(iso_a_minutos)
+        df_validation_filtered['Duracion'] = df_validation_filtered['Duracion'].apply(iso_a_minutos)
+        df_test_filtered['Duracion'] = df_test_filtered['Duracion'].apply(iso_a_minutos)
+        return df_train_filtered, df_validation_filtered, df_test_filtered
+
 preprocess_bag_of_words = ColumnTransformer(
     transformers=[
         ("Titulo", CountVectorizer(max_features=2000, ngram_range=(1,2)), "Titulo"),

@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, classification_report
 import wandb
 import joblib
 import pandas as pd
-from preprocess_utils import download_model_dfs
+from modelos_utils import download_model_dfs
 
 
 def entramiento_modelo_randomForest_generos(): 
@@ -25,13 +25,15 @@ def entramiento_modelo_randomForest_generos():
             "svd_components": 300,
             "cv_folds": 5,
             "criterion": "entropy",
-            "n_estimators": [30],
-            "max_depth":[20],
-            "max_features":	[0.5]
+            "n_estimators": [1, 3],
+            "max_depth":[5, 10, 15],
+            "max_features":	['sqrt']
         }
     )
 
     config = wandb.config
+
+    feature_cols = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Generos", "Duracion"]
 
     preprocess = ColumnTransformer(
         transformers=[
@@ -39,52 +41,34 @@ def entramiento_modelo_randomForest_generos():
             ("Descripcion", TfidfVectorizer(max_features=config.tfidf_descripcion_max_features, ngram_range=tuple(config.ngram_range)), "Descripcion"),
             ("Tags", TfidfVectorizer(max_features=config.tfidf_tags_max_features, ngram_range=tuple(config.ngram_range)), "Tags"),
             ("Subtitulos", TfidfVectorizer(max_features=config.tfidf_subtitulos_max_features, ngram_range=tuple(config.ngram_range)), "Subtitulos"),
-            ("Rango_edad", OneHotEncoder(), ["Rango_edad"]),
+            ("Generos", OneHotEncoder(handle_unknown='ignore'), ["Generos"]), 
             ("Duracion", StandardScaler(), ["Duracion"])
          ]
     )
-    best_md = None
-    best_ne = None
-    best_mf = None
-    best_acc = 0
-    best_model = None
 
+    print('Downloading dataframes')
     df_train, df_validation, df_test = download_model_dfs()
-
-    
-    #temporal
-    generos_a_eliminar = [
-        "Comedy", 
-        "Autos & Vehicles", 
-        "Travel & Events", 
-        "Nonprofits & Activism", 
-        "Pets & Animals"
-    ]
-    
-    # Filtramos los tres datasets
-    df_train = df_train[~df_train["Generos"].isin(generos_a_eliminar)]
-    df_validation = df_validation[~df_validation["Generos"].isin(generos_a_eliminar)]
-    df_test = df_test[~df_test["Generos"].isin(generos_a_eliminar)]
-
-    
-
     df_train = pd.concat([df_train, df_validation])
-    X_train = df_train.drop(columns=["Generos"])
-    y_train = df_train["Generos"]
-    #X_validation = df_validation.drop(columns=["Generos"])
-    #y_validation = df_validation["Generos"]
-    X_test = df_test.drop(columns=["Generos"])
-    y_test = df_test["Generos"]
+    
+    X_train = df_train[feature_cols]
+    X_test = df_test[feature_cols]
+
+    y_train = (df_train["Rango_edad"] != 'Adult').astype(int)
+    y_test = (df_test["Rango_edad"] != 'Adult').astype(int)
 
     results_table = wandb.Table(columns=["n_estimators", "max_depth", "max_features", "cv_accuracy"])
+
+    best_acc = 0
+    best_params = {}
 
     for md in config.max_depth:
         for ne in config.n_estimators:
             for mf in config.max_features:
+                
                 pipeline = Pipeline([
                     ("preprocess", preprocess),
                     ("svd", TruncatedSVD(n_components=config.svd_components)),
-                    ("model", RandomForestClassifier(n_estimators= ne, max_depth = md, criterion=config.criterion, max_features = mf))
+                    ("model", RandomForestClassifier(n_estimators=ne, max_depth=md, criterion=config.criterion, max_features=mf, n_jobs=-1))
                 ])
 
                 scores = cross_val_score(
@@ -93,13 +77,11 @@ def entramiento_modelo_randomForest_generos():
                     y_train,
                     cv=config.cv_folds,
                     scoring="accuracy",
-                    n_jobs=-1
+                    n_jobs=1
                 )
 
                 acc = scores.mean()
-
-                print(f"max_depth={md}, n_estimators={ne}, max_features={mf} -> CV accuracy: {acc:.4f}")
-
+                print(f"max_depth: {md}, n_estimators: {ne}, max_features: {mf} -> Accuracy: {acc:.4f}")
                 results_table.add_data(ne, md, mf, acc)
 
                 if acc > best_acc:
@@ -107,6 +89,7 @@ def entramiento_modelo_randomForest_generos():
                     best_ne = ne
                     best_md = md
                     best_mf = mf
+
 
     wandb.log({"cv_results": results_table})
 

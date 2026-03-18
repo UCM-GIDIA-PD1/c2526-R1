@@ -3,6 +3,81 @@ from comun.Server_PD import download_dataframe_minio, upload_dataframe_minio
 import comun.analisisutils as utils
 import pandas as pd
 import json
+from sklearn.model_selection import train_test_split
+
+def made_for_kids(df): 
+    """
+    Corrige los valores de la columna made for kids
+    Si es apto para niños == True
+    Si no es apto para niños == False
+
+    Parameters
+    ----------
+    df:
+        Dataframe a modificar
+
+    Returns
+    -------
+    df:
+        Datraframe modificado
+    """ 
+    df["Made for kids"] = df["Rango_edad"] != 'Adult'
+    
+    return df
+def download_latest_extraction_correct(filtrado = False):
+    """
+    Descarga el último dataframe de extracción (se pone a mano)
+
+    Parameters
+    ----------
+    Filtrado: bool
+        Marca si se quiere filtrar el dataframe
+
+    Returns
+    -------
+    df:
+        Datraframe descargado
+    """ 
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
+    if filtrado: 
+        df = filtrado(df) #Filtradomos el df
+    df = made_for_kids(df) # Corregimos los kids
+    return df
+
+
+def get_data_models_train_test(filtrado = False, to_predict = "Made for kids"):
+    """
+    Obten un X_train, y_train, X_test, y_test más reciente posible.
+    Estratificado para niños o generos
+
+    Parameters
+    ----------
+    Filtrado: bool
+        Marca si se quiere utilizar datos filtrados o sin filtrar
+    to_predict: string
+        Dice que columna vamos a predecir: Generos o Made for kids
+
+    Returns
+    -------
+    X_train, X_test, y_train, y_test:
+        Datos descargados
+    """ 
+    df = download_latest_extraction_correct(filtrado).copy()
+    y = df[to_predict]
+    X = df.drop([to_predict], axis=1)
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=0.15,      
+        random_state=42,    
+        stratify=y          
+    )
+    
+    return X_train, X_test, y_train, y_test
+
 
 def informacion_vacia(df): 
     """
@@ -87,16 +162,25 @@ def filtrado(df_original):
     bool_final = ~(bool_duracion | bool_text)  # seleccionamos los válidos
 
     df_filtrado = df[bool_final]
+
+    #Ahora filtramos por generos poco representativos 
+    first = len(df_filtrado)
+    frecuencias = df_filtrado["Generos"].value_counts()
+    generos_validos = frecuencias[frecuencias >= 500].index
+    df_filtrado = df_filtrado[df_filtrado["Generos"].isin(generos_validos)]
+    print(f'Numero de videos con poca representación de generos: {first - len(df_filtrado)}')
+
     numero_pos_filtrado = len(df_filtrado)
     diff = numero_pre_filtrado - numero_pos_filtrado
     df_filtrado = df_filtrado.reset_index(drop=True)
     print(f'Partiendo de {numero_pre_filtrado}, se han eliminado {diff}, resultando en: {numero_pos_filtrado} filas')
 
+
     return df_filtrado
 
-def divide_save_data(df, name):
+def divide_save_data(df, name): #Deberíamos eliminarla
     """
-    Divide un df en datos de train, test y validation.
+    Divide un df en datos de train y test. 
     Los sube al minio con un name
 
     Parameters
@@ -131,10 +215,10 @@ if __name__ == '__main__':
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     
-    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet")
-    print("Archivo descargado")
-    informacion_vacia(df)
-    df_filtered = filtrado(df)
-    divide_save_data(df, "no_filters")
-    divide_save_data(df_filtered, "filtered")
-    informacion_vacia(df_filtered)
+    X_train, X_test, y_train, y_test = get_data_models_train_test()
+    print(X_train)
+    print(y_train.value_counts())
+    print(y_test.value_counts())
+    #print(df_filtered.columns)
+    #print(df_filtered["Made for kids"].value_counts())
+    #print(df["Made for kids"].value_counts())
