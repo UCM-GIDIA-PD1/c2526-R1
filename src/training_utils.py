@@ -14,10 +14,7 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
         project= project_,
         name= name_,
         config={
-            "tfidf_titulo_max_features": 5000,
-            "tfidf_descripcion_max_features": 5000,
-            "tfidf_tags_max_features": 5000,
-            "tfidf_subtitulos_max_features": 5000,
+            "max_features": 5000,
             "ngram_range": (1,2),
             "svd_components": 300,
             "cv_folds": n_splits,
@@ -33,8 +30,9 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42) #n splits 5
     params_ = unzip_params(params=params)
     scores_dict = [] #{k.keys()[0]: [] for k in params_} #Revisad
+    i = 0
     for train_idx, val_idx in tqdm(kf.split(X_train)):
-        print("Iteracion")
+        print(f'Iteracion: {0}')
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
         preprocess = build_preprocess(preprocess_type, columns, X_tr)
@@ -54,6 +52,7 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
             acc = accuracy_score(y_val, preds)
 
             scores_dict.append((paramset, acc))
+            i = i+1
             #scores_dict[param_val].append(acc)
 
 
@@ -80,7 +79,16 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
 
     print(f"\nMejor combinación de parámetros encontrada: {best_param}")
     print(f"CrossVal accuracy: {best_acc:.4f}")
+    table = wandb.Table(columns=["params", "cv_accuracy"])
 
+    for param, score in mean_acc_scores:
+        table.add_data(str(param), score)
+
+    wandb.log({"cv_results": table})
+
+    wandb.summary["best_acc"] = best_acc
+    wandb.summary["best_params"] = best_param
+    wandb.finish()
     return best_acc, best_param
     
 def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset):
@@ -100,11 +108,48 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     print("Accuracy:", accuracy_score(y_test, pred_test))
     print("\nClassification Report:")
     print(classification_report(y_test, pred_test))
-
+    wandb.finish()
     return best_model
 
 #He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
 def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns, params, n_splits, filtrado = False):
+    """
+    Ejecuta un modelo especificado, haz una run en wandb y devuelve por pantalla la mejor selección de parametros
+
+    Parameters
+    ----------
+    project_: string
+        Nombre del projecto
+    
+    name_: string
+        nombre de la run
+    
+    modelo_: Modelo de skicit learn que se va a utilizar
+        Ejemplos: KNeighborsClassifier
+    
+    to_predict: Columna a predecir
+        Opciones: "Generos" o "Made for kids"
+    
+    preprocess_type: Tipo de preprocesamiento de palabras
+        Opciones: "Bag of words", "TF-IDF" and "Word2Vec"
+
+    columns: Columnas del dataframe
+        Opciones: "Descripcion", "Subtitulos", "Titulo", etc...
+    
+    params: Diccionario de parametros a ejecutarse (El valor siempre dentro de corchetes)
+        Ejemplo: {"n_neighbors": [3, 4, 5], "metric": ["cosine"]}
+
+    n_splits: int
+        Numero de pruebas del cross validation
+
+    filtrado: Bool
+        Indica si quieres (True) o no quieres (False), utilzar un dataframe filtrado
+
+    Returns
+    -------
+    Nada:
+        No devuelve nada
+    """ 
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
     X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)

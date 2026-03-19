@@ -1,5 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
 from training_utils import entrenamiento
+from sklearn.metrics import accuracy_score, precision_score
+
 
 if __name__ == '__main__':
     to_predict = "Generos"
@@ -14,7 +16,6 @@ if __name__ == '__main__':
     # metric = "cosine"
 
     params = {"n_neighbors": [3, 4, 5], "metric": ["cosine"]}
-
     n_fold = 2
 
     filtrado = True
