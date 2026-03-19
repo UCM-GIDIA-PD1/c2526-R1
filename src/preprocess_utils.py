@@ -1,6 +1,7 @@
 import isodate
 import json
 from comun.Server_PD import download_dataframe_minio
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -20,6 +21,17 @@ def iso_a_minutos(iso_duration):
         return duracion.total_seconds() / 60
     except:
         return 0
+    
+def build_score(score, y_val, preds, average = "weighted"): 
+    if score == "Accuracy":
+        return accuracy_score(y_val, preds)
+    elif score == "Precision": 
+        return precision_score(y_val, preds, average = average)
+    elif score == "Recall": 
+        return recall_score(y_val, preds, average = average)
+    else:
+        return f1_score(y_val, preds, average = average)
+
 def unzip_params(params): #Comprobar que ocurre cuando usas solo una clave
     """
     Dado un conjunto de parametros, hace todas las combinaciones posibles entre todos ellos
@@ -75,7 +87,7 @@ def download_and_divide(to_predict): #Deprecated
 
 types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", 
                    "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), 
-                   "Duracion": StandardScaler(), "Made for kids": "passthrough"}
+                   "Duracion": StandardScaler(), "Made for kids": "passthrough"} #passthrough marca que no se hacen transformaciones
 
 def build_preprocess_bow(columns):
     transformers = []

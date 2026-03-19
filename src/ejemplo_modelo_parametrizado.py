@@ -1,6 +1,6 @@
 from sklearn.neighbors import KNeighborsClassifier
 from training_utils import entrenamiento
-from sklearn.metrics import accuracy_score, precision_score
+from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score
 
 
 if __name__ == '__main__':
@@ -15,10 +15,11 @@ if __name__ == '__main__':
     # param_vals = range(3,5)
     # metric = "cosine"
 
-    params = {"n_neighbors": [3, 4, 5], "metric": ["cosine"]}
+    params = {"n_neighbors": [2,3], "metric": ["cosine"]}
+    score = "Precision"
+    average = "weighted"
     n_fold = 2
-
     filtrado = True
 
     entrenamiento(project, name, KNeighborsClassifier, to_predict, preprocess_type, columns, 
-                  params, n_fold, filtrado)
+                  params, score, average, n_fold, filtrado)
