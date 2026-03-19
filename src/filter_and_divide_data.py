@@ -36,7 +36,7 @@ def made_for_kids(df):
     df["Made for kids"] = df["Rango_edad"] != 'Adult'
     
     return df
-def download_latest_extraction_correct(filtrado = False):
+def download_latest_extraction_correct(filtrar = False):
     """
     Descarga el último dataframe de extracción (se pone a mano)
 
@@ -56,7 +56,7 @@ def download_latest_extraction_correct(filtrado = False):
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
 
-    if filtrado: 
+    if filtrar: 
         print("Filtrando datos")
         df = filtrado(df) #Filtradomos el df
     df = made_for_kids(df) # Corregimos los kids
@@ -95,7 +95,7 @@ def get_data_models_train_test(filtrado = False, to_predict = "Made for kids"):
     y_train = y_train.reset_index(drop=True)
     X_test = X_test.reset_index(drop = True)
     y_test = y_test.reset_index(drop = True)
-    return pd.DataFrame(X_train), pd.DataFrame(X_test), (y_train), (y_test)
+    return pd.DataFrame(X_train), pd.DataFrame(X_test), (y_train), (y_test) #Nos aseguramos de que se pasen los tipos correctos
 
 
 def informacion_vacia(df): 

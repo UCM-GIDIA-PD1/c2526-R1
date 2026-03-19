@@ -40,7 +40,7 @@ def unzip_params(params): #Comprobar que ocurre cuando usas solo una clave
     return unzip_params_
 
 
-def download_model_dfs():
+def download_model_dfs(): #Deprecated
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
         df_train = download_dataframe_minio("pd1", "grupo1/modelos/train_no_filters", claves, "parquet")
@@ -51,7 +51,7 @@ def download_model_dfs():
         df_test['Duracion'] = df_test['Duracion'].apply(iso_a_minutos)
         return df_train, df_validation, df_test
     
-def download_model_dfs_filtered():
+def download_model_dfs_filtered(): #Deprecated
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
         df_train_filtered = download_dataframe_minio("pd1", "grupo1/modelos/train_filtered", claves, "parquet")
@@ -63,7 +63,7 @@ def download_model_dfs_filtered():
         df_test_filtered['Duracion'] = df_test_filtered['Duracion'].apply(iso_a_minutos)
         return df_train_filtered, df_validation_filtered, df_test_filtered
 
-def download_and_divide(to_predict):
+def download_and_divide(to_predict): #Deprecated
     df_train, df_validation, df_test = download_model_dfs()
     df_train = pd.concat([df_train, df_validation])
     X_train = df_train.drop(columns=[to_predict])
@@ -75,7 +75,7 @@ def download_and_divide(to_predict):
 
 types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", 
                    "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), 
-                   "Duracion": StandardScaler()}
+                   "Duracion": StandardScaler(), "Made for kids": "passthrough"}
 
 def build_preprocess_bow(columns):
     transformers = []
@@ -91,6 +91,8 @@ def build_preprocess_tfidf(columns):
     for col in columns:
         if types_of_prepro[col] == "text":
             transformers.append((col, TfidfVectorizer(max_features=5000, ngram_range=(1,2)), col))
+        elif types_of_prepro[col] == "skip": 
+             transformers.append((col, "passthrough", [col])) #No hace transformaciones para made for kids porque ya es booleana
         else:
             transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)

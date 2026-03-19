@@ -7,8 +7,26 @@ from preprocess_utils import build_preprocess, unzip_params
 from filter_and_divide_data import get_data_models_train_test
 import numpy as np
 import pandas as pd
+import wandb
 
-def run_cross_validation(X_train, y_train, preprocess_type, columns, params, modelo, n_splits=5):
+def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, columns, params, modelo, n_splits=5):
+    wandb.init(
+        project= project_,
+        name= name_,
+        config={
+            "tfidf_titulo_max_features": 5000,
+            "tfidf_descripcion_max_features": 5000,
+            "tfidf_tags_max_features": 5000,
+            "tfidf_subtitulos_max_features": 5000,
+            "ngram_range": (1,2),
+            "svd_components": 300,
+            "cv_folds": n_splits,
+            "params": params, 
+            "columns": columns, 
+            "preprocess_type": preprocess_type, 
+            "modelo": modelo
+        }
+    )
     best_param = None
     best_acc = 0
     
@@ -86,7 +104,7 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     return best_model
 
 #He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
-def entrenamiento(modelo, to_predict, preprocess_type, columns, params, n_splits, filtrado = False):
+def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns, params, n_splits, filtrado = False):
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
     X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
@@ -94,7 +112,7 @@ def entrenamiento(modelo, to_predict, preprocess_type, columns, params, n_splits
     print("Finished data acquisition, starting crossvalidation")
 
     #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
-    best_acc, best_param = run_cross_validation(X_train, y_train, 
+    best_acc, best_param = run_cross_validation(project_, name_, X_train, y_train, 
                                                 preprocess_type=preprocess_type, 
                                                 columns=columns, params=params, 
                                                 modelo=modelo, n_splits=n_splits)

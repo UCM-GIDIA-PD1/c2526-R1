@@ -3,8 +3,10 @@ from training_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Generos"
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Made for kids", "Duracion"]
     
+    project = "Prueba generica"
+    name = "V0"
     preprocess_type = "Word2Vec"
 
     # param_name = "n_neighbours"
@@ -15,7 +17,7 @@ if __name__ == '__main__':
 
     n_fold = 2
 
-    filtrado = False
+    filtrado = True
 
-    entrenamiento(KNeighborsClassifier, to_predict, preprocess_type, columns, 
+    entrenamiento(project, name, KNeighborsClassifier, to_predict, preprocess_type, columns, 
                   params, n_fold, filtrado)
