@@ -150,6 +150,12 @@ def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns,
     params: Diccionario de parametros a ejecutarse (El valor siempre dentro de corchetes)
         Ejemplo: {"n_neighbors": [3, 4, 5], "metric": ["cosine"]}
 
+    score: string (Informa sobre la medida para elegir el mejor modelo)
+        Opciones: "Accuracy", "Precision", "Recall", "F1"
+
+    average: string (Distribución de los valores de score)
+        Opciones: "binary" (no funciona con multiclase), "macro", "weighted", "macro", "micro"
+
     n_splits: int
         Numero de pruebas del cross validation
 
