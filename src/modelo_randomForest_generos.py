@@ -7,11 +7,11 @@ if __name__ == '__main__':
     
     preprocess_type = "Word2Vec"
 
-    params = { "criterion": ["entropy"], "n_estimators": [10, 20, 30], "max_depth":[10, 15, 20], "max_features":[0.5]}
+    params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15], "max_features":[0.5]}
 
     n_fold = 5
 
-    filtrado = False
+    filtrado = True
 
     entrenamiento(RandomForestClassifier, to_predict, preprocess_type, columns, 
                   params, n_fold, filtrado)
