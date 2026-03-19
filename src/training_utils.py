@@ -89,7 +89,7 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
 
     wandb.log({"cv_results": table})
 
-    wandb.summary["best_acc"] = best_acc
+    wandb.summary["best_score_val"] = best_acc
     wandb.summary["best_params"] = best_param
     return best_acc, best_param
     
@@ -107,7 +107,10 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     pred_test = best_model.predict(X_test)
 
     print("\n--- RESULTADOS EN TEST ---")
+    best_score_test = build_score(score, y_test, pred_test, average)
     print("Score:", build_score(score, y_test, pred_test, average))
+    wandb.summary["best_score_test"] = best_score_test
+
     print("\nClassification Report:")
     print(classification_report(y_test, pred_test))
     report = classification_report(y_test, pred_test, output_dict= True)
