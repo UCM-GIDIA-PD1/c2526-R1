@@ -5,6 +5,9 @@ if __name__ == '__main__':
     to_predict = "Generos"
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion"]
     
+    project = "Prueba rf generos"
+    name = "V0"
+
     preprocess_type = "Word2Vec"
 
     params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15], "max_features":[0.5]}
@@ -13,5 +16,6 @@ if __name__ == '__main__':
 
     filtrado = True
 
-    entrenamiento(RandomForestClassifier, to_predict, preprocess_type, columns, 
+    entrenamiento(project, name, RandomForestClassifier, to_predict, preprocess_type, columns, 
                   params, n_fold, filtrado)
+
