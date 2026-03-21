@@ -7,7 +7,7 @@ if __name__ == '__main__':
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Made for kids", "Duracion"]
     
     project = "Modelo Knn Generos"
-    name = "V1"
+    name = "V1.1"
     preprocess_type = "Word2Vec"
 
     # param_name = "n_neighbours"
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     average = "weighted"
     n_fold = 2
     filtrado = False
-
-    entrenamiento(project, name, KNeighborsClassifier, to_predict, preprocess_type, columns, 
-                  params, score, average, n_fold, filtrado)
+    for i in ["V1.0", "V1.1"]:
+        entrenamiento(project, i, KNeighborsClassifier, to_predict, preprocess_type, columns, 
+                      params, score, average, n_fold, filtrado)
 

@@ -5,6 +5,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics import accuracy_score, classification_report
 from preprocess_utils import build_preprocess, unzip_params, build_score
 from filter_and_divide_data import get_data_models_train_test
+from collections import defaultdict
 import numpy as np
 import pandas as pd
 import wandb
@@ -56,20 +57,17 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
             i = i+1
             #scores_dict[param_val].append(acc)
 
-
+    #print(scores_dict)
     #mean_acc_scores = {k: np.mean(v) for k, v in scores_dict.items()}
     mean_acc_scores = []
-
-    for i in range(len(scores_dict) // n_splits):
-        total = 0
-        paramset = scores_dict[i][0]
-        total += scores_dict[i][1]
-        for j in range(i+1, len(scores_dict)):
-            if np.array_equal(scores_dict[j][0], paramset):
-                total += scores_dict[j][1]
-        total /= n_splits
-        mean_acc_scores.append((paramset, total))
-
+    scores_grouped = defaultdict(list)
+    for paramset, score_val in scores_dict:
+        key = tuple(sorted(paramset.items()))
+        scores_grouped[key].append(score_val)
+    for key, values in scores_grouped.items():
+        mean_score = np.mean(values)
+        paramset = dict(key)
+        mean_acc_scores.append((paramset, mean_score))
 
     for k in mean_acc_scores:
         print(f"Parameters set as {k[0]} -> CV score: {k[1]:.4f}")

@@ -11,7 +11,11 @@ from gensim.models import Word2Vec
 from itertools import product
 import numpy as np
 import pandas as pd
+import numpy as np
+import random
 
+np.random.seed(42)
+random.seed(42)
 def iso_a_minutos(iso_duration):
     """"
     Funcion que convierte la duracion a minutos
