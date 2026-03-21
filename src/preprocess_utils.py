@@ -147,7 +147,8 @@ def build_preprocess_word2vec(X_tr, columns):
             vector_size=300,
             window=5,
             min_count=2,
-            workers=4
+            workers=4,
+            seed = 42
         )
     
     transformers = []
