@@ -39,7 +39,7 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
         preprocess = build_preprocess(preprocess_type, columns, X_tr)
         pipe = Pipeline([
             ("preprocess", preprocess),
-            ("svd", TruncatedSVD(n_components=300))
+            ("svd", TruncatedSVD(n_components=300, random_state=42))
         ])
 
         X_tr_trans = pipe.fit_transform(X_tr, y_tr)
@@ -97,7 +97,7 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     preprocess = build_preprocess(preprocess_type, columns, X_train)
     best_model = Pipeline([
     ("preprocess", preprocess),
-    ("svd", TruncatedSVD(n_components=300)),
+    ("svd", TruncatedSVD(n_components=300, random_state= 42)),
     ("model", modelo(**paramset))
     ])
 
