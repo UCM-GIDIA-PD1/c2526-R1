@@ -12,16 +12,17 @@ if __name__ == '__main__':
 
     # param_name = "n_neighbours"
     # param_vals = range(3,5)
-    # metric = "cosine"
+    # metric = "cosine", "minkowski", "euclidean"
+    #weights = ["uniform", "distance"]
 
-    params = {"n_neighbors": np.arange(1,15), "metric": ["cosine", "minkowski", "euclidean"],
-               "weights":["uniform", "distance"], "n_jobs": [-1]}
+    params = {"n_neighbors": np.arange(1,15), "metric": ["cosine"],
+               "weights":["distance"], "n_jobs": [-1]}
     
-    score = "Precision"
+    score = "F1"
     average = "weighted"
-    n_fold = 2
+    n_fold = 10
     filtrado = False
-    for i in ["V1.0", "V1.1"]:
+    for i in ["V1.2", "V1.3", "V1.4", "V1.5", "V1.6", "V1.7", "V1.8", "V1.9", "V1.10"]:
         entrenamiento(project, i, KNeighborsClassifier, to_predict, preprocess_type, columns, 
                       params, score, average, n_fold, filtrado)
 

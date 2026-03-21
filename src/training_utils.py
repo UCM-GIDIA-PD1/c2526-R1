@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.metrics import accuracy_score, classification_report
@@ -30,11 +30,11 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
     best_param = None
     best_acc = 0
     
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42) #n splits 5
+    kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42) #n splits 5
     params_ = unzip_params(params=params)
     scores_dict = [] #{k.keys()[0]: [] for k in params_} #Revisad
     i = 0
-    for train_idx, val_idx in tqdm(kf.split(X_train)):
+    for train_idx, val_idx in tqdm(kf.split(X_train, y_train)):
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
         preprocess = build_preprocess(preprocess_type, columns, X_tr)
@@ -64,6 +64,7 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
     for paramset, score_val in scores_dict:
         key = tuple(sorted(paramset.items()))
         scores_grouped[key].append(score_val)
+    
     for key, values in scores_grouped.items():
         mean_score = np.mean(values)
         paramset = dict(key)
