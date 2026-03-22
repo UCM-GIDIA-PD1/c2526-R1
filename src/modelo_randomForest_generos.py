@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
     filtrado = True
 
-    entrenamiento(project, name, RandomForestClassifier, to_predict, preprocess_type, columns, 
-                  params, n_fold, filtrado)
+    score = "Precision"
+    average = "weighted"
 
+    entrenamiento(project, name, RandomForestClassifier, to_predict, preprocess_type, columns, 
+                  params, score, average, n_fold, filtrado)
