@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     preprocess_type = "Word2Vec"
 
-    params = { "criterion": ["entropy"], "n_estimators": [1, 2, 3, 4, 5], "max_depth":[10, 15, 20], "max_features":[0.5]}
+    params = { "criterion": ["entropy"], "n_estimators": [5], "max_depth":[15], "max_features":[0.5]}
 
     n_fold = 5
 
