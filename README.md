@@ -16,7 +16,7 @@
 
 ### **1. Descripción del proyecto**
 
-El objetivo principal de este proyecto es desarrollar una herramienta capar de determinar de manera autónoma si un video de Youtube va a ser apto o no para un nivel de madurez determinado. Para ello se usará un modelo de aprendizaje autónomo al que entrenaremos para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
+El objetivo principal de este proyecto es desarrollar una herramienta capar de determinar de manera autónoma si un video de Youtube va a estar destinado o no para un nivel de madurez determinado. Para ello se usará un modelo de aprendizaje autónomo al que entrenaremos para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
 
 Al mismo tiempo, este sistema será capaz de asignar una categoría principal y diversas subcategorías a un mismo video, proporcionando una organización más detallada y precisa en la clasificación del video. Esto otorga al cliente una búsqueda más específica y eficiente en base a sus intereses.
 
@@ -34,8 +34,8 @@ Al mismo tiempo, este sistema será capaz de asignar una categoría principal y 
 
 - Carpeta `src`: contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
 
-    - Extracción y transformación:
-        - `parametrizacion.py`: archivo que se puede llamar desde la consola para iniciar la extracción de datos
+    - Extracción y transformación (carpeta `extraccion`):
+        - `extraccion_y_guardado.py`: archivo que se puede llamar desde la consola para iniciar la extracción de datos
 
         - `collect_all_data.py`: archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
 
