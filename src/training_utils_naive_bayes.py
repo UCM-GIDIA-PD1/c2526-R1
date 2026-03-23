@@ -54,18 +54,23 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
 
             scores_dict.append((paramset, score_val))
 
-    mean_score = []
+    mean_scores = []  # lista de resultados
     scores_grouped = defaultdict(list)
+
+    # Agrupar scores
     for paramset, score_val in scores_dict:
         key = tuple(sorted(paramset.items()))
         scores_grouped[key].append(score_val)
 
+    # Calcular medias
     for key, values in scores_grouped.items():
-        mean_score = np.mean(values)
+        avg_score = np.mean(values)
         paramset = dict(key)
-        mean_score.append((paramset, mean_score))
-        if mean_score > best_score_val:
-            best_score_val = mean_score
+
+        mean_scores.append((paramset, avg_score))
+
+        if avg_score > best_score_val:
+            best_score_val = avg_score
             best_alpha = paramset.get("alpha", None)
 
     # Log CV resutados
