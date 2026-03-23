@@ -37,6 +37,7 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
     for train_idx, val_idx in tqdm(kf.split(X_train, y_train)):
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
+
         preprocess = build_preprocess(preprocess_type, columns, X_tr)
         pipe = Pipeline([
             ("preprocess", preprocess),
@@ -115,6 +116,7 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     report = classification_report(y_test, pred_test, output_dict= True)
     df_report = pd.DataFrame(report).transpose()
     wandb.log({"Classification_report": wandb.Table(dataframe=df_report)})
+    
     df_preds = pd.DataFrame({
     "y_true": y_test,
     "y_pred": pred_test
