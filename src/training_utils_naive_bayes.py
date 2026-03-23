@@ -19,6 +19,7 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
             "columns": columns,
             "preprocess_type": preprocess_type,
             "modelo": "MultinomialNB",
+            "ngram_range": (1,2),
             "score": score,
             "average": average,
             "cv_folds": n_splits
@@ -66,7 +67,6 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
 
         mean_scores.append((paramset, avg_score))
 
-    # Elegir mejor
     for paramset, avg_score in mean_scores:
         print(f"{paramset} -> {avg_score:.4f}")
 
@@ -78,7 +78,7 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
     table = wandb.Table(columns=["params", "cv_score"])
 
     for paramset, avg_score in mean_scores:
-        table.add_data(str(paramset), avg_score)  # ✅ corregido (antes tenías mean_score)
+        table.add_data(str(paramset), avg_score)
 
     wandb.log({"cv_results": table})
 
@@ -99,7 +99,6 @@ def run_best_model_nb(preprocess_type, columns, X_train, y_train, X_test, y_test
 
     best_model.fit(X_train, y_train)
 
-    # Evaluación en test
     pred_test = best_model.predict(X_test)
 
     print("\n--- RESULTADOS EN TEST ---")
