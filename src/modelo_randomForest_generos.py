@@ -8,9 +8,9 @@ if __name__ == '__main__':
     project = "Prueba rf generos"
     name = "V0"
 
-    preprocess_type = "Word2Vec"
+    preprocess_type = "TF-IDF"
 
-    params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15], "max_features":[0.5]}
+    params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15,20], "max_features":[0.8]}
 
     n_fold = 5
 

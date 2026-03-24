@@ -8,7 +8,7 @@ if __name__ == '__main__':
     project = "Prueba rf kids"
     name = "V0"
 
-    preprocess_type = "Word2Vec"
+    preprocess_type = "TF-IDF"
 
     params = { "criterion": ["entropy"], "n_estimators": [5], "max_depth":[15], "max_features":[0.5]}
 
