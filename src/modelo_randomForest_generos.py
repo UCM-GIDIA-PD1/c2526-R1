@@ -10,13 +10,13 @@ if __name__ == '__main__':
 
     preprocess_type = "TF-IDF"
 
-    params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15,20], "max_features":[0.8]}
+    params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15], "max_features":[None]}
 
     n_fold = 5
 
     filtrado = True
 
-    score = "Precision"
+    score = "F1"
     average = "weighted"
 
     entrenamiento(project, name, RandomForestClassifier, to_predict, preprocess_type, columns, 
