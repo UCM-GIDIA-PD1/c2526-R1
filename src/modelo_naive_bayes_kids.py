@@ -9,8 +9,8 @@ if __name__ == "__main__":
     preprocess_type = "TF-IDF"
     params = {"alpha": [0.001, 0.005, 0.01,0.02, 0.05, 0.1, 0.5, 1.0]}
     n_fold = 5
-    score = "Recall"
-    average = "binary"
+    score = "Precision"
+    average = "weighted"
     filtrado = True
 
     entrenamiento_nb(project, name, to_predict, preprocess_type, columns, params, score, average, 

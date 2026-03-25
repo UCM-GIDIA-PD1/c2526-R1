@@ -179,7 +179,7 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
         Opciones: "Accuracy", "Precision", "Recall", "F1"
 
     average: string (Distribución de los valores de score)
-        Opciones: "binary" (no funciona con multiclase), "macro", "weighted", "macro", "micro"
+        Opciones: "binary" (no funciona con multiclase), "macro", "weighted", "micro"
 
     n_splits: int
         Numero de pruebas del cross validation
