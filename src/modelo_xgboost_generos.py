@@ -18,8 +18,8 @@ if __name__ == '__main__':
     # metric = "cosine"
 
     params = {
-        "n_estimators": [3, 4, 5], 
-        "max_depth": range(1,15),
+        "n_estimators": range(5,15), 
+        "max_depth": range(8,12),
         'learning_rate':[0.01, 0.1, 0.5, 1.0]
         }
 

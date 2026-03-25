@@ -1,6 +1,7 @@
 from tqdm import tqdm
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.metrics import accuracy_score, classification_report
 from preprocess_utils import build_preprocess, unzip_params, build_score
@@ -93,7 +94,7 @@ def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram,
     wandb.summary["best_params"] = best_param
     return best_acc, best_param
     
-def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset, score, average):
+def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset, score, average, le):
     preprocess = build_preprocess(preprocess_type, columns, X_train, max_features, ngram, svd)
     best_model = Pipeline([
     ("preprocess", preprocess),
@@ -104,7 +105,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     best_model.fit(X_train, y_train)
 
     # Evaluación final con test
-    pred_test = best_model.predict(X_test)
+    pred_test = le.inverse_transform(best_model.predict(X_test))
 
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, pred_test, average)
@@ -183,11 +184,13 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
     X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
-
     print("Finished data acquisition, starting crossvalidation")
 
+    le = LabelEncoder()
+    y_train_encoded = pd.Series(le.fit_transform(y_train))
+
     #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
-    best_acc, best_param = run_cross_validation(project_, name_, X_train, y_train, max_features, ngram, svd,
+    best_acc, best_param = run_cross_validation(project_, name_, X_train, y_train_encoded, max_features, ngram, svd,
                                                 preprocess_type=preprocess_type, 
                                                 columns=columns, params=params, 
                                                 modelo=modelo, score = score, average = average, 
@@ -195,5 +198,5 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
 
     print("Finished crossvalidation, starting evaluating best model")
     #print(best_param)
-    run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, best_param, score, average)
+    run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train_encoded, X_test, y_test, modelo, best_param, score, average, le)
     print("Ready!")
