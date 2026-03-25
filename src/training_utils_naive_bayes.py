@@ -19,7 +19,6 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
             "columns": columns,
             "preprocess_type": preprocess_type,
             "modelo": "MultinomialNB",
-            "ngram_range": (1,2),
             "score": score,
             "average": average,
             "cv_folds": n_splits
@@ -38,7 +37,7 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
 
-        preprocess = build_preprocess(preprocess_type, columns, X_tr)
+        preprocess = build_preprocess(preprocess_type, columns, X_tr, 5000, (1,2), None)
         pipe = Pipeline([("preprocess", preprocess)])  # NB sin SVD
 
         X_tr_trans = pipe.fit_transform(X_tr, y_tr)
@@ -90,7 +89,7 @@ def run_cross_validation_nb(project_, name_, X_train, y_train, preprocess_type, 
 
 
 def run_best_model_nb(preprocess_type, columns, X_train, y_train, X_test, y_test, alpha, score, average):
-    preprocess = build_preprocess(preprocess_type, columns, X_train)
+    preprocess = build_preprocess(preprocess_type, columns, X_train, 5000, (1,2), None)
 
     best_model = Pipeline([
         ("preprocess", preprocess),
