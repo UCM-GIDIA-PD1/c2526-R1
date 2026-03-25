@@ -3,14 +3,13 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
 from preprocess_utils import build_preprocess, unzip_params, build_score
 from filter_and_divide_data import get_data_models_train_test
 from collections import defaultdict
 import numpy as np
 import pandas as pd
 import wandb
-
 def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram, svd, preprocess_type, columns, params, modelo, score, average, n_splits=5):
     wandb.init(
         project= project_,
@@ -106,6 +105,19 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
 
     # Evaluación final con test
     pred_test = le.inverse_transform(best_model.predict(X_test))
+
+    # Matriz de confusion
+    class_names = list(map(str, np.unique(y_test)))
+
+    wandb.log({
+        "confusion_matrix": wandb.plot.confusion_matrix(
+            probs=None,
+            y_true=y_test.values if hasattr(y_test, "values") else y_test, 
+            preds=pred_test,
+            class_names=class_names
+        )
+    })
+    
 
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, pred_test, average)
