@@ -10,14 +10,14 @@ import numpy as np
 import pandas as pd
 import wandb
 
-def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, columns, params, modelo, score, average, n_splits=5):
+def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram, svd, preprocess_type, columns, params, modelo, score, average, n_splits=5):
     wandb.init(
         project= project_,
         name= name_,
         config={
-            "max_features": 5000,
-            "ngram_range": (1,2),
-            "svd_components": 300,
+            "max_features": max_features,
+            "ngram_range": ngram,
+            "svd_components": svd,
             "cv_folds": n_splits,
             "params": params, 
             "columns": columns, 
@@ -38,10 +38,10 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
         y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
 
-        preprocess = build_preprocess(preprocess_type, columns, X_tr)
+        preprocess = build_preprocess(preprocess_type, columns, X_tr, max_features, ngram, svd)
         pipe = Pipeline([
             ("preprocess", preprocess),
-            ("svd", TruncatedSVD(n_components=300, random_state=42))
+            ("svd", TruncatedSVD(n_components=svd, random_state=42))
         ])
 
         X_tr_trans = pipe.fit_transform(X_tr, y_tr)
@@ -93,11 +93,11 @@ def run_cross_validation(project_, name_, X_train, y_train, preprocess_type, col
     wandb.summary["best_params"] = best_param
     return best_acc, best_param
     
-def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset, score, average):
-    preprocess = build_preprocess(preprocess_type, columns, X_train)
+def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset, score, average):
+    preprocess = build_preprocess(preprocess_type, columns, X_train, max_features, ngram, svd)
     best_model = Pipeline([
     ("preprocess", preprocess),
-    ("svd", TruncatedSVD(n_components=300, random_state= 42)),
+    ("svd", TruncatedSVD(n_components=svd, random_state= 42)),
     ("model", modelo(**paramset))
     ])
 
@@ -127,7 +127,7 @@ def run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, m
     return best_model
 
 #He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
-def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns, params, score, average, n_splits, filtrado = False):
+def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score, average, n_splits, filtrado = False):
     """
     Ejecuta un modelo especificado, haz una run en wandb y devuelve por pantalla la mejor selección de parametros
 
@@ -144,6 +144,15 @@ def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns,
     
     to_predict: Columna a predecir
         Opciones: "Generos" o "Made for kids"
+
+    max_features: int
+        Número máximo de dimensiones de cada columna textual 
+
+    ngram: tuple (int1, int2) (int1< int 2)
+        Rango del ngrama a utilizar (Combinaciones de palabras)
+
+    svd: int
+        Numero de dimensiones que quieres tener para entrenar el modelo
     
     preprocess_type: Tipo de preprocesamiento de palabras
         Opciones: "Bag of words", "TF-IDF" and "Word2Vec"
@@ -178,7 +187,7 @@ def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns,
     print("Finished data acquisition, starting crossvalidation")
 
     #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
-    best_acc, best_param = run_cross_validation(project_, name_, X_train, y_train, 
+    best_acc, best_param = run_cross_validation(project_, name_, X_train, y_train, max_features, ngram, svd,
                                                 preprocess_type=preprocess_type, 
                                                 columns=columns, params=params, 
                                                 modelo=modelo, score = score, average = average, 
@@ -186,5 +195,5 @@ def entrenamiento(project_, name_, modelo, to_predict, preprocess_type, columns,
 
     print("Finished crossvalidation, starting evaluating best model")
     #print(best_param)
-    run_best_model(preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, best_param, score, average)
+    run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, best_param, score, average)
     print("Ready!")
