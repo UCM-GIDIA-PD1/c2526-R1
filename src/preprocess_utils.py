@@ -89,25 +89,27 @@ def download_and_divide(to_predict): #Deprecated
     y_test = df_test[to_predict]
     return X_train, y_train, X_test, y_test
 
-types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", 
-                   "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), 
+types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", "Titulo_canal": "text", 
+                   "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), "Subgeneros": "text", #Subgeneros la analizamos como texto por su tamaño 
                    "Duracion": StandardScaler(), "Made for kids": "passthrough"} #passthrough marca que no se hacen transformaciones
 
-def build_preprocess_bow(columns):
+def build_preprocess_bow(columns, max, ngram):
     transformers = []
     for col in columns:
         if types_of_prepro[col] == "text":
-            transformers.append((col, CountVectorizer(max_features=5000, ngram_range=(1,2)), col))
+            transformers.append((col, CountVectorizer(max_features=max, ngram_range=ngram), col))
+        elif types_of_prepro[col] == "passthrough": 
+             transformers.append((col, "passthrough", [col])) #No hace transformaciones para made for kids porque ya es booleana
         else:
             transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
  
-def build_preprocess_tfidf(columns):
+def build_preprocess_tfidf(columns, max, ngram):
     transformers = []
     for col in columns:
         if types_of_prepro[col] == "text":
-            transformers.append((col, TfidfVectorizer(max_features=5000, ngram_range=(1,2)), col))
-        elif types_of_prepro[col] == "skip": 
+            transformers.append((col, TfidfVectorizer(max_features=max, ngram_range=ngram), col))
+        elif types_of_prepro[col] == "passthrough": 
              transformers.append((col, "passthrough", [col])) #No hace transformaciones para made for kids porque ya es booleana
         else:
             transformers.append((col, types_of_prepro[col], [col]))
@@ -135,7 +137,7 @@ class Word2VecVectorizer(BaseEstimator, TransformerMixin):
         else:
             return np.zeros(self.dim)
         
-def build_preprocess_word2vec(X_tr, columns):
+def build_preprocess_word2vec(X_tr, columns, svd):
     #preprocesamiento para word2vec
     all_text = ( #asumiendo que estas cuatro columnas van a estar
             X_tr["Titulo"].astype(str) + " " +
@@ -148,10 +150,10 @@ def build_preprocess_word2vec(X_tr, columns):
 
     model = Word2Vec(
             sentences=sentences,
-            vector_size=300,
+            vector_size=svd,
             window=5,
             min_count=2,
-            workers=4,
+            workers=1,
             seed = 42
         )
     
@@ -163,13 +165,13 @@ def build_preprocess_word2vec(X_tr, columns):
             transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
 
-def build_preprocess(type, columns, X_tr):
+def build_preprocess(type, columns, X_tr, max_features, ngram, svd):
     if (type == "Bag of words"):
-        return build_preprocess_bow(columns)
+        return build_preprocess_bow(columns, max_features, ngram)
     elif (type == "TF-IDF"):
-        return build_preprocess_tfidf(columns)
+        return build_preprocess_tfidf(columns, max_features, ngram)
     elif (type == "Word2Vec"):
-        return build_preprocess_word2vec(X_tr, columns)
+        return build_preprocess_word2vec(X_tr, columns, svd) #No tiene implementado selección de ngram, max features
     else:
         raise Exception("Preprocess type not valid. Valid types are Bag of words, TF-IDF and Word2Vec.")
     
