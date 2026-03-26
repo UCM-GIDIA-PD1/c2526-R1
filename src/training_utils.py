@@ -106,6 +106,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     # Evaluación final con test
     pred_test = le.inverse_transform(best_model.predict(X_test))
 
+    """
     # Matriz de confusion
     class_names = list(map(str, np.unique(y_test)))
 
@@ -117,7 +118,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
             class_names=class_names
         )
     })
-    
+    """
 
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, pred_test, average)
