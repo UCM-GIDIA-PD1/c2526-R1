@@ -3,21 +3,25 @@ from training_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Made for kids"
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Subgeneros", "Titulo_canal"]
     
-    project = "Prueba rf kids"
+    project = "Prueba matriz confusion "
     name = "V0"
 
     preprocess_type = "TF-IDF"
 
-    params = { "criterion": ["entropy"], "n_estimators": [5], "max_depth":[15], "max_features":[0.5]}
+    max_features = 3000
+    ngram = (1,2)
+    svd = 150
 
-    n_fold = 5
+    params = { "criterion": ["entropy"], "n_estimators": [5], "max_depth":[15], "max_features":["sqrt"]}
+
+    n_fold = 2
 
     filtrado = False
 
     score = "Precision"
     average = "weighted"
 
-    entrenamiento(project, name, RandomForestClassifier, to_predict, preprocess_type, columns, 
+    entrenamiento(project, name, RandomForestClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                   params, score, average, n_fold, filtrado)

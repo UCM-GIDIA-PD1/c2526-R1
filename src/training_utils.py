@@ -109,6 +109,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
 
     y_test_encoded = pd.Series(le.transform(y_test))
 
+    """
     # Matriz de confusion
     class_names = list(map(str, le.classes_))
 
@@ -120,7 +121,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
             class_names=class_names
         )
     })
-    
+    """
 
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, pred_test_labels, average)
