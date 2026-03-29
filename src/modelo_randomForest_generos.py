@@ -12,11 +12,11 @@ if __name__ == '__main__':
 
     preprocess_type = "Word2Vec"
 
-    max_features = 5000
-    ngram = (1,3)
-    svd = 200
+    max_features = 3000
+    ngram = (1,2)
+    svd = 150
 
-    params = { "criterion": ["entropy"], "n_estimators": [100], "max_depth":[15], "max_features":["sqrt", 0.5]}
+    params = { "criterion": ["gini"], "n_estimators": [100], "max_depth":[30], "max_features":["sqrt"]}
 
     n_fold = 5
 

@@ -103,6 +103,31 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
 
     best_model.fit(X_train, y_train)
 
+    """
+    #CODIGO PRUEBA
+    # 1. Obtenemos las predicciones numéricas
+    raw_preds = best_model.predict(X_test)
+
+    # 2. Convertimos AMBOS a texto para que WandB no se confunda
+    y_test_text = le.inverse_transform(y_test)
+    pred_test_text = le.inverse_transform(raw_preds)
+
+    # 3. Matriz de Confusión
+    # Usamos np.unique sobre las etiquetas de texto para tener los nombres reales
+    class_names = sorted(list(map(str, le.classes_)))
+
+    wandb.log({
+        "confusion_matrix": wandb.plot.confusion_matrix(
+            probs=None,
+            y_true=y_test_text, 
+            preds=pred_test_text,
+            class_names=class_names
+        )
+    })
+
+    #ACABA AQUI EL CODIGO DE PRUEBA
+
+    """
     # Evaluación final con test
     pred_test = le.inverse_transform(best_model.predict(X_test))
 
