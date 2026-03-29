@@ -104,35 +104,38 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     best_model.fit(X_train, y_train)
 
     # Evaluación final con test
-    pred_test = le.inverse_transform(best_model.predict(X_test))
+    pred_test = best_model.predict(X_test)
+    pred_test_labels = le.inverse_transform(pred_test)
+
+    y_test_encoded = pd.Series(le.transform(y_test))
 
     # Matriz de confusion
-    class_names = list(map(str, np.unique(y_test)))
+    class_names = list(map(str, le.classes_))
 
     wandb.log({
         "confusion_matrix": wandb.plot.confusion_matrix(
             probs=None,
             y_true=y_test.values if hasattr(y_test, "values") else y_test, 
-            preds=pred_test,
+            preds=pred_test_labels,
             class_names=class_names
         )
     })
     
 
     print("\n--- RESULTADOS EN TEST ---")
-    best_score_test = build_score(score, y_test, pred_test, average)
-    print("Score:", build_score(score, y_test, pred_test, average))
+    best_score_test = build_score(score, y_test, pred_test_labels, average)
+    print("Score:", best_score_test)
     wandb.summary["best_score_test"] = best_score_test
 
     print("\nClassification Report:")
-    print(classification_report(y_test, pred_test))
-    report = classification_report(y_test, pred_test, output_dict= True)
+    report = classification_report(y_test, pred_test_labels, output_dict= True)
+    print(report)
     df_report = pd.DataFrame(report).transpose()
     wandb.log({"Classification_report": wandb.Table(dataframe=df_report)})
     
     df_preds = pd.DataFrame({
     "y_true": y_test,
-    "y_pred": pred_test
+    "y_pred": pred_test_labels
     })
 
     wandb.log({"Predictions": wandb.Table(dataframe=df_preds)})

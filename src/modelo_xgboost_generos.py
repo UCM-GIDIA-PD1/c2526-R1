@@ -10,7 +10,7 @@ if __name__ == '__main__':
     svd = 150
 
     project = "Modelo XGB Generos"
-    name = "V1.0"
+    name = "V1.1"
     preprocess_type = "Word2Vec"
 
     # param_name = "n_neighbours"
@@ -18,9 +18,9 @@ if __name__ == '__main__':
     # metric = "cosine"
 
     params = {
-        "n_estimators": range(5,15), 
-        "max_depth": range(8,12),
-        'learning_rate':[0.01, 0.1, 0.5, 1.0]
+        "n_estimators": [25], 
+        "max_depth": [10],
+        'learning_rate':[0.3, 0.5, 0.7]
         }
 
     score = 'F1'
