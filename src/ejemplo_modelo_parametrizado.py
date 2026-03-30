@@ -24,6 +24,6 @@ if __name__ == '__main__':
     average = "weighted"
     n_fold = 2
     filtrado = True
-    for i in ["V0.0.1"]:#, "V0.0.2"]:
+    for i in ["V0.0.1", "V0.0.2"]:
         entrenamiento(project, i, KNeighborsClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                   params, score, average, n_fold, filtrado)
