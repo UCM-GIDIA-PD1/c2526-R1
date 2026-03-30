@@ -3,7 +3,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
-from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix
 from preprocess_utils import build_preprocess, unzip_params, build_score
 from filter_and_divide_data import get_data_models_train_test
 from collections import defaultdict
@@ -96,47 +96,38 @@ def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram,
 def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset, score, average, le):
     preprocess = build_preprocess(preprocess_type, columns, X_train, max_features, ngram, svd)
     best_model = Pipeline([
-    ("preprocess", preprocess),
-    ("svd", TruncatedSVD(n_components=svd, random_state= 42)),
-    ("model", modelo(**paramset))
+        ("preprocess", preprocess),
+        ("svd", TruncatedSVD(n_components=svd, random_state=42)),
+        ("model", modelo(**paramset))
     ])
 
     best_model.fit(X_train, y_train)
 
-    # Evaluación final con test
-    pred_test = best_model.predict(X_test)
-    pred_test_labels = le.inverse_transform(pred_test)
-
-    y_test_encoded = pd.Series(le.transform(y_test))
-
-    """
-    # Matriz de confusion
-    class_names = list(map(str, le.classes_))
-
-    wandb.log({
-        "confusion_matrix": wandb.plot.confusion_matrix(
-            probs=None,
-            y_true=y_test.values if hasattr(y_test, "values") else y_test, 
-            preds=pred_test_labels,
-            class_names=class_names
-        )
-    })
-    """
+    raw_preds = best_model.predict(X_test)
 
     print("\n--- RESULTADOS EN TEST ---")
-    best_score_test = build_score(score, y_test, pred_test_labels, average)
+    best_score_test = build_score(score, y_test, raw_preds, average)
     print("Score:", best_score_test)
     wandb.summary["best_score_test"] = best_score_test
 
+    # Matriz de confusión
+    class_names = le.classes_.tolist()
+    y_test_text = le.inverse_transform(y_test)
+    pred_test_text = le.inverse_transform(raw_preds)
+    cm = confusion_matrix(y_test_text, pred_test_text, labels=class_names)
+    df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
+    df_cm.insert(0, "Real \ Predicho", class_names)
+    wandb.log({"matriz_confusion": wandb.Table(dataframe=df_cm)})
+
     print("\nClassification Report:")
-    report = classification_report(y_test, pred_test_labels, output_dict= True)
+    report = classification_report(y_test_text, pred_test_text, output_dict= True)
     print(report)
     df_report = pd.DataFrame(report).transpose()
     wandb.log({"Classification_report": wandb.Table(dataframe=df_report)})
     
     df_preds = pd.DataFrame({
-    "y_true": y_test,
-    "y_pred": pred_test_labels
+    "y_true": y_test_text,
+    "y_pred": pred_test_text
     })
 
     wandb.log({"Predictions": wandb.Table(dataframe=df_preds)})
@@ -214,5 +205,12 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
 
     print("Finished crossvalidation, starting evaluating best model")
     #print(best_param)
-    run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train_encoded, X_test, y_test, modelo, best_param, score, average, le)
+
+    #PRUEBAS PARA MATRIZ DE CONFUSION
+    le = LabelEncoder()
+    y_train_encoded = pd.Series(le.fit_transform(y_train))
+    # CODIFICA TAMBIÉN EL TEST AQUÍ
+    y_test_encoded = pd.Series(le.transform(y_test))
+    #FIN PRUEBAS
+    run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train_encoded, X_test, y_test_encoded, modelo, best_param, score, average, le)
     print("Ready!")
