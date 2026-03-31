@@ -133,16 +133,25 @@ def informacion_vacia(df):
     return dicc
 
 def filtrar_subtitulos(df_original):
-    #ver videos sin subtitulos de adultos. Dejar un numero de videos sin subtitulos igual de niños. Reduplicar los videos de niños que sí tienen subtítulos para tener un 10-20% de niños.
-    no_subtitles = df_original[df_original["Subtitulos"] == "None"]
-    n_keep_per_age = len(no_subtitles[no_subtitles["Made for kids"] == False])
-    keep_kids = no_subtitles[no_subtitles["Made for kids"] == True].sample(n_keep_per_age)
-    keep_no_subtitles = pd.concat(no_subtitles[no_subtitles["Made for kids"] == False], keep_kids)
-    final = pd.concat(df_original[df_original["Subtitulos"] != "None"], keep_no_subtitles)
-    print("The original length was ", df_original, "and the filtered for subtitles is ", final)
-    return final
-    #print("Videos sin subtitulos", len(no_sub_adults), " adultos", len(no_subtitles) - len(no_sub_adults), " niños")
+    """ver videos sin subtitulos de adultos. Dejar un numero de videos sin subtitulos 
+    igual de niños. Reduplicar los videos de niños que sí tienen subtítulos 
+    para tener un 10-20% de niños."""
 
+    no_subtitles = df_original[df_original["Subtitulos"] == "None"]
+    acceptable_no_subs_percentage = len(no_subtitles[no_subtitles["Made for kids"] == False]) / len(df_original[df_original["Made for kids"] == False])
+    print("Guardamos aproximadamente ", round(acceptable_no_subs_percentage*100), "% de videos sin subtitulos para niños y adultos")
+ 
+    n_keep_nosub_kids = int(len(df_original[(df_original["Made for kids"] == True) & (df_original["Subtitulos"] != "None")]) * acceptable_no_subs_percentage)
+    keep_kids = no_subtitles[no_subtitles["Made for kids"] == True].sample(n_keep_nosub_kids)
+    
+    keep_no_subtitles = pd.concat([no_subtitles[no_subtitles["Made for kids"] == False], keep_kids])
+    final = pd.concat([df_original[df_original["Subtitulos"] != "None"], keep_no_subtitles])
+    
+    print("La longitud antes de filtrar los subtitulos era ", len(df_original), "y ahora es ", len(final))
+    print("Tenemos ", len(final[final["Made for kids"] == True]), " videos de niños y ", len(final[final["Made for kids"] == False]), " videos de adultos")
+    print("Hay ", len(final[(final["Made for kids"] == True) & (final["Subtitulos"] != "None")]), " videos de niños con subtítulos")
+    return final
+    
 def filtrado(df_original):
     """
     Filtra un dataframe informando sobre las filas eliminadas.
