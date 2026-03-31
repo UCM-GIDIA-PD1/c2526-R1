@@ -1,10 +1,11 @@
 from training_utils import entrenamiento
 from xgboost import XGBClassifier
 
+
 if __name__ == '__main__':
     to_predict = "Generos"
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal"]
-    
+
     max_features = 3000
     ngram = (1,3)
     svd = 150
@@ -30,4 +31,4 @@ if __name__ == '__main__':
     filtrado = True
 
     entrenamiento(project, name, XGBClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
-                  params, score, average, n_fold, filtrado)
+                    params, score, average, n_fold, filtrado)
