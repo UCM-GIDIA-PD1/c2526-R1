@@ -59,15 +59,16 @@ def download_latest_extraction_correct(filtrar = 0):
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
 
+    df = made_for_kids(df) # Corregimos los kids
+    
     if filtrar == 1: 
         print("Filtrando datos, sin filtro de subtitulos")
-        df = filtrado(df, filtrar_subtitulos=False) #Filtradomos el df
+        df = filtrado(df, filt_subtitulos=False) #Filtradomos el df
 
     elif filtrar == 2: 
         print("Filtrando datos, con filtro de subtitulos")
-        df = filtrado(df, filtrar_subtitulos=True) #Filtradomos el df
+        df = filtrado(df, filt_subtitulos=True) #Filtradomos el df
 
-    df = made_for_kids(df) # Corregimos los kids
     return df
 
 
@@ -160,7 +161,7 @@ def filtrar_subtitulos(df_original):
     print("Hay ", len(final[(final["Made for kids"] == True) & (final["Subtitulos"] != "None")]), " videos de niños con subtítulos")
     return final
     
-def filtrado(df_original, filtrar_subtitulos = False):
+def filtrado(df_original, filt_subtitulos = False):
     """
     Filtra un dataframe informando sobre las filas eliminadas.
     Los criterios son eliminar todos los videos con duraciones extremas
@@ -222,7 +223,7 @@ def filtrado(df_original, filtrar_subtitulos = False):
     diff = numero_pre_filtrado - numero_pos_filtrado
     df_filtrado = df_filtrado.reset_index(drop=True)
 
-    if filtrar_subtitulos:
+    if filt_subtitulos:
         df_filtrado = filtrar_subtitulos(df_filtrado)
 
     print(f'Partiendo de {numero_pre_filtrado}, se han eliminado {diff}, resultando en: {numero_pos_filtrado} filas')
