@@ -3,12 +3,16 @@ from training_utils import entrenamiento
 import numpy as np
 
 if __name__ == '__main__':
+    #1. preprocess type, 2. Filtrado, 3. Columnas utilizadas
     to_predict = "Made for kids"
-    columns = ["Titulo", "Descripcion", "Tags", "Generos", "Duracion"]
+    columns = ["Titulo", "Descripcion", "Tags", "Generos", "Duracion", "Subgeneros", "Titulo_canal"]
     
     project = "Modelo Knn Kids"
     name = "V1.1"
-    preprocess_type = "TF-IDF"
+    preprocess_type = "Word2Vec"
+    max = 5000
+    ngram = (1,3)
+    svd = 100
 
     # param_name = "n_neighbours"
     # param_vals = range(3,5)
@@ -18,11 +22,11 @@ if __name__ == '__main__':
     params = {"n_neighbors": np.arange(1,15), "metric": ["cosine", "minkowski", "euclidean"],
                "weights":["distance", "uniform"], "n_jobs": [-1]}
     
-    score = "F1"
+    score = "Precision"
     average = "weighted"
     n_fold = 5
     filtrado = False
-    for i in [("V2.3", False), ("V2.4", True)]:
-        entrenamiento(project, i[0], KNeighborsClassifier, to_predict, preprocess_type, columns, 
+    for i in [("V0.0.2", False), ("V0.1.2", True)]:
+        entrenamiento(project, i[0], KNeighborsClassifier, to_predict, max, ngram, svd, preprocess_type, columns, 
                       params, score, average, n_fold, i[1])
 

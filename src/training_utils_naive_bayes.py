@@ -103,6 +103,7 @@ def run_best_model_nb(preprocess_type, columns, X_train, y_train, X_test, y_test
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, pred_test, average)
     print(f"Score: {best_score_test:.4f}")
+
     wandb.summary["best_score_test"] = best_score_test
 
     print("\nClassification Report:")

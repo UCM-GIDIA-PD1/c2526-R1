@@ -1,16 +1,22 @@
 from sklearn.ensemble import RandomForestClassifier
 from training_utils import entrenamiento
 
+
+
 if __name__ == '__main__':
     to_predict = "Generos"
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal"]
     
     project = "Prueba rf generos"
     name = "V0"
 
-    preprocess_type = "TF-IDF"
+    preprocess_type = "Word2Vec"
 
-    params = { "criterion": ["entropy"], "n_estimators": [40], "max_depth":[15], "max_features":[None]}
+    max_features = 3000
+    ngram = (1,2)
+    svd = 150
+
+    params = { "criterion": ["gini"], "n_estimators": [100], "max_depth":[30], "max_features":["sqrt"]}
 
     n_fold = 5
 
@@ -19,5 +25,6 @@ if __name__ == '__main__':
     score = "F1"
     average = "weighted"
 
-    entrenamiento(project, name, RandomForestClassifier, to_predict, preprocess_type, columns, 
+    entrenamiento(project, name, RandomForestClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                   params, score, average, n_fold, filtrado)
+
