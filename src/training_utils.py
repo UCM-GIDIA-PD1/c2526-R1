@@ -7,9 +7,6 @@ from sklearn.metrics import accuracy_score, classification_report, ConfusionMatr
 from preprocess_utils import build_preprocess, unzip_params, build_score
 from filter_and_divide_data import get_data_models_train_test
 from collections import defaultdict
-import seaborn as sns
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import wandb
@@ -106,32 +103,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
 
     best_model.fit(X_train, y_train)
 
-<<<<<<< HEAD
-    # Evaluación final con test
-    pred_test = le.inverse_transform(best_model.predict(X_test))
-
-    
-    # Matriz de confusion
-    cm = confusion_matrix(y_test, pred_test)
-
-    # plot
-    fig, ax = plt.subplots(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
-                xticklabels=sorted(set(y_test)),
-                yticklabels=sorted(set(y_test)))
-
-    ax.set_xlabel("Predicted")
-    ax.set_ylabel("True")
-    ax.set_title("Confusion Matrix")
-
-    # log a wandb
-    wandb.log({"confusion_matrix": wandb.Image(fig)})
-
-    plt.close(fig)
-    
-=======
     raw_preds = best_model.predict(X_test)
->>>>>>> 693abfc575996ea41494a7c3034cc022a453629e
 
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, raw_preds, average)
