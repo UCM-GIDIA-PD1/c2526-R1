@@ -11,7 +11,7 @@ if __name__ == "__main__":
     n_fold = 5
     score = "Precision"
     average = "weighted"
-    filtrado = True
+    filtrado = False
 
     entrenamiento_nb(project, name, to_predict, preprocess_type, columns, params, score, average, 
                      n_fold, filtrado)
