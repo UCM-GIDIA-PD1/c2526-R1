@@ -38,14 +38,15 @@ def made_for_kids(df):
     return df
 
 
-def download_latest_extraction_correct(filtrar = False):
+def download_latest_extraction_correct(filtrar = 0):
     """
     Descarga el último dataframe de extracción (se pone a mano)
 
     Parameters
     ----------
-    Filtrado: bool
-        Marca si se quiere filtrar el dataframe
+    filtrado: 0, 1 o 2
+       0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
+       2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
 
     Returns
     -------
@@ -58,22 +59,29 @@ def download_latest_extraction_correct(filtrar = False):
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
 
-    if filtrar: 
-        print("Filtrando datos")
-        df = filtrado(df) #Filtradomos el df
+    if filtrar == 1: 
+        print("Filtrando datos, sin filtro de subtitulos")
+        df = filtrado(df, filtrar_subtitulos=False) #Filtradomos el df
+
+    elif filtrar == 2: 
+        print("Filtrando datos, con filtro de subtitulos")
+        df = filtrado(df, filtrar_subtitulos=True) #Filtradomos el df
+
     df = made_for_kids(df) # Corregimos los kids
     return df
 
 
-def get_data_models_train_test(filtrado = False, to_predict = "Made for kids"):
+def get_data_models_train_test(filtrado = 0, to_predict = "Made for kids"):
     """
     Obten un X_train, y_train, X_test, y_test más reciente posible.
     Estratificado para niños o generos
 
     Parameters
     ----------
-    Filtrado: bool
-        Marca si se quiere utilizar datos filtrados o sin filtrar
+    filtrado: 0, 1 o 2
+       0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
+       2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
+
     to_predict: string
         Dice que columna vamos a predecir: Generos o Made for kids
 
@@ -152,7 +160,7 @@ def filtrar_subtitulos(df_original):
     print("Hay ", len(final[(final["Made for kids"] == True) & (final["Subtitulos"] != "None")]), " videos de niños con subtítulos")
     return final
     
-def filtrado(df_original):
+def filtrado(df_original, filtrar_subtitulos = False):
     """
     Filtra un dataframe informando sobre las filas eliminadas.
     Los criterios son eliminar todos los videos con duraciones extremas
@@ -213,8 +221,11 @@ def filtrado(df_original):
     numero_pos_filtrado = len(df_filtrado)
     diff = numero_pre_filtrado - numero_pos_filtrado
     df_filtrado = df_filtrado.reset_index(drop=True)
-    print(f'Partiendo de {numero_pre_filtrado}, se han eliminado {diff}, resultando en: {numero_pos_filtrado} filas')
 
+    if filtrar_subtitulos:
+        df_filtrado = filtrar_subtitulos(df_filtrado)
+
+    print(f'Partiendo de {numero_pre_filtrado}, se han eliminado {diff}, resultando en: {numero_pos_filtrado} filas')
 
     return df_filtrado
 

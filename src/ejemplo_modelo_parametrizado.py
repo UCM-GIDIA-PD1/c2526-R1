@@ -23,7 +23,11 @@ if __name__ == '__main__':
     score = "Precision"
     average = "weighted"
     n_fold = 2
-    filtrado = True
+
+    # Opciones posibles de filtrado: 0 para no filtrar, 
+    # 1 para filtrar videos con longitud extrema o sin información textual 
+    # 2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
+    filtrado = 1 
     for i in ["Probar gráficas 2"]:
         entrenamiento(project, i, KNeighborsClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                   params, score, average, n_fold, filtrado)
