@@ -24,7 +24,7 @@ if __name__ == '__main__':
     score = "Precision"
     average = "weighted"
     n_fold = 5
-    filtrado = 2
+    filtrado = 0
 
     entrenamiento(project, name, MLPClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                 params, score, average, n_fold, filtrado)
