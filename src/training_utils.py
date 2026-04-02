@@ -186,8 +186,9 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     n_splits: int
         Numero de pruebas del cross validation
 
-    filtrado: Bool
-        Indica si quieres (True) o no quieres (False), utilzar un dataframe filtrado
+    filtrado: 0, 1 o 2
+       0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
+       2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
 
     Returns
     -------
