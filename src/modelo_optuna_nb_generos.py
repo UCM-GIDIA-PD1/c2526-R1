@@ -6,7 +6,8 @@ if __name__ == "__main__":
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos"]
     
     X_train, X_test, y_train, y_test = get_data_models_train_test(
-        filtrado=True, to_predict=to_predict
+        filtrado=True, 
+        to_predict=to_predict
     )
 
     # Ejecutar Optuna
