@@ -3,7 +3,7 @@ from training_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Made for kids"
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Subgeneros", "Titulo_canal"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Subgeneros", "Titulo_canal"]
     
     project = "Prueba matriz confusion "
     name = "V0"
