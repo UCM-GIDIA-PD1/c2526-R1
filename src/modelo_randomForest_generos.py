@@ -5,10 +5,10 @@ from training_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Generos"
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Subgeneros", "Titulo_canal"]
     
-    project = "Prueba rf generos"
-    name = "V0"
+    project = "Modelo randomForest generos"
+    name = "Version final"
 
     preprocess_type = "Word2Vec"
 

@@ -114,10 +114,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     class_names = le.classes_.tolist()
     y_test_text = le.inverse_transform(y_test)
     pred_test_text = le.inverse_transform(raw_preds)
-    cm = confusion_matrix(y_test_text, pred_test_text, labels=class_names)
-    df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
-    df_cm.insert(0, "Real / Predicho", class_names)
-    wandb.log({"matriz_confusion": wandb.Table(dataframe=df_cm)})
+    
     wandb.log({
         "confusion_matrix": wandb.plot.confusion_matrix(
                                 probs=None, 
@@ -128,15 +125,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     print("\nClassification Report:")
     report = classification_report(y_test_text, pred_test_text, output_dict= True)
     print(report)
-    df_report = pd.DataFrame(report).transpose()
-    wandb.log({"Classification_report": wandb.Table(dataframe=df_report)})
-    
-    df_preds = pd.DataFrame({
-    "y_true": y_test_text,
-    "y_pred": pred_test_text
-    })
-
-    wandb.log({"Predictions": wandb.Table(dataframe=df_preds)})
+   
     wandb.finish()
     return best_model
 

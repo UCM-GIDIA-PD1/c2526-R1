@@ -14,9 +14,9 @@ if __name__ == '__main__':
     ngram = (1,2)
     svd = 150
 
-    params = { "criterion": ["entropy"], "n_estimators": [5], "max_depth":[15], "max_features":["sqrt"]}
+    params = { "criterion": ["gini"], "n_estimators": [3], "max_depth":[3], "max_features":["sqrt"]}
 
-    n_fold = 2
+    n_fold = 5
 
     filtrado = False
 
