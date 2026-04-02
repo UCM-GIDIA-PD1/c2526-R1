@@ -118,9 +118,9 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
     df_cm.insert(0, "Real / Predicho", class_names)
     wandb.log({"matriz_confusion": wandb.Table(dataframe=df_cm)})
-    wandb.plot.confusion_matrix(y_test_text, pred_test_text, class_names=class_names)
     wandb.log({
-        "confusion_matrix": wandb.plot.confusion_matrix(probs=None, 
+        "confusion_matrix": wandb.plot.confusion_matrix(
+                                probs=None, 
                                 y_true=y_test, 
                                 preds=raw_preds, 
                                 class_names=class_names)})
@@ -213,8 +213,6 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     #print(best_param)
 
     #PRUEBAS PARA MATRIZ DE CONFUSION
-    le = LabelEncoder()
-    y_train_encoded = pd.Series(le.fit_transform(y_train))
     # CODIFICA TAMBIÉN EL TEST AQUÍ
     y_test_encoded = pd.Series(le.transform(y_test))
     #FIN PRUEBAS
