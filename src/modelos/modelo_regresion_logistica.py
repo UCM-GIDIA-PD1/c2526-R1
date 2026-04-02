@@ -13,17 +13,17 @@ if __name__ == '__main__':
     svd = 150
 
     project = "Regresion logística géneros"
-    name = "V1.0.1"
+    name = "W0.T0"
     preprocess_type = "TF-IDF"
 
     params = {
-        "C": [0.1],
-        "solver": ["saga"],
-        "max_iter": [4000]
+        "C": [0.01, 0.1, 1, 10],
+        "solver": ["saga", "lbfgs"],
+        "max_iter": [3000, 4000, 5000]
     }
     
     score = "Precision"
-    average = "weighted"
+    average = "Weighted"
     n_fold = 5
     filtrado = 0
 

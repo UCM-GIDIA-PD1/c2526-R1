@@ -122,12 +122,12 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
 
 
     wandb.log({"matriz_confusion": wandb.Table(dataframe=df_cm)})
-    wandb.plot.confusion_matrix(y_test_text, pred_test_text, class_names=class_names)
-    wandb.log({
-        "confusion_matrix": wandb.plot.confusion_matrix(probs=probs, 
-                                y_true=y_test, 
-                                # preds=raw_preds, 
-                                class_names=class_names)})
+    # wandb.plot.confusion_matrix(y_test_text, pred_test_text, class_names=class_names)
+    # wandb.log({
+    #     "confusion_matrix": wandb.plot.confusion_matrix(probs=probs, 
+    #                             y_true=y_test, 
+    #                             # preds=raw_preds, 
+    #                             class_names=class_names)})
 
     print("\nClassification Report:")
     report = classification_report(y_test_text, pred_test_text, output_dict= True)
