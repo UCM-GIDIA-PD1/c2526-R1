@@ -3,9 +3,9 @@ from training_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Made for kids"
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Subgeneros", "Titulo_canal"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Subgeneros", "Titulo_canal"]
     
-    project = "Prueba matriz confusion "
+    project = "Prueba rf kids"
     name = "V0"
 
     preprocess_type = "TF-IDF"
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     ngram = (1,2)
     svd = 150
 
-    params = { "criterion": ["gini"], "n_estimators": [3], "max_depth":[3], "max_features":["sqrt"]}
+    params = { "criterion": ["gini"], "n_estimators": [30], "max_depth":[30], "max_features":["sqrt"]}
 
     n_fold = 5
 
