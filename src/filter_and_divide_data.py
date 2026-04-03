@@ -33,7 +33,7 @@ def made_for_kids(df):
     df:
         Datraframe modificado
     """ 
-    df["Made for kids"] = (df["Rango_edad"] != 'Adult')
+    df["Made for kids"] = ((df["Rango_edad"] != 'Adult'))# | (df["Made for kids"] == True))
     
     return df
 
