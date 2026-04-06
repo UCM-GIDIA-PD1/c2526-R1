@@ -4,11 +4,11 @@ if __name__ == "__main__":
     to_predict = "Generos"
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos"]
 
-    project = "Modelo Naive Bayes generos"
-    name = "V0"
+    project = "Modelos definitivos generos"
+    name = "Naive Bayes Generos 2"
     preprocess_type = "TF-IDF"
-    params = {"alpha": [0.001, 0.005, 0.01, 0.02, 0.05, 0.1, 0.5, 1.0]}
-    n_fold = 5
+    params = {"alpha": [0.005]}
+    n_fold = 2
     score = "F1" 
     average = "weighted"
     filtrado = 2

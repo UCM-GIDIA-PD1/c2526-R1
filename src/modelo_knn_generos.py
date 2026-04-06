@@ -5,10 +5,10 @@ import numpy as np
 if __name__ == '__main__':
     #1. preprocess type, 2. Filtrado, 3. Columnas utilizadas
     to_predict = "Generos"
-    columns = ["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Subgeneros", "Titulo_canal"]
+    columns = ["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Titulo_canal"]
     
     project = "Modelo Knn Generos"
-    name = "V1.1"
+    name = "Sin subgeneros"
     preprocess_type = "Word2Vec"
     max = 5000
     ngram = (1,3)
@@ -19,14 +19,14 @@ if __name__ == '__main__':
     # metric = "cosine", "minkowski", "euclidean"
     #weights = ["uniform", "distance"]
 
-    params = {"n_neighbors": np.arange(1,15), "metric": ["cosine", "minkowski", "euclidean"],
+    params = {"n_neighbors": [6], "metric": ["cosine", "minkowski", "euclidean"],
                "weights":["distance", "uniform"], "n_jobs": [-1]}
     
     score = "F1"
     average = "weighted"
-    n_fold = 5
+    n_fold = 2
     filtrado = False
-    for i in [("V0.0.2", False), ("V0.1.2", True)]:
-        entrenamiento(project, i[0], KNeighborsClassifier, to_predict, max, ngram, svd, preprocess_type, columns, 
-                      params, score, average, n_fold, i[1])
+
+    entrenamiento(project, name, KNeighborsClassifier, to_predict, max, ngram, svd, preprocess_type, columns, 
+                      params, score, average, n_fold, 2)
 
