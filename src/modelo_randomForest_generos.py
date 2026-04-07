@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     n_fold = 5
 
-    filtrado = True
+    filtrado = 2
 
     score = "F1"
     average = "weighted"

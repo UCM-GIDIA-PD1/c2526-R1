@@ -8,7 +8,7 @@ if __name__ == '__main__':
     project = "Prueba rf kids"
     name = "V0"
 
-    preprocess_type = "TF-IDF"
+    preprocess_type = "Word2Vec"
 
     max_features = 3000
     ngram = (1,2)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     n_fold = 5
 
-    filtrado = False
+    filtrado = 2
 
     score = "Precision"
     average = "weighted"
