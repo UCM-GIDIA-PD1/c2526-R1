@@ -1,6 +1,6 @@
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import  classification_report, confusion_matrix
-from preprocess_utils import  build_score
+from comun.preprocess_utils import  build_score
 
 
 import numpy as np

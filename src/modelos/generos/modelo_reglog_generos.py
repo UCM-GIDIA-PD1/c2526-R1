@@ -1,5 +1,5 @@
 from sklearn.linear_model import LogisticRegression
-from training_utils import entrenamiento
+from comun.training_utils import entrenamiento
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score
 
 if __name__ == '__main__':

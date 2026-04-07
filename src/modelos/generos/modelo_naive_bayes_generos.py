@@ -1,4 +1,4 @@
-from training_utils_naive_bayes import entrenamiento_nb
+from comun.training_utils_naive_bayes import entrenamiento_nb
 
 if __name__ == "__main__":
     to_predict = "Generos"

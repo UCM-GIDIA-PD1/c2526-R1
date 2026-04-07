@@ -4,8 +4,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix
-from preprocess_utils import build_preprocess, unzip_params, build_score
-from filter_and_divide_data import get_data_models_train_test
+from comun.preprocess_utils import build_preprocess, unzip_params, build_score
+from comun.filter_and_divide_data import get_data_models_train_test
 from collections import defaultdict
 import numpy as np
 import pandas as pd

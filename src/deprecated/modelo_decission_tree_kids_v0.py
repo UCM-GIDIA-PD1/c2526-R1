@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, classification_report, recall_score,
 import wandb
 import joblib
 import pandas as pd
-from preprocess_utils import download_model_dfs
+from comun.preprocess_utils import download_model_dfs
 
 
 def entramiento_modelo_decission_tree_kids():
