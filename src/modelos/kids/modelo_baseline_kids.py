@@ -1,13 +1,13 @@
 from sklearn.dummy import DummyClassifier 
-from training_utils import entrenamiento
+from comun.training_utils import entrenamiento
 
 if __name__ == '__main__':
-    to_predict = "Generos"
+    to_predict = "Made for kids"
     
     columns = ["Titulo", "Tags"] 
     
-    project = "Baseline_generos"
-    name = "V_Baseline_G"
+    project = "Baseline_kids"
+    name = "V_Baseline_K"
     
     
     preprocess_type = "Bag of words" 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     params = {"strategy": ["most_frequent"]}
     
-    score = "F1" 
+    score = "Precision" 
     average = "weighted"
     n_fold = 5 
     filtrado = False

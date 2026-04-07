@@ -1,5 +1,5 @@
-from filter_and_divide_data import get_data_models_train_test
-from training_utils_optuna import run_optuna_nb
+from comun.filter_and_divide_data import get_data_models_train_test
+from comun.training_utils_optuna import run_optuna_nb
 
 if __name__ == "__main__":
     to_predict = "Generos"

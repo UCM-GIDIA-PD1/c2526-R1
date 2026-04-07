@@ -1,13 +1,13 @@
 from sklearn.neighbors import KNeighborsClassifier
-from training_utils import entrenamiento
+from comun.training_utils import entrenamiento
 import numpy as np
 
 if __name__ == '__main__':
     #1. preprocess type, 2. Filtrado, 3. Columnas utilizadas
-    to_predict = "Generos"
-    columns = ["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Subgeneros", "Titulo_canal"]
+    to_predict = "Made for kids"
+    columns = ["Titulo", "Descripcion", "Tags", "Generos", "Duracion", "Subgeneros", "Titulo_canal"]
     
-    project = "Modelo Knn Generos"
+    project = "Modelo Knn Kids"
     name = "V1.1"
     preprocess_type = "Word2Vec"
     max = 5000
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     params = {"n_neighbors": np.arange(1,15), "metric": ["cosine", "minkowski", "euclidean"],
                "weights":["distance", "uniform"], "n_jobs": [-1]}
     
-    score = "F1"
+    score = "Precision"
     average = "weighted"
     n_fold = 5
     filtrado = False

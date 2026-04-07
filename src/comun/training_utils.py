@@ -1,8 +1,12 @@
+from tqdm import tqdm
+from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import  classification_report, confusion_matrix
-from preprocess_utils import  build_score
-
-
+from sklearn.decomposition import TruncatedSVD 
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix
+from comun.preprocess_utils import build_preprocess, unzip_params, build_score
+from comun.filter_and_divide_data import get_data_models_train_test
+from collections import defaultdict
 import numpy as np
 import pandas as pd
 import wandb
@@ -23,15 +27,83 @@ def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram,
             "average": average
         }
     )
-    best_param = {'learning_rate': 0.3, 'max_depth': 10, 'n_estimators': 50}
+    best_param = None
     best_acc = 0
+    
+    kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42) #n splits 5
+    params_ = unzip_params(params=params)
+    scores_dict = [] #{k.keys()[0]: [] for k in params_} #Revisad
+    i = 0
+    for train_idx, val_idx in tqdm(kf.split(X_train, y_train)):
+        X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
+        y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
+
+        preprocess = build_preprocess(preprocess_type, columns, X_tr, max_features, ngram, svd)
+        pipe = Pipeline([
+            ("preprocess", preprocess),
+            ("svd", TruncatedSVD(n_components=svd, random_state=42))
+        ])
+
+        X_tr_trans = pipe.fit_transform(X_tr, y_tr)
+        X_val_trans = pipe.transform(X_val)
+
+        for paramset in params_: #un array
+            model = modelo(**paramset)#parameter_name = param_val) #KNeighborsClassifier(n_neighbors=k, metric="cosine")
+            model.fit(X_tr_trans, y_tr)
+
+            preds = model.predict(X_val_trans)
+            score_val = build_score(score, y_val, preds, average)
+
+            scores_dict.append((paramset, score_val))
+            i = i+1
+            #scores_dict[param_val].append(acc)
+
+    #print(scores_dict)
+    #mean_acc_scores = {k: np.mean(v) for k, v in scores_dict.items()}
+    mean_acc_scores = []
+    scores_grouped = defaultdict(list)
+    for paramset, score_val in scores_dict:
+        key = tuple(sorted(paramset.items()))
+        scores_grouped[key].append(score_val)
+    
+    for key, values in scores_grouped.items():
+        mean_score = np.mean(values)
+        paramset = dict(key)
+        mean_acc_scores.append((paramset, mean_score))
+
+    for k in mean_acc_scores:
+        print(f"Parameters set as {k[0]} -> CV score: {k[1]:.4f}")
+
+        if k[1] > best_acc:
+            best_acc = k[1]
+            best_param = k[0]
+
+    print(f"\nMejor combinación de parámetros encontrada: {best_param}")
+    print(f"CrossVal score: {best_acc:.4f}")
+
+    #Creamos tabla
+    table = wandb.Table(columns=["params", "cv_score"])
+
+    for param, score in mean_acc_scores:
+        table.add_data(str(param), score)
+
+    wandb.log({"cv_results": table})
+
+    wandb.summary["best_score_val"] = best_acc
+    wandb.summary["best_params"] = best_param
     return best_acc, best_param
     
 def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train, X_test, y_test, modelo, paramset, score, average, le):
-    
-    best_model=None
-    raw_preds = pd.read_csv("data/pred_test.csv", header=None)[0].values
-    print(raw_preds)
+    preprocess = build_preprocess(preprocess_type, columns, X_train, max_features, ngram, svd)
+    best_model = Pipeline([
+        ("preprocess", preprocess),
+        ("svd", TruncatedSVD(n_components=svd, random_state=42)),
+        ("model", modelo(**paramset))
+    ])
+
+    best_model.fit(X_train, y_train)
+
+    raw_preds = best_model.predict(X_test)
 
     print("\n--- RESULTADOS EN TEST ---")
     best_score_test = build_score(score, y_test, raw_preds, average)
@@ -42,12 +114,10 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     class_names = le.classes_.tolist()
     y_test_text = le.inverse_transform(y_test)
     pred_test_text = le.inverse_transform(raw_preds)
-    cm = confusion_matrix(y_test_text, pred_test_text, labels=class_names)
-    df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
-    df_cm.insert(0, "Real / Predicho", class_names)
-    wandb.log({"matriz_confusion": wandb.Table(dataframe=df_cm)})
+    
     wandb.log({
-        "confusion_matrix": wandb.plot.confusion_matrix(probs=None, 
+        "confusion_matrix": wandb.plot.confusion_matrix(
+                                probs=None, 
                                 y_true=y_test, 
                                 preds=raw_preds, 
                                 class_names=class_names)})
@@ -55,15 +125,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     print("\nClassification Report:")
     report = classification_report(y_test_text, pred_test_text, output_dict= True)
     print(report)
-    df_report = pd.DataFrame(report).transpose()
-    wandb.log({"Classification_report": wandb.Table(dataframe=df_report)})
-    
-    df_preds = pd.DataFrame({
-    "y_true": y_test_text,
-    "y_pred": pred_test_text
-    })
-
-    wandb.log({"Predictions": wandb.Table(dataframe=df_preds)})
+   
     wandb.finish()
     return best_model
 
@@ -113,8 +175,9 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     n_splits: int
         Numero de pruebas del cross validation
 
-    filtrado: Bool
-        Indica si quieres (True) o no quieres (False), utilzar un dataframe filtrado
+    filtrado: 0, 1 o 2
+       0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
+       2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
 
     Returns
     -------
@@ -123,10 +186,7 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     """ 
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
-    X_train = pd.read_csv("data/X_train.csv", header=None)
-    y_train = pd.read_csv("data/y_train.csv", header=None)
-    X_test = pd.read_csv("data/X_test.csv", header=None)
-    y_test = pd.read_csv("data/y_test.csv", header=None)
+    X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
     print("Finished data acquisition, starting crossvalidation")
 
     le = LabelEncoder()
@@ -143,8 +203,6 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     #print(best_param)
 
     #PRUEBAS PARA MATRIZ DE CONFUSION
-    le = LabelEncoder()
-    y_train_encoded = pd.Series(le.fit_transform(y_train))
     # CODIFICA TAMBIÉN EL TEST AQUÍ
     y_test_encoded = pd.Series(le.transform(y_test))
     #FIN PRUEBAS

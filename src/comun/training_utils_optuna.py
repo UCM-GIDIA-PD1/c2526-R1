@@ -3,7 +3,7 @@ import wandb
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
-from preprocess_utils import build_preprocess
+from comun.preprocess_utils import build_preprocess
 
 def objective(trial, X_train, y_train, preprocess_type, columns, score_name):
 
