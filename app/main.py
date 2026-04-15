@@ -24,7 +24,9 @@ def check_video(data: VideoRequest):
     
 @app.get("/video", response_class=HTMLResponse)
 def video_page(request: Request):
-    return templates.TemplateResponse("video_check.html", {"request": request})
+    return templates.TemplateResponse(request,
+                                      name = "video_check.html",
+                                      context = {"request": request})
 
 class GenreRequest(BaseModel):
     url: str
@@ -51,4 +53,6 @@ def classify_video(data: GenreRequest):
     
 @app.get("/video/genre", response_class=HTMLResponse)
 def genre_page(request: Request):
-    return templates.TemplateResponse("video_genre.html", {"request": request})
+    return templates.TemplateResponse(request, 
+                                      name = "genres.html", 
+                                      context = {"request": request})
