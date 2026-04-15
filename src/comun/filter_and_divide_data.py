@@ -55,7 +55,7 @@ def download_latest_extraction_correct(filtrar = 0):
     """ 
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
-    
+    # NO LO TOQUES
     df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260309", claves, "parquet") #Descargamos el más reciente
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
 

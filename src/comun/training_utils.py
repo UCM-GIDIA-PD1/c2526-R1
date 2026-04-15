@@ -125,6 +125,15 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     print("\nClassification Report:")
     report = classification_report(y_test_text, pred_test_text, output_dict= True)
     print(report)
+    wandb.log({
+    "accuracy": report["accuracy"], 
+    "precision_weighted": report["weighted avg"]["precision"],
+    "recall_weighted": report["weighted avg"]["recall"],
+    "f1_weighted": report["weighted avg"]["f1-score"],
+    "precision_macro": report["macro avg"]["precision"],
+    "recall_macro": report["macro avg"]["recall"],
+    "f1_macro": report["macro avg"]["f1-score"]
+})
    
     wandb.finish()
     return best_model
