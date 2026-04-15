@@ -10,25 +10,28 @@ from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_sc
 
 
 if __name__ == '__main__':
-    to_predict = "Generos"
-    columns = ["Titulo","Descripcion","Tags","Made for kids","Duracion","Titulo_canal"]
+    to_predict = "Made for kids"
+    columns = ["Titulo","Descripcion","Tags","Generos","Subgeneros","Duracion","Titulo_canal"]
 
 
     max_features = 5000
     ngram = (1,2)
     svd = 150
 
-    project = "Modelos definitivos generos"
-    name = "Random Forest Generos 2"
+    project = "Modelos definitivos kids"
+    name = "Log Kids 2"
     preprocess_type = "Word2Vec"
 
     # param_name = "n_neighbours"
     # param_vals = range(3,5)
     # metric = "cosine"
 
-    params = {'criterion': ['gini'], 'max_depth': [30], 'max_features': ['sqrt'], 'n_estimators': [100]}
+    params = {'C': [10], 'max_iter': [3000], 'solver': ['lbfgs']}
 
-    score = "F1"
+
+ 
+
+    score = "Precision"
     average = "weighted"
     n_fold = 2
 
@@ -37,5 +40,5 @@ if __name__ == '__main__':
     # 2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
     filtrado = 2
     
-    entrenamiento(project, name, RandomForestClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
+    entrenamiento(project, name, LogisticRegression, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                 params, score, average, n_fold, filtrado)

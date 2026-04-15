@@ -263,6 +263,12 @@ def divide_save_data(df, name): #Deberíamos eliminarla
     upload_dataframe_minio(df_test, "pd1", f"grupo1/modelos/test_{name}", claves, "parquet")
     upload_dataframe_minio(df_val, "pd1", f"grupo1/modelos/validation_{name}", claves, "parquet")
 
+def extract_definitive_model_data(columna = "Made for Kids"): 
+    X_train, X_test, y_train, y_test = get_data_models_train_test(2, columna)
+    X_train = pd.concat([X_train, X_test], axis=0).reset_index(drop=True)
+    y_train = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)
+    return X_train, y_train
+
 if __name__ == '__main__':
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)

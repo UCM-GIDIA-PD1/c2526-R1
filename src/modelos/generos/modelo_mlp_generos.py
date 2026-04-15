@@ -1,5 +1,5 @@
 from sklearn.neural_network import MLPClassifier
-from training_utils_logistic import entrenamiento
+from comun.training_utils import entrenamiento
 
 # No se puede sacar la matriz de confusión.
 
