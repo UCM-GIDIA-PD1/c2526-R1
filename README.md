@@ -4,42 +4,44 @@
 
 ## **Índice**
 
-1. [Descripción del proyecto](#1-descripción-del-proyecto)
+1. [Descripción de los objetivos](#1-descripción-de-los-objetivos)
 
 2. [Estructura del repositorio](#2-estructura-del-repositorio)
 
 3. [Iniciar el entorno de desarrollo y sus dependecias](#3-️-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
 
 4. [Descarga de la base de datos](#4-descarga-de-la-base-de-datos)
+5. [Mejores modelos construídos](#5-mejores-modelos-construídos)
 
-5. [Equipo de desarrollo]()
+8. [Equipo de desarrollo](#8-equipo-de-desarrollo)
 
-### **1. Descripción del proyecto**
+### **1. Descripción de los objetivos**
 
-El objetivo principal de este proyecto es desarrollar una herramienta capar de determinar de manera autónoma si un video de Youtube va a estar destinado o no para un nivel de madurez determinado. Para ello se usará un modelo de aprendizaje autónomo al que entrenaremos para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
+1. Desarrollar una herramienta capaz de determinar de manera autónoma si un video de Youtube va a estar destinado o no para (niños). Para ello se usa un modelo de aprendizaje autónomo entrenado para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
 
-Al mismo tiempo, este sistema será capaz de asignar una categoría principal y diversas subcategorías a un mismo video, proporcionando una organización más detallada y precisa en la clasificación del video. Esto otorga al cliente una búsqueda más específica y eficiente en base a sus intereses.
+2. (AJUSTAR) Al mismo tiempo, este sistema será capaz de asignar una categoría principal y diversas subcategorías a un mismo video, proporcionando una organización más detallada y precisa en la clasificación del video. Esto otorga al cliente una búsqueda más específica y eficiente en base a sus intereses.
 
 ### **2. Estructura del repositorio**
 
 **Archivos:**
 
-- `.gitignore`: contiene los archivos que no se deben subir al git desde el repositorio local.
+- `.gitignore`: Contiene los archivos que no se deben subir al git desde el repositorio local.
 
-- `.python-version`: contiene la version de python usada en el proyecto.
+- `.python-version`: Contiene la version de python usada en el proyecto.
 
-- `pyproyect.toml` y `uv.lock`: contiene la configuración del entorno, con las dependencias y las versiones correspondientes.
+- `pyproyect.toml` y `uv.lock`: Contiene la configuración del entorno, con las dependencias y las versiones correspondientes.
 
 **Carpetas:**
+- Carpeta `app`: Contiene los ficheros necesarios para ejecutar la aplicación web, incluyendo el código fuente, los ficheros de configuración, plantillas, ....
 
-- Carpeta `src`: contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
+- Carpeta `src`: Contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
 
     - Extracción y transformación (carpeta `extraccion`):
-        - `extraccion_y_guardado.py`: archivo que se puede llamar desde la consola para iniciar la extracción de datos
+        - `extraccion_y_guardado.py`: Archivo que se puede llamar desde la consola para iniciar la extracción de datos
 
-        - `collect_all_data.py`: archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
+        - `collect_all_data.py`: Archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
 
-        - `get_all_dfs.py`: archivo que une todos los dataframes de los videos extraidos.
+        - `get_all_dfs.py`: Archivo que une todos los dataframes de los videos extraidos.
     - Carpeta Private: _Importante_
         - Dentro de la carpeta src, el usuario que desee utilizar este proyecto debe crear una carpeta llamada "*Private*".
             En el interior de esa carpeta, es necesario añadir un archivo llamado `claves.json` donde se almacenarán las credenciales y configuraciones necesarias para el funcionamiento del proyecto (APIs y otros servicios externos).
@@ -117,18 +119,26 @@ Por ejemplo:
 uv run python src/parametrizacion.py -n 1000 -p 0.5.   
 ````
 
-### **5. Análisis de datos**
-Para el análisis de datos se pueden ejecutar los notebooks analisis_kids.ipynb y analisis_subgeneros.ipynb.  
+### **Instrucciones para ejecutar los scripts del proyecto**
+### **5. Mejores modelos construídos**
+- Para el objetivo de predicción de videos 'Made for Kids', el mejor modelo construído es Random Forest con precision de 0.94%.
+- Para el objetivo de predicción de generos, el mejor modelo construído es KNN con un F1-score de 0.69%.
 
-### **6. Equipo de desarrollo**
-- Alejo Muñoz Pinilla
+### **6. Instrucciones para ejecutar la aplicación web
+Aquí va la explicación para acceder a la aplicación, si hay un servidor o se deber ejecutar local, etc.
 
+### **7. Instrucciones para crear y ejecutar el contenedor**
+Aquí va la explicación de Docker
+
+### **8. Equipo de desarrollo**
 - Andrea Yu García Gómez
+  
+- Marina Gurova
 
 - Luis López Rodríguez
 
 - María Martín Portal
+  
+- Alejo Muñoz Pinilla
 
-- Marina Gurova
-
-- Angie Tatiana Ruiz Martínez
+- Angie Ruiz Martínez
