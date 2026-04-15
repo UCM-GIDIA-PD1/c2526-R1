@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detector de contenido infantil</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: fadeIn 0.8s ease;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .result {
+            margin-top: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .safe {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .unsafe {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .loading {
+            margin-top: 20px;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🎬 Video Safe Check</h1>
+    <p>Introduce la URL de un vídeo para comprobar si es apto para niños</p>
+
+    <input type="text" id="videoUrl" placeholder="https://...">
+
+    <button onclick="checkVideo()">Analizar vídeo</button>
+
+    <div class="loading" id="loading">Analizando...</div>
+
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+async function checkVideo() {
+    const url = document.getElementById("videoUrl").value;
+    const resultDiv = document.getElementById("result");
+    const loading = document.getElementById("loading");
+
+    resultDiv.style.display = "none";
+    loading.style.display = "block";
+
+    try {
+        const response = await fetch("/video/check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ url: url })
+        });
+
+        const data = await response.json();
+
+        loading.style.display = "none";
+        resultDiv.style.display = "block";
+
+        if (data.safe) {
+            resultDiv.className = "result safe";
+            resultDiv.innerHTML = "Apto para niños";
+        } else {
+            resultDiv.className = "result unsafe";
+            resultDiv.innerHTML = "No apto para niños";
+        }
+
+    } catch (error) {
+        loading.style.display = "none";
+        resultDiv.style.display = "block";
+        resultDiv.className = "result unsafe";
+        resultDiv.innerHTML = "Error al analizar el vídeo";
+    }
+}
+</script>
+
+</body>
+</html>
