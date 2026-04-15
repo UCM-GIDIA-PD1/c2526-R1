@@ -7,7 +7,6 @@ from pydantic import BaseModel
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
-BaseModel = ...
 class VideoRequest(BaseModel):
     url: str
 
