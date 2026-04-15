@@ -1,6 +1,8 @@
 from sklearn.neighbors import KNeighborsClassifier
 from comun.training_utils import entrenamiento
+from comun.Server_PD import upload_model_minio
 import numpy as np
+import json
 
 if __name__ == '__main__':
     #1. preprocess type, 2. Filtrado, 3. Columnas utilizadas
@@ -19,14 +21,19 @@ if __name__ == '__main__':
     # metric = "cosine", "minkowski", "euclidean"
     #weights = ["uniform", "distance"]
 
+    
     params = {"n_neighbors": np.arange(1,15), "metric": ["cosine", "minkowski", "euclidean"],
                "weights":["distance", "uniform"], "n_jobs": [-1]}
     
+
     score = "Precision"
     average = "weighted"
-    n_fold = 5
+    n_fold = 2
     filtrado = False
+
     for i in [("V0.0.2", False), ("V0.1.2", True)]:
         entrenamiento(project, i[0], KNeighborsClassifier, to_predict, max, ngram, svd, preprocess_type, columns, 
                       params, score, average, n_fold, i[1])
 
+
+    

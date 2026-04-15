@@ -193,12 +193,13 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     y_train_encoded = pd.Series(le.fit_transform(y_train))
 
     #X_train, y_train, X_test, y_test = download_and_divide(to_predict=to_predict)
+    
     best_acc, best_param = run_cross_validation(project_, name_, X_train, y_train_encoded, max_features, ngram, svd,
                                                 preprocess_type=preprocess_type, 
                                                 columns=columns, params=params, 
                                                 modelo=modelo, score = score, average = average, 
                                                 n_splits=n_splits)
-
+    
     print("Finished crossvalidation, starting evaluating best model")
     #print(best_param)
 
@@ -206,5 +207,8 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     # CODIFICA TAMBIÉN EL TEST AQUÍ
     y_test_encoded = pd.Series(le.transform(y_test))
     #FIN PRUEBAS
-    run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train_encoded, X_test, y_test_encoded, modelo, best_param, score, average, le)
+
+    best_model = run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train_encoded, X_test, y_test_encoded, modelo, best_param, score, average, le)
     print("Ready!")
+    return best_model
+    

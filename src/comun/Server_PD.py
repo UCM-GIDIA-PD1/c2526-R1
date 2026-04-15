@@ -1,7 +1,8 @@
 #Incluye todas las funcionas para hacer carga, descarga e inicializar en minio
 #Sirve tanto para csv como para parquets
-import os
+import joblib
 import tempfile
+import os
 import pandas as pd
 from minio import Minio
 
@@ -87,3 +88,31 @@ def download_dataframe_minio(
     os.remove(temp_path)
 
     return df
+
+def upload_model_minio(
+    model,            
+    bucket: str,     
+    object_name: str, # Nombre del archivo
+    claves: dict,     
+):
+    """
+    Sube un modelo (objeto de ML) a MinIO en formato .joblib.
+    """
+    client = get_minio_client(claves)
+
+    with tempfile.NamedTemporaryFile(suffix=".joblib", delete=False) as tmp:
+        temp_path = tmp.name
+
+    try:
+        joblib.dump(model, temp_path)
+        
+        client.fput_object(
+            bucket_name=bucket,
+            object_name=f"{object_name}.joblib",
+            file_path=temp_path
+        )
+        print(f"Modelo subido con éxito a: {bucket}/{object_name}.joblib")
+
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)  
