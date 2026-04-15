@@ -13,15 +13,15 @@ if __name__ == '__main__':
 
     project = "Multilayer Perceptron generos"
     name = "W0.T0"
-    preprocess_type = "TF-IDF"
+    preprocess_type = "Word2Vec"
 
     params = {
         "max_iter": [10000], 
-        "hidden_layer_sizes": [1, 5, 10], 
+        "hidden_layer_sizes": [1, 10, 30], 
         "random_state": [42]
     }
     
-    score = "Precision"
+    score = "F1"
     average = "weighted"
     n_fold = 5
     filtrado = 0

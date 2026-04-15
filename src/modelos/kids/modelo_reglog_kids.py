@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     project = "Regresion logística kids"
     name = "W0.T0"
-    preprocess_type = "TF-IDF"
+    preprocess_type = "Word2Vec"
 
     params = {
         "C": [0.01, 0.1, 1, 10],
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         "max_iter": [3000]#, 4000, 5000]
     }
     
-    score = "Precision"
+    score = "F1"
     average = "weighted"
     n_fold = 5
     filtrado = 0
