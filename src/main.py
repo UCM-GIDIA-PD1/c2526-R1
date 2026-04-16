@@ -29,10 +29,13 @@ templates = Jinja2Templates(directory="templates")
 class VideoInput(BaseModel):
     url: HttpUrl
 
-class Prediction(BaseModel):
-    url: str
+class GenrePrediction(BaseModel):
+    confidence: float
     prediction: str
 
+class KidsPrediction(BaseModel):
+    confidence: float
+    prediction: str
 
 
 # Extraccion de datos 
@@ -70,6 +73,7 @@ def _get_data_and_predict(model, url: str):
 @app.get('/', response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse(request, name='index.html')
+
 
 @app.post("/predict/genre", response_model=Prediction)
 async def predict_genre(video: VideoInput):
