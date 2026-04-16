@@ -29,7 +29,7 @@ if __name__ == '__main__':
     #Generos/Knn
     X_train, y_train = f.extract_definitive_model_data("Generos")
 
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Made for Kids", "Duracion", "Titulo_canal"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Made for kids", "Duracion", "Titulo_canal"]
     preprocess = train.build_preprocess("Word2Vec", columns, X_train, 3000, (1,3), 100)
     pipe = Pipeline([
         ("preprocess", preprocess),
@@ -41,6 +41,8 @@ if __name__ == '__main__':
     y_train_trans = le.fit_transform(y_train)
     modelo_generos = KNeighborsClassifier()
     modelo_generos.fit(X_train_trans, y_train_trans)
+
+    spd.upload_model_minio(le, "pd1", "grupo1/models/genres/encoder", claves)
     spd.upload_model_minio(modelo_generos, "pd1", "grupo1/models/genres/genres_definitive", claves)
 
 

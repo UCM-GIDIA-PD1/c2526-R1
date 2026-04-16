@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_sc
 
 if __name__ == '__main__':
     to_predict = "Made for kids"
-    columns = ["Titulo","Descripcion","Tags","Generos","Subgeneros","Duracion","Titulo_canal"]
+    columns = ["Titulo","Descripcion","Tags","Subtitulos", "Generos", "Subgeneros","Duracion","Titulo_canal"]
 
 
     max_features = 5000
@@ -28,8 +28,6 @@ if __name__ == '__main__':
 
     params = {'C': [10], 'max_iter': [3000], 'solver': ['lbfgs']}
 
-
- 
 
     score = "Precision"
     average = "weighted"
