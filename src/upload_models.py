@@ -12,8 +12,10 @@ if __name__ == '__main__':
         claves = json.load(archivo)
     
     #Kids/XGBoost
+    print(f'Descarga de datos')
     X_train, y_train = f.extract_definitive_model_data("Made for kids")
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Generos", "Subgeneros", "Duracion", "Titulo_canal"]
+    print(f'Inicio de preprocesado')
     preprocess = train.build_preprocess("Word2Vec", columns, X_train, 5000, (1,2), 150)
     pipe = Pipeline([
         ("preprocess", preprocess),
@@ -22,15 +24,19 @@ if __name__ == '__main__':
 
     X_train_trans = pipe.fit_transform(X_train, y_train)
     modelo_kids = XGBClassifier()
+    print(f'Inicio de entrenamiento')
     modelo_kids.fit(X_train_trans, y_train)
 
     spd.upload_model_minio(modelo_kids, "pd1", "grupo1/models/kids/kids_definitive", claves)
 
     #Generos/Knn
+    print(f'Descarga de datos')
     X_train, y_train = f.extract_definitive_model_data("Generos")
 
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Made for kids", "Duracion", "Titulo_canal"]
     preprocess = train.build_preprocess("Word2Vec", columns, X_train, 3000, (1,3), 100)
+    print(f'Inicio de preprocesado')
+
     pipe = Pipeline([
         ("preprocess", preprocess),
         ("svd", TruncatedSVD(n_components=150, random_state=42))
@@ -39,6 +45,7 @@ if __name__ == '__main__':
     X_train_trans = pipe.fit_transform(X_train, y_train)
     le = LabelEncoder()
     y_train_trans = le.fit_transform(y_train)
+    print(f'Inicio de entrenamiento')
     modelo_generos = KNeighborsClassifier()
     modelo_generos.fit(X_train_trans, y_train_trans)
 
