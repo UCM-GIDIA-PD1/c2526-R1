@@ -1,8 +1,31 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, Form
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from typing import Annotated
+from pydantic import BaseModel, HttpUrl         #HttpUrl - adicional
+from joblib import load
+import json
+from comun.Server_PD import download_model_minio
+# Adicionales
+from extraccion.get_video_info_api import get_info
+import re
 
 from pydantic import BaseModel
+# Ciclo de vida
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    app.state.model_genre = load(download_model_minio("pd1", "grupo1/models/genres/genres_definitive.joblib", claves))
+    app.state.encoder_genre = load(download_model_minio("pd1", "grupo1/models/genres/encoder.joblib", claves)) # encoder
+    app.state.model_kids = load(download_model_minio("pd1", "grupo1/models/kids/kids_definitive.joblib", claves))
+    yield
+
 #Hay que definir el BaseModel
 app = FastAPI()
 
@@ -28,15 +51,12 @@ def video_page(request: Request):
                                       name = "video_check.html",
                                       context = {"request": request})
 
-class GenreRequest(BaseModel):
-    url: str
-
 class GenreResponse(BaseModel):
     genre: str
     confidence: float
 
 @app.post("/video/genre", response_model=GenreResponse)
-def classify_video(data: GenreRequest):
+def classify_video(data: VideoRequest):
     url = data.url.lower()
 
     #Simulación para probar web
