@@ -14,9 +14,9 @@ import re
 # Ciclo de vida
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Cargamos los modelos finales
-    app.state.model_genre = load('models/final_model_genre.joblib')
-    app.state.model_kids = load('models/final_model_kids.joblib')
+    app.state.model_genre = load('pd1/grupo1/models/genres/genres_definitive.joblib')
+    app.state.encoder_genre = load('pd1/grupo1/models/genres/encoder.joblib') # encoder
+    app.state.model_kids = load('pd1/grupo1/models/kids/kids_definitive.joblib')
     yield
 
 # Web
@@ -30,12 +30,11 @@ class VideoInput(BaseModel):
     url: HttpUrl
 
 class GenrePrediction(BaseModel):
+    genre: str
     confidence: float
-    prediction: str
 
 class KidsPrediction(BaseModel):
-    confidence: float
-    prediction: str
+    safe: bool
 
 
 # Extraccion de datos 
@@ -53,7 +52,7 @@ def _get_data_and_predict(model, url: str):
     # Extracción de ID
     video_id_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
     if not video_id_match:
-        return "Error: URL no válida", 0.0
+        return None, 0.0
     
     video_id = video_id_match.group(1)
 
@@ -61,13 +60,26 @@ def _get_data_and_predict(model, url: str):
     df_video = get_info(video_id)
     
     if df_video is None or df_video.empty:
-        return "Error: No se pudo obtener info del video", 0.0
+        return None, 0.0
 
     # Predicción
-    prediction_encoded = model.predict(df_video)                #[0]
-    
-    return str(prediction_encoded)
+    prediction= model.predict(df_video)[0]
 
+    try:
+        prob = model.predict_proba(df_video).max()
+    except:
+        prob = 0.95
+    
+    return prediction, prob
+
+
+@app.get("/video/genre", response_class=HTMLResponse)
+def genre_page(request: Request):
+    return templates.TemplateResponse(request, name="genres.html")
+
+@app.get("/video", response_class=HTMLResponse)
+def video_page(request: Request):
+    return templates.TemplateResponse(request, name="video_check.html")
 
 # Predicciones
 @app.get('/', response_class=HTMLResponse)
@@ -75,15 +87,26 @@ def index(request: Request):
     return templates.TemplateResponse(request, name='index.html')
 
 
-@app.post("/predict/genre", response_model=Prediction)
+@app.post("/video/genre", response_model=GenrePrediction)
 async def predict_genre(video: VideoInput):
     """Calsifica segun el género del video"""
-    label = _get_data_and_predict(app.state.model_genre, str(video.url))
-    return Prediction(url=str(video.url), prediction=label)
+    label, prob = _get_data_and_predict(app.state.model_genre, str(video.url))
 
-@app.post("/predict/kids-safe", response_model=Prediction)
+    if label is None:
+        return GenrePrediction(genre="Error: URL no válida", confidence=0.0)
+
+    genre_name = app.state.encoder_genre.inverse_transform([label])[0]
+    
+    return GenrePrediction(genre=str(genre_name), confidence=float(prob))
+
+@app.post("/video/check", response_model=KidsPrediction)
 async def predict_kids(video: VideoInput):
     """Clasifica si es apto para niños"""
-    label = _get_data_and_predict(app.state.model_kids, str(video.url))
-    return Prediction(url=str(video.url), prediction=label)
+    label, prob = _get_data_and_predict(app.state.model_kids, str(video.url))
+
+    if label is None:
+        return KidsPrediction(safe=False) 
+    
+    is_safe = bool(label)
+    return KidsPrediction(safe=is_safe)
 
