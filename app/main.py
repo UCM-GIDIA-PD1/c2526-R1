@@ -111,7 +111,7 @@ async def predict_genre(video: VideoInput):
 async def predict_kids(video: VideoInput):
     """Clasifica si es apto para niños"""
     modelo = model_kids(app.state.model_kids, app.state.pipe_kids)
-    label, prob = modelo._get_data_and_predict(str(video.url))
+    label = modelo._get_data_and_predict(str(video.url))
 
     if label is None:
         return KidsPrediction(safe=False) 

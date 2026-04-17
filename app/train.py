@@ -4,9 +4,20 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.preprocessing import LabelEncoder
 import comun.training_utils as train
+from comun.filter_and_divide_data import iso_a_minutos
 
 class model_kids:
     def __init__(self, model, pipe):
+        """
+        Parametros entrada -> 
+        model: Modelo que vamos a utilizar para la predicción.
+        pipe: Pipeline de transformación de datos que vamos a utilizar
+
+        Parametros salida -> 
+            Predicción (string)
+
+        Extrae los datos de un video a partir de la url y predice el resultado
+        """
         self.model = model
         self.pipe = pipe
         self.answer = None
@@ -35,7 +46,8 @@ class model_kids:
         print(df_video)
 
         # Predicción
-        df_video_trans = self.pipe.transform(df_video[0])
+        df_video["Duracion"] = df_video["Duracion"].apply(iso_a_minutos)        
+        df_video_trans = self.pipe.transform(df_video)
         prediction= self.model.predict(df_video_trans)
         
         return prediction
