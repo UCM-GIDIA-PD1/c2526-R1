@@ -117,8 +117,7 @@ def upload_model_minio(
         if os.path.exists(temp_path):
             os.remove(temp_path)  
 
-def download_model_minio(
-    model,            
+def download_model_minio(          
     bucket: str,     
     object_name: str, # Nombre del archivo
     claves: dict,     

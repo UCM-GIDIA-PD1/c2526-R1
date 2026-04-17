@@ -26,8 +26,8 @@ if __name__ == '__main__':
     modelo_kids = XGBClassifier()
     print(f'Inicio de entrenamiento')
     modelo_kids.fit(X_train_trans, y_train)
-
-    spd.upload_model_minio(modelo_kids, "pd1", "grupo1/models/kids/kids_definitive", claves)
+    spd.upload_model_minio(pipe, "pd1", "grupo1/models/kids/pipe_kids", claves) #Guarda las transformaciones necesarias
+    spd.upload_model_minio(modelo_kids, "pd1", "grupo1/models/kids/kids_definitive", claves) #Guarda el modelo
 
     #Generos/Knn
     print(f'Descarga de datos')
@@ -48,9 +48,10 @@ if __name__ == '__main__':
     print(f'Inicio de entrenamiento')
     modelo_generos = KNeighborsClassifier()
     modelo_generos.fit(X_train_trans, y_train_trans)
-
-    spd.upload_model_minio(le, "pd1", "grupo1/models/genres/encoder", claves)
-    spd.upload_model_minio(modelo_generos, "pd1", "grupo1/models/genres/genres_definitive", claves)
+    
+    spd.upload_model_minio(pipe, "pd1", "grupo1/models/genres/pipe_genres", claves) #Guarda las transformaciones necesarias
+    spd.upload_model_minio(le, "pd1", "grupo1/models/genres/encoder", claves) #Guarda el encoder
+    spd.upload_model_minio(modelo_generos, "pd1", "grupo1/models/genres/genres_definitive", claves) #Guarda el modelo
 
 
 

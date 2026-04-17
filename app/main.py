@@ -14,6 +14,7 @@ from comun.Server_PD import download_model_minio
 # Adicionales
 from extraccion.get_video_info_api import get_info
 import re
+from train import model_kids
 
 from pydantic import BaseModel
 # Ciclo de vida
@@ -21,13 +22,15 @@ from pydantic import BaseModel
 async def lifespan(app: FastAPI):
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
-    app.state.model_genre = (download_model_minio("pd1", "grupo1/models/genres/genres_definitive.joblib", claves))
-    app.state.encoder_genre = (download_model_minio("pd1", "grupo1/models/genres/encoder.joblib", claves)) # encoder
-    app.state.model_kids = (download_model_minio("pd1", "grupo1/models/kids/kids_definitive.joblib", claves))
+    app.state.model_genre = (download_model_minio("pd1", "grupo1/models/genres/genres_definitive", claves))
+    app.state.encoder_genre = (download_model_minio("pd1", "grupo1/models/genres/encoder", claves)) # encoder
+    app.state.model_kids = (download_model_minio("pd1", "grupo1/models/kids/kids_definitive", claves))
+    app.state.pipe_kids = (download_model_minio("pd1", "grupo1/models/kids/pipe_kids", claves))
+    app.state.pipe_genres = (download_model_minio("pd1", "grupo1/models/genres/pipe_genres", claves))
     yield
 
 #Hay que definir el BaseModel
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 #app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
@@ -94,7 +97,8 @@ def index(request: Request):
 @app.post("/video/genre", response_model=GenrePrediction)
 async def predict_genre(video: VideoInput):
     """Calsifica segun el género del video"""
-    label, prob = _get_data_and_predict(app.state.model_genre, str(video.url))
+    modelo = model_kids(app.state.model_kids, app.state.pipe_kids)
+    label, prob = modelo._get_data_and_predict(str(video.url))
 
     if label is None:
         return GenrePrediction(genre="Error: URL no válida", confidence=0.0)
@@ -106,7 +110,8 @@ async def predict_genre(video: VideoInput):
 @app.post("/video/check", response_model=KidsPrediction)
 async def predict_kids(video: VideoInput):
     """Clasifica si es apto para niños"""
-    label, prob = _get_data_and_predict(app.state.model_kids, str(video.url))
+    modelo = model_kids(app.state.model_kids, app.state.pipe_kids)
+    label, prob = modelo._get_data_and_predict(str(video.url))
 
     if label is None:
         return KidsPrediction(safe=False) 
