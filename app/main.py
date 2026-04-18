@@ -14,7 +14,7 @@ from comun.Server_PD import download_model_minio
 # Adicionales
 from extraccion.get_video_info_api import get_info
 import re
-from train import model_kids
+from train import model_kids, model_genres
 
 from pydantic import BaseModel
 # Ciclo de vida
@@ -40,7 +40,7 @@ class VideoInput(BaseModel):
 
 class GenrePrediction(BaseModel):
     genre: str
-    confidence: float
+    #confidence: float
 
 class KidsPrediction(BaseModel):
     safe: bool
@@ -97,15 +97,13 @@ def index(request: Request):
 @app.post("/video/genre", response_model=GenrePrediction)
 async def predict_genre(video: VideoInput):
     """Calsifica segun el género del video"""
-    modelo = model_kids(app.state.model_kids, app.state.pipe_kids)
-    label, prob = modelo._get_data_and_predict(str(video.url))
+    modelo = model_genres(app.state.model_genre, app.state.pipe_genres, app.state.encoder_genre)
+    genre_name = modelo._get_data_and_predict(str(video.url))
 
-    if label is None:
+    if genre_name is None:
         return GenrePrediction(genre="Error: URL no válida", confidence=0.0)
-
-    genre_name = app.state.encoder_genre.inverse_transform([label])[0]
-    
-    return GenrePrediction(genre=str(genre_name), confidence=float(prob))
+        
+    return GenrePrediction(genre=str(genre_name))
 
 @app.post("/video/check", response_model=KidsPrediction)
 async def predict_kids(video: VideoInput):
