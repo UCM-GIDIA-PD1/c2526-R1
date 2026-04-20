@@ -10,7 +10,7 @@
 
 3. [Iniciar el entorno de desarrollo y sus dependecias](#3-️-iniciar-el-entorno-de-desarrollo-y-sus-dependencias)
 
-4. [Descarga de la base de datos](#4-descarga-de-la-base-de-datos)
+4. [Ejecutar los scripts del proyecto](#4-ejecutar-los-scripts-del-proyecto)
 5. [Mejores modelos construídos](#5-mejores-modelos-construídos)
 
 8. [Equipo de desarrollo](#8-equipo-de-desarrollo)
@@ -34,7 +34,7 @@
 - Carpeta `Images readme`: Contiene las imágenes de este archivo.
 - Carpeta `app`: Contiene los ficheros necesarios para ejecutar la aplicación web (API y Frontend), organizada de la siguiente manera:
      - `main.py`: Punto de entrada de la aplicación. Contiene la lógica del servidor, la definición de los endpoints de la API REST y la carga de los modelos entrenados para generar las predicciones en tiempo real.
-     - `train.py`: Script destinado al re-entrenamiento o ajuste final de los modelos antes de su puesta en producción en el entorno web.
+     - `train.py`: Script que gestiona la inferencia; encapsula la lógica de extracción de ID mediante expresiones regulares, la obtención de metadatos vía API y la aplicación de transformaciones para devolver la clasificación final (booleana para niños o string para géneros).
      - Carpeta `templates`: Almacena las interfaces de usuario (HTML) que permiten la interacción con los modelos:
           - video_check.html: Interfaz dedicada a la clasificación de seguridad (Kids vs. Adults). Permite introducir un video y visualizar si es apto para menores.
           - genres.html: Interfaz diseñada para la clasificación multietiqueta, donde se muestra el género principal y las subcategorías detectadas del video.
@@ -103,31 +103,56 @@ Para poder iniciar el entorno hay que seguir una serie de pasos:
 
     Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto.
 
-4. Se pueden ejecutar scripts dentro del entorno usando:
-    ````
-    uv run nombre_script.py
-    ````
+### **4. Ejecutar los scripts del proyecto**
 
-    Esto asegura que el script se ejecuta con al versión correcta de python y las dependencias necesarias sin necesidad de activar nada manualmente.
+Para ejecutar los scripts principales del proyecto, utiliza el gestor uv. Los scripts están diseñados para ser ejecutados desde la raíz del repositorio. 
 
-### **4. Descarga de datos**
-Para descargar nuevos videos de YouTube y YouTube Kids para la base de datos, se debe ejecutar el archivo parametrizacion.py, llamándolo como 
+Se pueden ejecutar dentro del entorno usando:
+
 ````
-uv run python src/parametrizacion.py.
-````
-Por defecto, al ejecutar el código de este archivo se guardarán 500 videos nuevos, de los cuales aproximadamente 80% están destinados a adultos y 20% a niños.
-Se pueden proporcionar parámetros para el número de videos a guardar, la fecha a partir de la cuál se van a guardar los videos y la proporción de videos para adultos.
-Por ejemplo: 
-````
-uv run python src/parametrizacion.py -n 1000 -p 0.5.   
+uv run nombre_script.py
 ````
 
-### **Instrucciones para ejecutar los scripts del proyecto**
+Esto asegura que el script se ejecuta con al versión correcta de python y las dependencias necesarias sin necesidad de activar nada manualmente.
+
+**A. Extracción y preparación de datos**
+
+Para la generación de nuevos conjuntos de datos o la validación del pipeline de extracción, se debe ejecutar el script principal de recolección. Este permite parametrizar los datos mediante flags:
+````
+uv run python src/extraccion/extraccion_y_guardado.py -p 0 -i 4
+````
+En donde:
+- `-p` (Proportion): Define la proporción de videos para adultos (0 para una muestra infantil, 1 para adultos)
+- `-i` (Iterations): Determina el número de ciclos de búsqueda por palabras aleatorias, controlando el volumen final de la extracción.
+
+**B. Consolidación y limpieza**
+
+Una vez finalizadas las tandas de extracción, se deben integrar todos los ficheros `.parquet` en un único DataFrame global. Este proceso elimina los duplicados por ID y la normalización inicial:
+````
+uv run python src/extraccion/get_all_dfs.py  
+````
+**C. Implementación de lógica**
+
+En este paso se define la arquitectura de los objetos de predicción en `app/train.py`. Estos objetos actúan como un "wrapper" que integra el pipeline de preprocesamiento y el modelo clasificador para automatizar el flujo completo:
+
+     URL $\rightarrow$ Scraping de metadatos $\rightarrow$ Transformación $\rightarrow$ Clasificación.
+
+*Nota: Este archivo no requiere ejecución manual, ya que sus clases son instanciadas automáticamente por el servidor web.*
+
+**D. Ejecución de la Aplicación Web**
+
+Para interactuar con los modelos de clasificación de forma visual y sencilla, se debe lanzar el servidor local.
+````
+uv run python app/main.py
+````
+
+
+
 ### **5. Mejores modelos construídos**
 - Para el objetivo de predicción de videos 'Made for Kids', el mejor modelo construído es Random Forest con precision de 0.94%.
-- Para el objetivo de predicción de generos, el mejor modelo construído es KNN con un F1-score de 0.69%.
+- Para el objetivo de clasificación de generos, el mejor modelo construído es KNN con un F1-score de 0.69%.
 
-### **6. Instrucciones para ejecutar la aplicación web
+### **6. Instrucciones para ejecutar la aplicación web**
 Aquí va la explicación para acceder a la aplicación, si hay un servidor o se deber ejecutar local, etc.
 
 ### **7. Instrucciones para crear y ejecutar el contenedor**
