@@ -31,6 +31,7 @@
 - `pyproyect.toml` y `uv.lock`: Contiene la configuración del entorno, con las dependencias y las versiones correspondientes.
 
 **Carpetas:**
+- Carpeta `Images readme`: Contiene las imágenes de este archivo.
 - Carpeta `app`: Contiene los ficheros necesarios para ejecutar la aplicación web (API y Frontend), organizada de la siguiente manera:
      - `main.py`: Punto de entrada de la aplicación. Contiene la lógica del servidor, la definición de los endpoints de la API REST y la carga de los modelos entrenados para generar las predicciones en tiempo real.
      - `train.py`: Script destinado al re-entrenamiento o ajuste final de los modelos antes de su puesta en producción en el entorno web.
@@ -39,14 +40,13 @@
           - genres.html: Interfaz diseñada para la clasificación multietiqueta, donde se muestra el género principal y las subcategorías detectadas del video.
    
 - Carpeta `src`: Contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
-
-    - Extracción y transformación (carpeta `extraccion`):
-        - `extraccion_y_guardado.py`: Archivo que se puede llamar desde la consola para iniciar la extracción de datos
-
-        - `collect_all_data.py`: Archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
-
-        - `get_all_dfs.py`: Archivo que une todos los dataframes de los videos extraidos.
-  - Carpeta `Modelos`: 
+    - Carpeta `analisis`: Contiene los notebooks necesarios para el análisis exploratorio de datos (EDA) para ambos objetivos del proyecto. En ellos se documenta el estudio de distribuciones de duración, densidad de palabras (WPM) y frecuencias de categorías.
+    - Carpeta `comun`: Contiene centrada la lógica compartida y las herramientas principales del proyecto. Incluye scripts especializados para el preprocesamiento de texto y escalado de datos, utilidades de entrenamiento optimizadas para distintos los algoritmos, y módulos para el filtrado, división y evaluación de modelos. Además, contiene herramientas para la generación de gráficos y la gestión del servidor.
+    - Carpeta `deprecated`: Almacena versiones obsoletas y pruebas iniciales del proyecto para mantener la trazabilidad del desarrollo. Incluye las primeras implementaciones de modelos (versiones 0), scripts de testeo primarios y cuadernos con análisis preliminares de las características del dataset que han sido superados por las versiones finales en producción.
+    - Carpeta `extraccion`: Implementa el pipeline de obtención de datos mediante la búsqueda de videos aleatorios y la consulta a la API de YouTube. Incluye el script principal collect_all_data.py para la captura de información de videos infantiles y adultos, get_all_dfs.py para la consolidación de múltiples conjuntos de datos en un DataFrame único, y extraccion_y_guardado.py para la ejecución automatizada del proceso desde la consola.
+  - Carpeta `modelos`: Contienen los ficheros que entrenan la predicción de si un vídeo es apto o no para niños y la clasificación de videos por genero y subcategorías.
+     Para cada objetivo, se entrenaron los siguientes modelos junto con el Baseline:KNN, MLP, Naive Bayes, Random Forest, Regresión Logística, XGBoost. En Kids, además se entrenó el algoritmo Decision Tree.
+  - Carpeta `notebooks`: Contiene pruebas de experimentación y desarrollo del proyecto. Incluye ficheros iniciales de extracción de identificadores (IDs) para YouTube y YouTube Kids mediante web scraping, el diseño y prueba del pipeline completo de datos, y los experimentos preliminares de modelado con árboles de decisión para validar la capacidad predictiva de las variables seleccionadas.
   - Carpeta Private: _Importante_
         - Dentro de la carpeta src, el usuario que desee utilizar este proyecto debe crear una carpeta llamada "*Private*".
             En el interior de esa carpeta, es necesario añadir un archivo llamado `claves.json` donde se almacenarán las credenciales y configuraciones necesarias para el funcionamiento del proyecto (APIs y otros servicios externos).
@@ -61,8 +61,6 @@
                 }
 
             *Nota importante:* _Este archivo contiene información sensible, por lo que no debe subirse al repositorio._
-
-- Carpeta `Images readme`: contiene las imágenes de este archivo.
 
 
 ### **3. 🛠️ Iniciar el entorno de desarrollo y sus dependencias**
