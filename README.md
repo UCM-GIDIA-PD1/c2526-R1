@@ -79,8 +79,8 @@
         }
         ````
 
-    > [!WARNING]
-    > Este archivo contiene información sensible, por lo que no debe subirse al repositorio.
+> [!WARNING]
+> Este archivo contiene información sensible, por lo que no debe subirse al repositorio.
 
 ### **3. 🛠️ Iniciar el entorno de desarrollo y sus dependencias**
 
