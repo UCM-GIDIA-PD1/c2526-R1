@@ -116,3 +116,35 @@ def upload_model_minio(
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)  
+
+def download_model_minio(          
+    bucket: str,     
+    object_name: str, # Nombre del archivo
+    claves: dict,     
+):
+    """
+    Descarga un modelo (objeto de ML) desde MinIO.
+    """
+    client = get_minio_client(claves)
+
+    with tempfile.NamedTemporaryFile(suffix=".joblib", delete=False) as tmp:
+        temp_path = tmp.name
+
+    try:
+        # Descargar archivo desde MinIO
+        client.fget_object(
+            bucket_name=bucket,
+            object_name=f"{object_name}.joblib",
+            file_path=temp_path
+        )
+
+        # Cargar modelo
+        model = joblib.load(temp_path)
+
+        print(f"Modelo descargado con éxito desde: {bucket}/{object_name}.joblib")
+
+        return model
+
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)

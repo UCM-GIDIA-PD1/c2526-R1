@@ -107,7 +107,6 @@
     <div class="loading" id="loading">⏳ Analizando contenido...</div>
 
     <div id="result" class="result"></div>
-    <div id="confidence" class="badge" style="display:none;"></div>
 </div>
 
 <script>
@@ -115,10 +114,8 @@ async function classifyGenre() {
     const url = document.getElementById("videoUrl").value;
     const resultDiv = document.getElementById("result");
     const loading = document.getElementById("loading");
-    const confidence = document.getElementById("confidence");
 
     resultDiv.style.display = "none";
-    confidence.style.display = "none";
     loading.style.display = "block";
 
     try {
@@ -134,10 +131,8 @@ async function classifyGenre() {
 
         loading.style.display = "none";
         resultDiv.style.display = "block";
-        confidence.style.display = "inline-block";
 
         resultDiv.innerHTML = `🎬 Género: ${data.genre}`;
-        confidence.innerHTML = `Confianza: ${(data.confidence * 100).toFixed(1)}%`;
 
     } catch (error) {
         loading.style.display = "none";
