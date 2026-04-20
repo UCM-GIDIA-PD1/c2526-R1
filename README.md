@@ -18,8 +18,7 @@
 ### **1. Descripción de los objetivos**
 
 1. Desarrollar una herramienta capaz de determinar de manera autónoma si un video de Youtube va a estar destinado o no para (niños). Para ello se usa un modelo de aprendizaje autónomo entrenado para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
-
-2. (AJUSTAR) Al mismo tiempo, este sistema será capaz de asignar una categoría principal y diversas subcategorías a un mismo video, proporcionando una organización más detallada y precisa en la clasificación del video. Esto otorga al cliente una búsqueda más específica y eficiente en base a sus intereses.
+2. Asignar un género principal y múltiples subcategorías a cada video para identificar tanto la temática general (e.g., Educación, Deportes, Videojuegos) como detalles específicos, permitiendo a cualquier usuario filtrar contenido de manera precisa según sus intereses o necesidades pedagógicas.
 
 ### **2. Estructura del repositorio**
 
