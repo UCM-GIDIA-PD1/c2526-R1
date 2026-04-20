@@ -31,8 +31,13 @@
 - `pyproyect.toml` y `uv.lock`: Contiene la configuración del entorno, con las dependencias y las versiones correspondientes.
 
 **Carpetas:**
-- Carpeta `app`: Contiene los ficheros necesarios para ejecutar la aplicación web, incluyendo el código fuente, los ficheros de configuración, plantillas, ....
-
+- Carpeta `app`: Contiene los ficheros necesarios para ejecutar la aplicación web (API y Frontend), organizada de la siguiente manera:
+     - `main.py`: Punto de entrada de la aplicación. Contiene la lógica del servidor, la definición de los endpoints de la API REST y la carga de los modelos entrenados para generar las predicciones en tiempo real.
+     - `train.py`: Script destinado al re-entrenamiento o ajuste final de los modelos antes de su puesta en producción en el entorno web.
+     - Carpeta `templates`: Almacena las interfaces de usuario (HTML) que permiten la interacción con los modelos:
+          - video_check.html: Interfaz dedicada a la clasificación de seguridad (Kids vs. Adults). Permite introducir un video y visualizar si es apto para menores.
+          - genres.html: Interfaz diseñada para la clasificación multietiqueta, donde se muestra el género principal y las subcategorías detectadas del video.
+   
 - Carpeta `src`: Contiene todo el código. En esta carpeta encontramos todos los procesos utilizados para realizar este proyecto:
 
     - Extracción y transformación (carpeta `extraccion`):
@@ -41,7 +46,8 @@
         - `collect_all_data.py`: Archivo principal que se encarga de la extracción de datos de videos aleatorios, utilizando los IDs y la API oficial de Youtube. Se extraen videos tanto para adultos como para videos.
 
         - `get_all_dfs.py`: Archivo que une todos los dataframes de los videos extraidos.
-    - Carpeta Private: _Importante_
+  - Carpeta `Modelos`: 
+  - Carpeta Private: _Importante_
         - Dentro de la carpeta src, el usuario que desee utilizar este proyecto debe crear una carpeta llamada "*Private*".
             En el interior de esa carpeta, es necesario añadir un archivo llamado `claves.json` donde se almacenarán las credenciales y configuraciones necesarias para el funcionamiento del proyecto (APIs y otros servicios externos).
             
