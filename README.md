@@ -48,7 +48,7 @@
 
     - Carpeta `templates`: Almacena las interfaces de usuario (HTML) que permiten la interacción con los modelos:
 
-        -`video_check.html`: Interfaz dedicada a la clasificación de seguridad (Kids vs. Adults). Permite introducir un video y visualizar si es apto para menores.
+        - `video_check.html`: Interfaz dedicada a la clasificación de seguridad (Kids vs. Adults). Permite introducir un video y visualizar si es apto para menores.
 
         - `genres.html`: Interfaz diseñada para la clasificación multietiqueta, donde se muestra el género principal y las subcategorías detectadas del video.
 
