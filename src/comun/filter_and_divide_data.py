@@ -38,7 +38,7 @@ def made_for_kids(df):
     return df
 
 
-def download_latest_extraction_correct(filtrar = 0):
+def download_first_extraction_correct(filtrar = 0):
     """
     Descarga el último dataframe de extracción (se pone a mano)
 
@@ -71,6 +71,38 @@ def download_latest_extraction_correct(filtrar = 0):
 
     return df
 
+def download_latest_extraction_correct():
+    """
+    Descarga el último dataframe de extracción (se pone a mano)
+
+    Parameters
+    ----------
+    filtrado: 0, 1 o 2
+       0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
+       2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
+
+    Returns
+    -------
+    df:
+        Datraframe descargado
+    """ 
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    # NO LO TOQUES
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260420", claves, "parquet") #Descargamos el más reciente
+    df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
+
+    df = made_for_kids(df) # Corregimos los kids
+    
+    if filtrar == 1: 
+        print("Filtrando datos, sin filtro de subtitulos")
+        df = filtrado(df, filt_subtitulos=False) #Filtradomos el df
+
+    elif filtrar == 2: 
+        print("Filtrando datos, con filtro de subtitulos")
+        df = filtrado(df, filt_subtitulos=True) #Filtradomos el df
+
+    return df
 
 def get_data_models_train_test(filtrado = 0, to_predict = "Made for kids"):
     """
@@ -91,7 +123,7 @@ def get_data_models_train_test(filtrado = 0, to_predict = "Made for kids"):
     X_train, X_test, y_train, y_test:
         Datos descargados
     """ 
-    df = download_latest_extraction_correct(filtrado).copy()
+    df = download_first_extraction_correct(filtrado).copy()
     y = df[to_predict]
     X = df.drop([to_predict], axis=1)
     
@@ -269,6 +301,12 @@ def extract_definitive_model_data(columna = "Made for Kids"):
     y_train = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)
     return X_train, y_train
 
+def extract_definitive_test(columna = "Made for Kids"): 
+    X_train, X_test, y_train, y_test = get_data_models_train_test_latest(2, columna)
+    X_train = pd.concat([X_train, X_test], axis=0).reset_index(drop=True)
+    y_train = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)
+    return X_train, y_train
+
 if __name__ == '__main__':
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
@@ -280,3 +318,40 @@ if __name__ == '__main__':
     #print(df_filtered.columns)
     #print(df_filtered["Made for kids"].value_counts())
     #print(df["Made for kids"].value_counts())
+
+def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids"):
+    """
+    Obten un X_train, y_train, X_test, y_test más reciente posible.
+    Estratificado para niños o generos
+
+    Parameters
+    ----------
+    filtrado: 0, 1 o 2
+       0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
+       2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
+
+    to_predict: string
+        Dice que columna vamos a predecir: Generos o Made for kids
+
+    Returns
+    -------
+    X_train, X_test, y_train, y_test:
+        Datos descargados
+    """ 
+    df = download_latest_extraction_correct(filtrado).copy()
+    y = df[to_predict]
+    X = df.drop([to_predict], axis=1)
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=0.15,      
+        random_state=42,    
+        stratify=y          
+    )
+    
+    X_train = X_train.reset_index(drop=True)
+    y_train = y_train.reset_index(drop=True)
+    X_test = X_test.reset_index(drop = True)
+    y_test = y_test.reset_index(drop = True)
+    return pd.DataFrame(X_train), pd.DataFrame(X_test), (y_train), (y_test) #Nos aseguramos de que se pasen los tipos correctos
+

@@ -160,6 +160,38 @@ if __name__ == "__main__":
         claves = json.load(archivo)
 
     bucket = "pd1"
+    prefix = "grupo1/raw_new_test/"
+
+    df_final = unir_parquets_minio(bucket, prefix, claves)
+
+    print("\n--- ANÁLISIS DE DUPLICADOS ---")
+
+    total_filas = len(df_final)
+    ids_unicos = df_final["ID"].nunique()
+
+    print("Total filas:", total_filas)
+    print("IDs únicos:", ids_unicos)
+    print("Duplicados encontrados:", total_filas - ids_unicos)
+
+    print("\nTop 5 IDs más repetidos:")
+    print(df_final["ID"].value_counts().head())
+
+    print("\n--- LIMPIEZA ---")
+
+    df_limpio = limpiar_dataframe(df_final)
+
+    print("\nFilas eliminadas en limpieza:", total_filas - len(df_limpio))
+    prefix = "grupo1/clean/"
+    subir_union(df_limpio, bucket, prefix, clsaves)
+
+    print("Proceso finalizado correctamente")
+
+
+
+    """with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+
+    bucket = "pd1"
     prefix = "grupo1/raw/"
 
     df_final = unir_parquets_minio(bucket, prefix, claves)
@@ -184,4 +216,4 @@ if __name__ == "__main__":
     prefix = "grupo1/clean/"
     subir_union(df_limpio, bucket, prefix, claves)
 
-    print("Proceso finalizado correctamente")
+    print("Proceso finalizado correctamente")"""
