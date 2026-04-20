@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import numpy as np
 import random
+from sentence_transformers import SentenceTransformer   #Redes neuronales
 
 np.random.seed(42)
 random.seed(42)
@@ -165,6 +166,29 @@ def build_preprocess_word2vec(X_tr, columns, svd):
             transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
 
+class TransformerVectorizer(BaseEstimator, TransformerMixin):
+    def __init__(self, model_name='paraphrase-multilingual-MiniLM-L12-v2'):
+        self.model_name = model_name
+        self.model = SentenceTransformer(model_name)
+        self.dim = self.model.get_sentence_embedding_dimension()
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return self.model.encode(list(X), show_progress_bar=False)
+
+def build_preprocess_deep_learning(columns):
+    transformers = []
+    for col in columns:
+        if types_of_prepro[col] == "text":
+            transformers.append((col, TransformerVectorizer(), col))
+        elif types_of_prepro[col] == "passthrough": 
+             transformers.append((col, "passthrough", [col]))
+        else:
+            transformers.append((col, types_of_prepro[col], [col]))
+    return ColumnTransformer(transformers = transformers)
+
 def build_preprocess(type, columns, X_tr, max_features, ngram, svd):
     if (type == "Bag of words"):
         return build_preprocess_bow(columns, max_features, ngram)
@@ -172,6 +196,8 @@ def build_preprocess(type, columns, X_tr, max_features, ngram, svd):
         return build_preprocess_tfidf(columns, max_features, ngram)
     elif (type == "Word2Vec"):
         return build_preprocess_word2vec(X_tr, columns, svd) #No tiene implementado selección de ngram, max features
+    elif (type == "DeepLearning"):
+        return build_preprocess_deep_learning(columns)
     else:
         raise Exception("Preprocess type not valid. Valid types are Bag of words, TF-IDF and Word2Vec.")
     
