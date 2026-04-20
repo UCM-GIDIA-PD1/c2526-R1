@@ -9,7 +9,7 @@ if __name__ == '__main__':
     
     project = "Modelo Knn Generos"
     name = "Sin subgeneros"
-    preprocess_type = "Word2Vec"
+    preprocess_type = "DeepLearning"
     max = 5000
     ngram = (1,3)
     svd = 100
