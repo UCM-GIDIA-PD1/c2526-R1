@@ -1,5 +1,6 @@
 from joblib import load
 import json
+import wandb
 from comun.Server_PD import download_model_minio
 from sklearn.metrics import classification_report
 from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     encoder_genre = (download_model_minio("pd1", "grupo1/models/genres/encoder", claves)) # encoder
     model_kids = (download_model_minio("pd1", "grupo1/models/kids/kids_definitive", claves))
     pipe_kids = (download_model_minio("pd1", "grupo1/models/kids/pipe_kids", claves))
-    pipe_genres = (download_model_minio("pd1", "grupo1/models/genres/pipe_genres", claves))ç
+    pipe_genres = (download_model_minio("pd1", "grupo1/models/genres/pipe_genres", claves))
     
     # Descarga datos
 
@@ -59,7 +60,7 @@ if __name__ == '__main__':
     evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
 
     # Generos
-    X_test, y_test = extract_definitive_test(to_predict = "Generos")
+    X_test, y_test = extract_definitive_test(columna = "Generos")
     X_test_trans_genre = pipe_genres.transform(X_test)
     y_test_encoded = encoder_genre.transform(y_test)
     evaluar_modelo_final("modelo_generos_definitivo", "V0", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
