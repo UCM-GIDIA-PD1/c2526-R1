@@ -14,7 +14,7 @@ from comun.Server_PD import download_model_minio
 # Adicionales
 from extraccion.get_video_info_api import get_info
 import re
-from train import model_kids, model_genres
+from .train import model_kids, model_genres
 
 from pydantic import BaseModel
 # Ciclo de vida
@@ -119,4 +119,4 @@ async def predict_kids(video: VideoInput):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=2350, reload=True)

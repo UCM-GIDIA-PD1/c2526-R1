@@ -9,7 +9,7 @@
 **/*.pyc
 
 # Carpetas que no hace falta subir
-Images readme
+"Images readme"
 
 # Ignoramos las carpetas co archivos que no necesitamos
 src/analisis
