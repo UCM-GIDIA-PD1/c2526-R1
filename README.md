@@ -155,7 +155,7 @@ uv run python src/extraccion/get_all_dfs.py
 
 En este paso se define la arquitectura de los objetos de predicción en `app/train.py`. Estos objetos actúan como un "wrapper" que integra el pipeline de preprocesamiento y el modelo clasificador para automatizar el flujo completo:
 
-     URL $\rightarrow$ Scraping de metadatos $\rightarrow$ Transformación $\rightarrow$ Clasificación.
+     URL ➡️ Scraping de metadatos ➡️ Transformación ➡️ Clasificación.
 
 > [!NOTE]
 > Este archivo no requiere ejecución manual, ya que sus clases son instanciadas automáticamente por el servidor web.
