@@ -31,6 +31,13 @@ def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder 
     # Métricas
     report = classification_report(y_test_text, pred_test_text, output_dict=True)
     
+    wandb.log({
+        "test_accuracy": report["accuracy"],
+        "test_f1_weighted": report["weighted avg"]["f1-score"],
+        "test_precision_weighted": report["weighted avg"]["precision"],
+        "test_recall_weighted": report["weighted avg"]["recall"]
+    })
+
     wandb.summary["accuracy"] = report["accuracy"]
     wandb.summary["f1_weighted"] = report["weighted avg"]["f1-score"]
     wandb.summary["precision_weighted"] = report["weighted avg"]["precision"]
@@ -57,10 +64,10 @@ if __name__ == '__main__':
     X_test, y_test = extract_definitive_test()
     X_test_trans_kids = pipe_kids.transform(X_test)
 
-    evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
+    evaluar_modelo_final("modelo_kids_definitivo", "V1", model_kids, X_test_trans_kids, y_test)
 
     # Generos
     X_test, y_test = extract_definitive_test(columna = "Generos")
     X_test_trans_genre = pipe_genres.transform(X_test)
     y_test_encoded = encoder_genre.transform(y_test)
-    evaluar_modelo_final("modelo_generos_definitivo", "V0", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
+    evaluar_modelo_final("modelo_generos_definitivo", "V1", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
