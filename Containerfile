@@ -15,8 +15,11 @@ COPY pyproject.toml .
 # 2. Instalar las dependencias
 RUN uv sync --no-cache
 
-# 3. Copiar el resto de codigo
-EXPOSE 8000
+# 3. Copiar el resto de codigo (origen - destino)
+COPY . .
+
+# Ponemos el codigo para la aplicacion
+EXPOSE 2350
 
 # Comando para ejecutar el contenedor
-CMD ["uv", "run", "python", "main.py"]
+CMD ["uv", "run", "python", "app/main.py"]

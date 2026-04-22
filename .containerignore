@@ -11,8 +11,10 @@
 # Carpetas que no hace falta subir
 Images readme
 
-# Ignoramos las carpetas de analisis y notebooks antiguos
+# Ignoramos las carpetas co archivos que no necesitamos
 src/analisis
-src/notebooks
 src/deprecated
-src/Private # no se si habria que añadirla
+src/notebooks
+
+# La carpeta private hay no tiene q estar aqui, tiene que subirse al contenedor para poder acceder a lo que necesite
+# En caso de querer subirlo (publicarlo) sería un problema de seguridad.
