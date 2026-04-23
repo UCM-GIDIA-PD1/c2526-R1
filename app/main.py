@@ -45,41 +45,6 @@ class GenrePrediction(BaseModel):
 class KidsPrediction(BaseModel):
     safe: bool
 
-# Extraccion de datos 
-def _get_data_and_predict(model, url: str):
-    """
-    Parametros entrada -> 
-    model: Modelo correspondiente a la predicción que queramos hacer. (Generos o kids).
-    url (string): Url del video que se quiere clasficar.
-
-    Parametros salida -> 
-        Predicción (string)
-
-    Extrae los datos de un video a partir de la url y predice el resultado
-    """
-    # Extracción de ID
-    video_id_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
-    if not video_id_match:
-        return None, 0.0
-    
-    video_id = video_id_match.group(1)
-
-    # Extraemos los datos del video a partir del ID
-    df_video = get_info(video_id)
-    
-    if df_video is None or df_video.empty:
-        return None, 0.0
-
-    # Predicción
-    prediction= model.predict(df_video)[0]
-
-    try:
-        prob = model.predict_proba(df_video).max()
-    except:
-        prob = 0.95
-    
-    return prediction, prob
-
 @app.get("/video/genre", response_class=HTMLResponse)
 def genre_page(request: Request):
     return templates.TemplateResponse(request, name="genres.html")
