@@ -9,6 +9,10 @@ from extraccion.get_video_info_api import get_info
 from extraccion.get_video_ids_bs4 import get_random_ids, get_random_ids_kids
 from comun.Server_PD import upload_dataframe_minio
 
+# Redes neuronales
+import requests                                 # Descargar la imagen de URL
+from comun.Server_PD import upload_image_minio 
+
 def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
     '''
     Elegimos y descargamos n videos random, donde n es el parámetro num_videos de la función. 
@@ -51,6 +55,22 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
         for id in tqdm(ids_ages): #tqdm
             try:
                 row = get_info(id[0])
+                #Extraccion de Miniatura (imagenes)
+                img_url = row.get("Thumbnail_url") 
+                
+                if img_url:
+                    try:
+                        img_res = requests.get(img_url, timeout=10)
+                        if img_res.status_code == 200:
+                            upload_image_minio(
+                                image_bytes=img_res.content,
+                                bucket="pd1",
+                                object_name=f"grupo1/thumbnails/{id[0]}.jpg",
+                                claves=claves
+                            )
+                    except Exception as e_img:
+                        print(f"Error descargando imagen para {id[0]}: {e_img}")
+
                 row["Rango_edad"] = id[1]
                 df_videos.append(row)
                 #print(df_videos)
