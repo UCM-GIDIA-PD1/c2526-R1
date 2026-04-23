@@ -54,6 +54,13 @@ def get_info(id_video):
     
     video = response["items"][0]
 
+    thumbnails = video["snippet"].get("thumbnails", {})
+    img_url = (
+        thumbnails.get("maxres", {}).get("url") or 
+        thumbnails.get("high", {}).get("url") or 
+        thumbnails.get("default", {}).get("url")
+    )
+
     has_captions = video["contentDetails"].get("caption") in ["true", True]
 
     # --- SUBTÍTULOS ---
@@ -141,6 +148,7 @@ def get_info(id_video):
         "Visualizaciones": video["statistics"]["viewCount"],
         "Tags":", ".join(video["snippet"].get("tags", [])),
         "Duracion": video["contentDetails"]["duration"],
+        "Thumbnail_url": img_url,
         "Fecha_publicacion": video["snippet"]["publishedAt"],
         "Titulo_canal": video["snippet"]["channelTitle"],
         "Subtitulos": cleant_sub if has_captions and cleant_sub else "None",

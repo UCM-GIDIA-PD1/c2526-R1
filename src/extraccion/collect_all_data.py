@@ -56,9 +56,9 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
             try:
                 row = get_info(id[0])
                 #Extraccion de Miniatura (imagenes)
-                img_url = row.get("Thumbnail_url") 
+                img_url = row.get("Thumbnail_url").iloc[0]
                 
-                if img_url:
+                if img_url and img_url != "None":
                     try:
                         img_res = requests.get(img_url, timeout=10)
                         if img_res.status_code == 200:
