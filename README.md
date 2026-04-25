@@ -22,9 +22,9 @@
 
 ### **1. Descripción de los objetivos**
 
-1. Desarrollar una herramienta capaz de determinar de manera autónoma si un video de Youtube va a estar destinado o no para (niños). Para ello se usa un modelo de aprendizaje autónomo entrenado para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
+1. Desarrollar una herramienta capaz de determinar de manera autónoma si un video de Youtube va a estar destinado o no para niños. Para ello se usa un modelo de aprendizaje autónomo entrenado para que sea capaz de decidir, a partir de un umbral de decisión, si es apto o no.
 
-2. Asignar un género principal y múltiples subcategorías a cada video para identificar tanto la temática general (e.g, Educación, Deportes, Videojuegos) como detalles específicos, permitiendo a cualquier usuario filtrar contenido de manera precisa según sus intereses o necesidades pedagógicas.
+2. Asignar un género principal a cada video según su temática general (e.g, Educación, Deportes, Videojuegos), permitiendo a cualquier usuario filtrar contenido de manera precisa según sus intereses o necesidades pedagógicas.
 
 ### **2. Estructura del repositorio**
 
@@ -155,7 +155,7 @@ uv run python src/extraccion/get_all_dfs.py
 
 En este paso se define la arquitectura de los objetos de predicción en `app/train.py`. Estos objetos actúan como un "wrapper" que integra el pipeline de preprocesamiento y el modelo clasificador para automatizar el flujo completo:
 
-     URL $\rightarrow$ Scraping de metadatos $\rightarrow$ Transformación $\rightarrow$ Clasificación.
+     URL ➡️ Scraping de metadatos ➡️ Transformación ➡️ Clasificación.
 
 > [!NOTE]
 > Este archivo no requiere ejecución manual, ya que sus clases son instanciadas automáticamente por el servidor web.

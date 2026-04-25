@@ -3,6 +3,7 @@
 import joblib
 import tempfile
 import os
+import io
 import pandas as pd
 from minio import Minio
 
@@ -148,3 +149,21 @@ def download_model_minio(
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+# Imagenes (Prueba para redes neuronales - Maria - 22/04)
+def upload_image_minio(image_bytes, bucket, object_name, claves):
+    """
+    Sube el contenido binario de una imagen a MinIO.
+    """
+    client = get_minio_client(claves) # Reutiliza tu función
+    
+    # Convertimos los bytes en un flujo que MinIO pueda leer
+    data = io.BytesIO(image_bytes)
+    
+    client.put_object(
+        bucket_name=bucket,
+        object_name=object_name,
+        data=data,
+        length=len(image_bytes),
+        content_type='image/jpeg'
+    )

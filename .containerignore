@@ -1,0 +1,20 @@
+# Ficheros y carpetas que Docker NO debe copiar al construir la imagen.
+# Equivalente al .gitignore pero para docker build.
+
+# Ficheros ocultos: .git, .venv, .dockerignore, etc.
+**/.*
+
+# Bytecode compilado de Python (se regenera automáticamente)
+**/__pycache__
+**/*.pyc
+
+# Carpetas que no hace falta subir
+"Images readme"
+
+# Ignoramos las carpetas co archivos que no necesitamos
+src/analisis
+src/deprecated
+src/notebooks
+
+# La carpeta private hay no tiene q estar aqui, tiene que subirse al contenedor para poder acceder a lo que necesite
+# En caso de querer subirlo (publicarlo) sería un problema de seguridad.

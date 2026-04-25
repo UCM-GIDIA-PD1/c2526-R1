@@ -65,7 +65,7 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
                             upload_image_minio(
                                 image_bytes=img_res.content,
                                 bucket="pd1",
-                                object_name=f"grupo1/thumbnails/{id[0]}.jpg",
+                                object_name=f"grupo1/test_images/thumbnails/{id[0]}.jpg",
                                 claves=claves
                             )
                     except Exception as e_img:
@@ -88,7 +88,13 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
         try:
             with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
                 claves = json.load(archivo)
-            upload_dataframe_minio(df = df_data, bucket = "pd1", object_name=f"grupo1/raw_new_test/df_videos_{timestamp}", claves=claves, file_format="parquet") 
+            upload_dataframe_minio(
+                df = df_data, 
+                bucket = "pd1", 
+                object_name=f"grupo1/test_images/raw/df_videos_PRUEBA_{timestamp}", 
+                claves=claves, 
+                file_format="parquet"
+            )  
         except Exception:
 
             DataFrame(df_data).to_parquet(path=f"src/data/df_videos_{timestamp}", index=False)

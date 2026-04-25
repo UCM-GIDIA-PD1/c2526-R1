@@ -137,6 +137,10 @@ class Word2VecVectorizer(BaseEstimator, TransformerMixin):
             return np.mean(vectors, axis=0)
         else:
             return np.zeros(self.dim)
+
+    # Pesos
+    def get_feature_names_out(self, input_features=None):
+        return np.array([f"v_{i}" for i in range(self.dim)])
         
 def build_preprocess_word2vec(X_tr, columns, svd):
     #preprocesamiento para word2vec
@@ -177,6 +181,10 @@ class TransformerVectorizer(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         return self.model.encode(list(X), show_progress_bar=False)
+
+    # Pesos 
+    def get_feature_names_out(self, input_features=None):
+        return np.array([f"trans_{i}" for i in range(self.dim)])
 
 def build_preprocess_deep_learning(columns):
     transformers = []

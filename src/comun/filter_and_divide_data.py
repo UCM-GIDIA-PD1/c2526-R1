@@ -71,7 +71,7 @@ def download_first_extraction_correct(filtrar = 0):
 
     return df
 
-def download_latest_extraction_correct():
+def download_latest_extraction_correct(filtro = 0):
     """
     Descarga el último dataframe de extracción (se pone a mano)
 
@@ -89,16 +89,16 @@ def download_latest_extraction_correct():
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     # NO LO TOQUES
-    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260420", claves, "parquet") #Descargamos el más reciente
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260424", claves, "parquet") #Descargamos el más reciente
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos) #Corregimos tiempos
 
     df = made_for_kids(df) # Corregimos los kids
     
-    if filtrar == 1: 
+    if filtro == 1: 
         print("Filtrando datos, sin filtro de subtitulos")
         df = filtrado(df, filt_subtitulos=False) #Filtradomos el df
 
-    elif filtrar == 2: 
+    elif filtro == 2: 
         print("Filtrando datos, con filtro de subtitulos")
         df = filtrado(df, filt_subtitulos=True) #Filtradomos el df
 
@@ -296,12 +296,12 @@ def divide_save_data(df, name): #Deberíamos eliminarla
     upload_dataframe_minio(df_val, "pd1", f"grupo1/modelos/validation_{name}", claves, "parquet")
 
 def extract_definitive_model_data(columna = "Made for Kids"): 
-    X_train, X_test, y_train, y_test = get_data_models_train_test(2, columna)
+    X_train, X_test, y_train, y_test = get_data_models_train_test(columna)
     X_train = pd.concat([X_train, X_test], axis=0).reset_index(drop=True)
     y_train = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)
     return X_train, y_train
 
-def extract_definitive_test(columna = "Made for Kids"): 
+def extract_definitive_test(columna = "Made for kids"): 
     X_train, X_test, y_train, y_test = get_data_models_train_test_latest(2, columna)
     X_train = pd.concat([X_train, X_test], axis=0).reset_index(drop=True)
     y_train = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)

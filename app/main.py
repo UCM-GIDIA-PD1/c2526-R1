@@ -14,7 +14,7 @@ from comun.Server_PD import download_model_minio
 # Adicionales
 from extraccion.get_video_info_api import get_info
 import re
-from train import model_kids, model_genres
+from .train import model_kids, model_genres
 
 from pydantic import BaseModel
 # Ciclo de vida
@@ -44,41 +44,6 @@ class GenrePrediction(BaseModel):
 
 class KidsPrediction(BaseModel):
     safe: bool
-
-# Extraccion de datos 
-def _get_data_and_predict(model, url: str):
-    """
-    Parametros entrada -> 
-    model: Modelo correspondiente a la predicción que queramos hacer. (Generos o kids).
-    url (string): Url del video que se quiere clasficar.
-
-    Parametros salida -> 
-        Predicción (string)
-
-    Extrae los datos de un video a partir de la url y predice el resultado
-    """
-    # Extracción de ID
-    video_id_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
-    if not video_id_match:
-        return None, 0.0
-    
-    video_id = video_id_match.group(1)
-
-    # Extraemos los datos del video a partir del ID
-    df_video = get_info(video_id)
-    
-    if df_video is None or df_video.empty:
-        return None, 0.0
-
-    # Predicción
-    prediction= model.predict(df_video)[0]
-
-    try:
-        prob = model.predict_proba(df_video).max()
-    except:
-        prob = 0.95
-    
-    return prediction, prob
 
 @app.get("/video/genre", response_class=HTMLResponse)
 def genre_page(request: Request):
@@ -119,4 +84,4 @@ async def predict_kids(video: VideoInput):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=2350, reload=True)
