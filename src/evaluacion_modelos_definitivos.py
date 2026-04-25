@@ -4,8 +4,9 @@ import wandb
 import pandas as pd
 from sklearn.inspection import permutation_importance
 from comun.Server_PD import download_model_minio
-from sklearn.metrics import classification_report, accuracy_score, f1_score, roc_auc_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_recall_curve, auc
 from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
+import numpy as np
 
 def importancia_intrinseca_xgb(model, pipe):
     # Intentar obtener nombres de columnas tras el preprocesamiento
@@ -25,7 +26,8 @@ def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder 
     wandb.init(project=proyecto, name=nombre)
 
     raw_preds = model.predict(X_test_trans)
-    
+    prob_preds = model.predict_proba(X_test_trans)[:, 1]
+
     if encoder:
         class_names = encoder.classes_.tolist()
         y_test_text = encoder.inverse_transform(y_test)
@@ -46,11 +48,13 @@ def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder 
 
     # Métricas
     report = classification_report(y_test_text, pred_test_text, output_dict=True)
-    
+    auc_score = auc_score(prob_preds, y_test)
+
     wandb.summary["accuracy"] = report["accuracy"]
     wandb.summary["f1_weighted"] = report["weighted avg"]["f1-score"]
     wandb.summary["precision_weighted"] = report["weighted avg"]["precision"]
     wandb.summary["recall_weighted"] = report["weighted avg"]["recall"]
+    wandb.summary["auc"] = auc_score
     
     print(f"Evaluación de {nombre} finalizada. F1-Score: {report['weighted avg']['f1-score']:.4f}")
     wandb.finish()
@@ -91,6 +95,20 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
     wandb.log({"importancia_variables_reales": wandb.plot.bar(tabla, "Variable Real", "Importancia Media", title="Importancia por Columna Original")})
     wandb.finish()
 
+def auc_score(y_scores, y_val):
+    precisions, recalls, thresholds = precision_recall_curve(y_val, y_scores)
+    score_val = auc(recalls, precisions)
+    print(f"PR-AUC del modelo: {score_val}")
+    f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
+    best_f1_val = np.max(f1_scores)
+    idx_max_f1 = np.argmax(f1_scores)
+    if idx_max_f1 < len(thresholds):
+        mejor_umbral = thresholds[idx_max_f1]
+    else:
+        mejor_umbral = thresholds[-1]
+    print(f"PR-AUC: {score_val:.4f} | Max F1: {best_f1_val:.4f} | Threshold: {mejor_umbral:.4f}")
+
+    return score_val
 
 if __name__ == '__main__':
 

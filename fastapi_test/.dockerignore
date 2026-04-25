@@ -1,9 +1,0 @@
-# Ficheros y carpetas que Docker NO debe copiar al construir la imagen.
-# Equivalente al .gitignore pero para docker build.
-
-# Ficheros ocultos: .git, .venv, .dockerignore, etc.
-**/.*
-
-# Bytecode compilado de Python (se regenera automáticamente)
-**/__pycache__
-**/*.pyc
