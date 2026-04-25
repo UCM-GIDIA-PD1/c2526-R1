@@ -104,7 +104,17 @@ if __name__ == '__main__':
     X_test, y_test = extract_definitive_test(columna = "Generos")
     X_test_trans_genre = pipe_genres.transform(X_test)
     y_test_encoded = encoder_genre.transform(y_test)
+    
     evaluar_modelo_final("modelo_generos_definitivo", "V0", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
-    print(f'Evaluamos importancia')
-    calcular_importancia_generos(model_genre, pipe_genres, X_test, y_test)
+    
+    print(f'Evaluamos importancia...')
 
+    # SOLUCIÓN: Incluimos TODAS las columnas que el Pipeline espera encontrar
+    # Se añaden 'Titulo_canal' y 'Made for kids' para evitar el ValueError
+    cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Made for kids"] 
+    
+    # Filtramos el X_test original para quedarnos con estas columnas
+    X_test_filtrado = X_test[cols_usadas]
+
+    # Ahora sí funcionará la permutación
+    calcular_importancia_generos(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
