@@ -52,7 +52,6 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
             return self.model.predict(X_trans)
             
         def score(self, X, y):
-            # Este es el método que faltaba para que permutation_importance funcione
             preds = self.predict(X)
             return accuracy_score(y, preds)
 
@@ -61,12 +60,10 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
 
     full_model = FullPipelineWrapper(pipe, model)
 
-    # 2. Ejecutar la permutación (n_jobs=1 suele ser más estable en Windows para evitar errores de pickling)
     result = permutation_importance(
         full_model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=1
     )
 
-    # 3. Organizar y mostrar resultados
     importancia_df = pd.DataFrame({
         'Variable Real': X_test.columns,
         'Importancia Media': result.importances_mean
@@ -75,11 +72,11 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
     print("\n--- IMPORTANCIA DE VARIABLES REALES (GÉNEROS) ---")
     print(importancia_df)
     
-    # Opcional: Registrar en WandB para que no se pierda el dato
     wandb.init(project="modelo_generos_definitivo", name="Importancia_Variables")
     tabla = wandb.Table(dataframe=importancia_df)
     wandb.log({"importancia_variables_reales": wandb.plot.bar(tabla, "Variable Real", "Importancia Media", title="Importancia por Columna Original")})
     wandb.finish()
+
 
 if __name__ == '__main__':
 
@@ -92,7 +89,6 @@ if __name__ == '__main__':
     pipe_kids = (download_model_minio("pd1", "grupo1/models/kids/pipe_kids", claves))
     pipe_genres = (download_model_minio("pd1", "grupo1/models/genres/pipe_genres", claves))
     
-    # Descarga datos
 
     # Kids
     X_test, y_test = extract_definitive_test()
@@ -109,12 +105,8 @@ if __name__ == '__main__':
     
     print(f'Evaluamos importancia...')
 
-    # SOLUCIÓN: Incluimos TODAS las columnas que el Pipeline espera encontrar
-    # Se añaden 'Titulo_canal' y 'Made for kids' para evitar el ValueError
     cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Made for kids"] 
     
-    # Filtramos el X_test original para quedarnos con estas columnas
     X_test_filtrado = X_test[cols_usadas]
 
-    # Ahora sí funcionará la permutación
     calcular_importancia_generos(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
