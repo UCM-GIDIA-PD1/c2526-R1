@@ -4,8 +4,22 @@ import wandb
 import pandas as pd
 from sklearn.inspection import permutation_importance
 from comun.Server_PD import download_model_minio
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score, roc_auc_score
 from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
+
+def importancia_intrinseca_xgb(model, pipe):
+    # Intentar obtener nombres de columnas tras el preprocesamiento
+    try:
+        feature_names = pipe.get_feature_names_out()
+    except:
+        feature_names = [f"f{i}" for i in range(model.n_features_in_)]
+
+    importancia_data = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': model.feature_importances_
+    }).sort_values(by='Importance', ascending=False)
+    
+    return importancia_data
 
 def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder = None):
     wandb.init(project=proyecto, name=nombre)
@@ -53,7 +67,7 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
             
         def score(self, X, y):
             preds = self.predict(X)
-            return accuracy_score(y, preds)
+            return f1_score(y, preds)
 
         def fit(self, X, y=None):
             return self
@@ -95,6 +109,8 @@ if __name__ == '__main__':
     X_test_trans_kids = pipe_kids.transform(X_test)
 
     evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
+    print(f'Evaluamos importancia...')
+    importancia_intrinseca_xgb(model_kids, pipe_kids)
 
     # Generos
     X_test, y_test = extract_definitive_test(columna = "Generos")
