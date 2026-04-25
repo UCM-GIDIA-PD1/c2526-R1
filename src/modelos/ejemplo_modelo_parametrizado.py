@@ -26,10 +26,10 @@ if __name__ == '__main__':
     # param_vals = range(3,5)
     # metric = "cosine"
 
-    params = {'C': [10], 'max_iter': [3000], 'solver': ['lbfgs']}
+    params = {'C': [10,11], 'max_iter': [1000, 2000, 3000], 'solver': ['lbfgs']}
 
 
-    score = "Precision"
+    score = "auc"
     average = "weighted"
     n_fold = 2
 
