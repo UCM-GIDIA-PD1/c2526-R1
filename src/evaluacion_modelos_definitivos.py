@@ -4,8 +4,22 @@ import wandb
 import pandas as pd
 from sklearn.inspection import permutation_importance
 from comun.Server_PD import download_model_minio
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score, roc_auc_score
 from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
+
+def importancia_intrinseca_xgb(model, pipe):
+    # Intentar obtener nombres de columnas tras el preprocesamiento
+    try:
+        feature_names = pipe.get_feature_names_out()
+    except:
+        feature_names = [f"f{i}" for i in range(model.n_features_in_)]
+
+    importancia_data = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': model.feature_importances_
+    }).sort_values(by='Importance', ascending=False)
+    
+    return importancia_data
 
 def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder = None):
     wandb.init(project=proyecto, name=nombre)
@@ -52,21 +66,18 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
             return self.model.predict(X_trans)
             
         def score(self, X, y):
-            # Este es el método que faltaba para que permutation_importance funcione
             preds = self.predict(X)
-            return accuracy_score(y, preds)
+            return f1_score(y, preds)
 
         def fit(self, X, y=None):
             return self
 
     full_model = FullPipelineWrapper(pipe, model)
 
-    # 2. Ejecutar la permutación (n_jobs=1 suele ser más estable en Windows para evitar errores de pickling)
     result = permutation_importance(
         full_model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=1
     )
 
-    # 3. Organizar y mostrar resultados
     importancia_df = pd.DataFrame({
         'Variable Real': X_test.columns,
         'Importancia Media': result.importances_mean
@@ -75,11 +86,11 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
     print("\n--- IMPORTANCIA DE VARIABLES REALES (GÉNEROS) ---")
     print(importancia_df)
     
-    # Opcional: Registrar en WandB para que no se pierda el dato
     wandb.init(project="modelo_generos_definitivo", name="Importancia_Variables")
     tabla = wandb.Table(dataframe=importancia_df)
     wandb.log({"importancia_variables_reales": wandb.plot.bar(tabla, "Variable Real", "Importancia Media", title="Importancia por Columna Original")})
     wandb.finish()
+
 
 if __name__ == '__main__':
 
@@ -92,19 +103,26 @@ if __name__ == '__main__':
     pipe_kids = (download_model_minio("pd1", "grupo1/models/kids/pipe_kids", claves))
     pipe_genres = (download_model_minio("pd1", "grupo1/models/genres/pipe_genres", claves))
     
-    # Descarga datos
 
     # Kids
     X_test, y_test = extract_definitive_test()
     X_test_trans_kids = pipe_kids.transform(X_test)
 
     evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
+    print(f'Evaluamos importancia...')
+    importancia_intrinseca_xgb(model_kids, pipe_kids)
 
     # Generos
     X_test, y_test = extract_definitive_test(columna = "Generos")
     X_test_trans_genre = pipe_genres.transform(X_test)
     y_test_encoded = encoder_genre.transform(y_test)
+    
     evaluar_modelo_final("modelo_generos_definitivo", "V0", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
-    print(f'Evaluamos importancia')
-    calcular_importancia_generos(model_genre, pipe_genres, X_test, y_test)
+    
+    print(f'Evaluamos importancia...')
 
+    cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Made for kids"] 
+    
+    X_test_filtrado = X_test[cols_usadas]
+
+    calcular_importancia_generos(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
