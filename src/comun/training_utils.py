@@ -3,7 +3,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
-from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix, precision_recall_curve, f1_score, auc
 from comun.preprocess_utils import build_preprocess, unzip_params, build_score
 from comun.filter_and_divide_data import get_data_models_train_test
 from collections import defaultdict
@@ -50,9 +50,18 @@ def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram,
         for paramset in params_: #un array
             model = modelo(**paramset)#parameter_name = param_val) #KNeighborsClassifier(n_neighbors=k, metric="cosine")
             model.fit(X_tr_trans, y_tr)
-
-            preds = model.predict(X_val_trans)
-            score_val = build_score(score, y_val, preds, average)
+            
+            if score.lower() == "auc":
+                y_scores = model.predict_proba(X_val_trans)[:, 1]
+                precisions, recalls, thresholds = precision_recall_curve(y_val, y_scores)
+                score_val = auc(recalls, precisions)
+                print(f"PR-AUC del modelo: {score_val}")
+                f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
+                best_f1_val = np.max(f1_scores)
+                print(f"PR-AUC: {score_val:.4f} | Max F1: {best_f1_val:.4f}")
+            else:
+                preds = model.predict(X_val_trans)
+                score_val = build_score(score, y_val, preds, average)
 
             scores_dict.append((paramset, score_val))
             i = i+1
@@ -102,13 +111,34 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     ])
 
     best_model.fit(X_train, y_train)
-
-    raw_preds = best_model.predict(X_test)
-
+    if score.lower() == "auc":
+        y_probs_test = best_model.predict_proba(X_test)[:, 1]
+        precisions, recalls, thresholds = precision_recall_curve(y_test, y_probs_test)
+        
+        # Calculamos PR-AUC final
+        best_score_test = auc(recalls, precisions)
+        
+        # Buscamos el umbral que maximiza el F1 en test (o podrías usar el de CV)
+        f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
+        idx_max = np.argmax(f1_scores)
+        
+        # Nota: thresholds tiene N-1 elementos respecto a precision/recall
+        best_threshold = thresholds[idx_max] if idx_max < len(thresholds) else thresholds[-1]
+        
+        # Aplicamos el umbral para tener las predicciones finales
+        raw_preds = (y_probs_test >= best_threshold).astype(int)
+        
+        print(f"\n--- OPTIMIZACIÓN PR-AUC ---")
+        print(f"PR-AUC Test: {best_score_test:.4f}")
+        print(f"Umbral óptimo seleccionado: {best_threshold:.4f}")
+    else:
+        raw_preds = best_model.predict(X_test)
+        best_score_test = build_score(score, y_test, raw_preds, average)
+    
     print("\n--- RESULTADOS EN TEST ---")
-    best_score_test = build_score(score, y_test, raw_preds, average)
     print("Score:", best_score_test)
     wandb.summary["best_score_test"] = best_score_test
+    if score.lower() == "auc": wandb.summary["optimal_threshold"] = best_threshold
 
     # Matriz de confusión
     class_names = le.classes_.tolist()
