@@ -8,20 +8,6 @@ from sklearn.metrics import classification_report, accuracy_score, f1_score, pre
 from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
 import numpy as np
 
-def importancia_intrinseca_xgb(model, pipe):
-    # Intentar obtener nombres de columnas tras el preprocesamiento
-    try:
-        feature_names = pipe.get_feature_names_out()
-    except:
-        feature_names = [f"f{i}" for i in range(model.n_features_in_)]
-
-    importancia_data = pd.DataFrame({
-        'Feature': feature_names,
-        'Importance': model.feature_importances_
-    }).sort_values(by='Importance', ascending=False)
-    
-    return importancia_data
-
 def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder = None):
     wandb.init(project=proyecto, name=nombre)
 
@@ -48,17 +34,20 @@ def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder 
 
     # Métricas
     report = classification_report(y_test_text, pred_test_text, output_dict=True)
-    auc_score = auc_score(prob_preds, y_test)
+    if(encoder == None): 
+        aucScore = auc_score(prob_preds, y_test)
+    else: 
+        aucScore = None
 
     wandb.summary["accuracy"] = report["accuracy"]
     wandb.summary["f1_weighted"] = report["weighted avg"]["f1-score"]
     wandb.summary["precision_weighted"] = report["weighted avg"]["precision"]
     wandb.summary["recall_weighted"] = report["weighted avg"]["recall"]
-    wandb.summary["auc"] = auc_score
+    wandb.summary["auc"] = aucScore
     
     print(f"Evaluación de {nombre} finalizada. F1-Score: {report['weighted avg']['f1-score']:.4f}")
     wandb.finish()
-def calcular_importancia_generos(model, pipe, X_test, y_test):
+def calcular_importancia(model, pipe, X_test, y_test):
     
     class FullPipelineWrapper:
         def __init__(self, pipe, model):
@@ -71,7 +60,7 @@ def calcular_importancia_generos(model, pipe, X_test, y_test):
             
         def score(self, X, y):
             preds = self.predict(X)
-            return f1_score(y, preds)
+            return f1_score(y, preds, average='weighted')
 
         def fit(self, X, y=None):
             return self
@@ -128,7 +117,10 @@ if __name__ == '__main__':
 
     evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
     print(f'Evaluamos importancia...')
-    importancia_intrinseca_xgb(model_kids, pipe_kids)
+    cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Generos", "Subgeneros"] 
+    
+    X_test_filtrado = X_test[cols_usadas]
+    calcular_importancia(model_kids, pipe_kids, X_test_filtrado, y_test)
 
     # Generos
     X_test, y_test = extract_definitive_test(columna = "Generos")
@@ -143,4 +135,4 @@ if __name__ == '__main__':
     
     X_test_filtrado = X_test[cols_usadas]
 
-    calcular_importancia_generos(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
+    calcular_importancia(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
