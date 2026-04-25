@@ -58,7 +58,12 @@ def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram,
                 print(f"PR-AUC del modelo: {score_val}")
                 f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
                 best_f1_val = np.max(f1_scores)
-                print(f"PR-AUC: {score_val:.4f} | Max F1: {best_f1_val:.4f}")
+                idx_max_f1 = np.argmax(f1_scores)
+                if idx_max_f1 < len(thresholds):
+                    mejor_umbral = thresholds[idx_max_f1]
+                else:
+                    mejor_umbral = thresholds[-1]
+                print(f"PR-AUC: {score_val:.4f} | Max F1: {best_f1_val:.4f} | Threshold: {mejor_umbral:.4f}")
             else:
                 preds = model.predict(X_val_trans)
                 score_val = build_score(score, y_val, preds, average)

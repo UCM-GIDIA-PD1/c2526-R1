@@ -1,0 +1,17 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado de la clasificación</title>
+</head>
+<body>
+    <h1>Resultado de la clasificación</h1>
+    <p><b>Clase predicha</b>: {{clase}}</p>
+    <p><b>Probabilidades:</b></p>
+    <ul>
+        <li>Setosa: {{(prob_setosa * 100) | round(1)}}%</li>
+        <li>Versicolor: {{(prob_versicolor * 100) | round(1)}}%</li>
+        <li>Virginica: {{(prob_virginica * 100) | round(1)}}%</li>
+    </ul>
+    <p><a href="/">← Volver al inicio</a></p>
+</body>
+</html>
