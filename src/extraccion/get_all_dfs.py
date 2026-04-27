@@ -160,7 +160,7 @@ if __name__ == "__main__":
         claves = json.load(archivo)
 
     bucket = "pd1"
-    prefix = "grupo1/raw_new_test/"
+    prefix = "grupo1/raw_new_test/" #raw_new_test o raw
 
     df_final = unir_parquets_minio(bucket, prefix, claves)
 
@@ -181,6 +181,10 @@ if __name__ == "__main__":
     df_limpio = limpiar_dataframe(df_final)
 
     print("\nFilas eliminadas en limpieza:", total_filas - len(df_limpio))
+
+    print("Videos de adultos que quedan en el dataset:", len(df_limpio[df_limpio["Rango_edad"] == "Adult"]))
+    print("Videos de niños que quedan en el dataset:", len(df_limpio[df_limpio["Rango_edad"] != "Adult"]))
+
     prefix = "grupo1/clean/"
     subir_union(df_limpio, bucket, prefix, claves)
 
