@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
     print("\nFilas eliminadas en limpieza:", total_filas - len(df_limpio))
     prefix = "grupo1/clean/"
-    subir_union(df_limpio, bucket, prefix, clsaves)
+    subir_union(df_limpio, bucket, prefix, claves)
 
     print("Proceso finalizado correctamente")
 

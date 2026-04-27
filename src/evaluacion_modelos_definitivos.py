@@ -4,14 +4,16 @@ import wandb
 import pandas as pd
 from sklearn.inspection import permutation_importance
 from comun.Server_PD import download_model_minio
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_recall_curve, auc
 from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
+import numpy as np
 
 def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder = None):
     wandb.init(project=proyecto, name=nombre)
 
     raw_preds = model.predict(X_test_trans)
-    
+    prob_preds = model.predict_proba(X_test_trans)[:, 1]
+
     if encoder:
         class_names = encoder.classes_.tolist()
         y_test_text = encoder.inverse_transform(y_test)
@@ -32,45 +34,70 @@ def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder 
 
     # Métricas
     report = classification_report(y_test_text, pred_test_text, output_dict=True)
-    
+    if(encoder == None): 
+        aucScore = auc_score(prob_preds, y_test)
+    else: 
+        aucScore = None
+
     wandb.summary["accuracy"] = report["accuracy"]
     wandb.summary["f1_weighted"] = report["weighted avg"]["f1-score"]
     wandb.summary["precision_weighted"] = report["weighted avg"]["precision"]
     wandb.summary["recall_weighted"] = report["weighted avg"]["recall"]
+    wandb.summary["auc"] = aucScore
     
     print(f"Evaluación de {nombre} finalizada. F1-Score: {report['weighted avg']['f1-score']:.4f}")
     wandb.finish()
-def calcular_importancia_generos(model, pipe, X_test, y_test):
-    #Construye un wrapper porque necesitamos el pipeline completo para el sklearn full
+def calcular_importancia(model, pipe, X_test, y_test):
+    
     class FullPipelineWrapper:
         def __init__(self, pipe, model):
             self.pipe = pipe
             self.model = model
-            #self._estimator_type = "classifier"
 
         def predict(self, X):
-            # Transforma las 11 variables (W2V + SVD) y luego predice
             X_trans = self.pipe.transform(X)
             return self.model.predict(X_trans)
+            
+        def score(self, X, y):
+            preds = self.predict(X)
+            return f1_score(y, preds, average='weighted')
+
         def fit(self, X, y=None):
             return self
 
     full_model = FullPipelineWrapper(pipe, model)
 
-    # 2. Ejecutar la permutación
-    # n_repeats=5 es un buen equilibrio entre precisión y tiempo
     result = permutation_importance(
-        full_model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=-1
+        full_model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=1
     )
 
-    # 3. Organizar resultados
     importancia_df = pd.DataFrame({
-        'feature': X_test.columns,
-        'importance_mean': result.importances_mean,
-        'importance_std': result.importances_std
-    }).sort_values(by='importance_mean', ascending=False)
+        'Variable Real': X_test.columns,
+        'Importancia Media': result.importances_mean
+    }).sort_values(by='Importancia Media', ascending=False)
 
+    print("\n--- IMPORTANCIA DE VARIABLES REALES (GÉNEROS) ---")
     print(importancia_df)
+    
+    wandb.init(project="modelo_generos_definitivo", name="Importancia_Variables")
+    tabla = wandb.Table(dataframe=importancia_df)
+    wandb.log({"importancia_variables_reales": wandb.plot.bar(tabla, "Variable Real", "Importancia Media", title="Importancia por Columna Original")})
+    wandb.finish()
+
+def auc_score(y_scores, y_val):
+    precisions, recalls, thresholds = precision_recall_curve(y_val, y_scores)
+    score_val = auc(recalls, precisions)
+    print(f"PR-AUC del modelo: {score_val}")
+    f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
+    best_f1_val = np.max(f1_scores)
+    idx_max_f1 = np.argmax(f1_scores)
+    if idx_max_f1 < len(thresholds):
+        mejor_umbral = thresholds[idx_max_f1]
+    else:
+        mejor_umbral = thresholds[-1]
+    print(f"PR-AUC: {score_val:.4f} | Max F1: {best_f1_val:.4f} | Threshold: {mejor_umbral:.4f}")
+
+    return score_val
 
 if __name__ == '__main__':
 
@@ -83,19 +110,29 @@ if __name__ == '__main__':
     pipe_kids = (download_model_minio("pd1", "grupo1/models/kids/pipe_kids", claves))
     pipe_genres = (download_model_minio("pd1", "grupo1/models/genres/pipe_genres", claves))
     
-    # Descarga datos
 
     # Kids
     X_test, y_test = extract_definitive_test()
     X_test_trans_kids = pipe_kids.transform(X_test)
 
     evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
+    print(f'Evaluamos importancia...')
+    cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Generos", "Subgeneros"] 
+    
+    X_test_filtrado = X_test[cols_usadas]
+    calcular_importancia(model_kids, pipe_kids, X_test_filtrado, y_test)
 
     # Generos
     X_test, y_test = extract_definitive_test(columna = "Generos")
     X_test_trans_genre = pipe_genres.transform(X_test)
     y_test_encoded = encoder_genre.transform(y_test)
+    
     evaluar_modelo_final("modelo_generos_definitivo", "V0", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
-    print(f'Evaluamos importancia')
-    calcular_importancia_generos(model_genre, pipe_genres, X_test, y_test)
+    
+    print(f'Evaluamos importancia...')
 
+    cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Made for kids"] 
+    
+    X_test_filtrado = X_test[cols_usadas]
+
+    calcular_importancia(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
