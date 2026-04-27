@@ -47,7 +47,7 @@ def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder 
     
     print(f"Evaluación de {nombre} finalizada. F1-Score: {report['weighted avg']['f1-score']:.4f}")
     wandb.finish()
-def calcular_importancia(model, pipe, X_test, y_test):
+def calcular_importancia(project, model, pipe, X_test, y_test):
     
     class FullPipelineWrapper:
         def __init__(self, pipe, model):
@@ -79,7 +79,7 @@ def calcular_importancia(model, pipe, X_test, y_test):
     print("\n--- IMPORTANCIA DE VARIABLES REALES (GÉNEROS) ---")
     print(importancia_df)
     
-    wandb.init(project="modelo_generos_definitivo", name="Importancia_Variables")
+    wandb.init(project=project, name="Importancia_Variables")
     tabla = wandb.Table(dataframe=importancia_df)
     wandb.log({"importancia_variables_reales": wandb.plot.bar(tabla, "Variable Real", "Importancia Media", title="Importancia por Columna Original")})
     wandb.finish()
@@ -115,19 +115,19 @@ if __name__ == '__main__':
     X_test, y_test = extract_definitive_test()
     X_test_trans_kids = pipe_kids.transform(X_test)
 
-    evaluar_modelo_final("modelo_kids_definitivo", "V0", model_kids, X_test_trans_kids, y_test)
+    evaluar_modelo_final("modelo_kids_definitivo", "V1", model_kids, X_test_trans_kids, y_test)
     print(f'Evaluamos importancia...')
     cols_usadas = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Titulo_canal", "Generos", "Subgeneros"] 
     
     X_test_filtrado = X_test[cols_usadas]
-    calcular_importancia(model_kids, pipe_kids, X_test_filtrado, y_test)
+    calcular_importancia("modelo_kids_definitivo", model_kids, pipe_kids, X_test_filtrado, y_test)
 
     # Generos
     X_test, y_test = extract_definitive_test(columna = "Generos")
     X_test_trans_genre = pipe_genres.transform(X_test)
     y_test_encoded = encoder_genre.transform(y_test)
     
-    evaluar_modelo_final("modelo_generos_definitivo", "V0", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
+    evaluar_modelo_final("modelo_generos_definitivo", "V1", model_genre, X_test_trans_genre, y_test_encoded, encoder_genre)
     
     print(f'Evaluamos importancia...')
 
@@ -135,4 +135,4 @@ if __name__ == '__main__':
     
     X_test_filtrado = X_test[cols_usadas]
 
-    calcular_importancia(model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
+    calcular_importancia("modelo_generos_definitivo", model_genre, pipe_genres, X_test_filtrado, y_test_encoded)
