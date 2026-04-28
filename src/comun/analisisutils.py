@@ -149,6 +149,48 @@ def calcular_wpm(row):
     numero_palabras = len(sub_texto.split())
     return numero_palabras / row['Duracion']
 
+def gráfico_frecuencias_generos(diccionario_generos):
+    """
+    Muestra un gráficos de las frecuencias de cada género de los datos
+
+    Parameters
+    ----------
+    diccionario_generos: dicc
+        Diccionario de dataframes divididos por géneros
+
+    Returns
+    -------
+    Imagen: .png
+        Imagen del nuevo gráfico
+    -------
+    """
+    #Frecuencias
+    generos_nombres = list(diccionario_generos.keys())
+    frecuencias = [len(df) for df in diccionario_generos.values()]
+
+    #Ordenamos
+    datos_ordenados = pd.Series(frecuencias, index=generos_nombres).sort_values(ascending=False)
+
+    #Grafica
+    plt.figure(figsize=(10, 8))
+    sns.barplot(x=datos_ordenados.values, y=datos_ordenados.index, palette='viridis')
+    #Ticks
+    max_frecuencia = datos_ordenados.max()
+    tus_ticks = [0, 250, 500]
+
+    paso_automatico = 200 if max_frecuencia < 2000 else 500
+    ticks_automaticos = list(range(0, int(max_frecuencia) + paso_automatico, paso_automatico))
+
+    ticks_finales = sorted(list(set(tus_ticks + ticks_automaticos)))
+    plt.xticks(ticks_finales)
+
+
+    plt.title("Distribución de Vídeos en los 15 Géneros Principales")
+    plt.xlabel("Cantidad de Vídeos")
+    plt.ylabel("Género")
+    plt.grid(axis='x', linestyle='--', alpha=0.4)
+
+    plt.show()
 
 #Duracion
 def graficar_histograma_duracion(df, titulo, ax_obj, color):
