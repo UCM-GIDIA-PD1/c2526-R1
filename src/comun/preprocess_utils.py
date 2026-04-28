@@ -92,13 +92,15 @@ def download_and_divide(to_predict): #Deprecated
 
 types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", "Titulo_canal": "text", 
                    "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), "Subgeneros": "text", #Subgeneros la analizamos como texto por su tamaño 
-                   "Duracion": StandardScaler(), "Made for kids": "passthrough"} #passthrough marca que no se hacen transformaciones
+                   "Duracion": StandardScaler(), "Made for kids": "passthrough", "img_embedding": "passthrough"} #passthrough marca que no se hacen transformaciones
 
 def build_preprocess_bow(columns, max, ngram):
     transformers = []
     for col in columns:
         if types_of_prepro[col] == "text":
             transformers.append((col, CountVectorizer(max_features=max, ngram_range=ngram), col))
+        elif col == "img_embedding":
+            transformers.append((col, EmbeddingReshaper(), [col]))
         elif types_of_prepro[col] == "passthrough": 
              transformers.append((col, "passthrough", [col])) #No hace transformaciones para made for kids porque ya es booleana
         else:
@@ -110,6 +112,8 @@ def build_preprocess_tfidf(columns, max, ngram):
     for col in columns:
         if types_of_prepro[col] == "text":
             transformers.append((col, TfidfVectorizer(max_features=max, ngram_range=ngram), col))
+        elif col == "img_embedding":
+            transformers.append((col, EmbeddingReshaper(), [col]))
         elif types_of_prepro[col] == "passthrough": 
              transformers.append((col, "passthrough", [col])) #No hace transformaciones para made for kids porque ya es booleana
         else:
@@ -141,6 +145,15 @@ class Word2VecVectorizer(BaseEstimator, TransformerMixin):
     # Pesos
     def get_feature_names_out(self, input_features=None):
         return np.array([f"v_{i}" for i in range(self.dim)])
+
+class EmbeddingReshaper(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        # Convierte una columna de arrays/listas en una matriz 2D
+        return np.stack(X.iloc[:, 0].values)
+    def get_feature_names_out(self, input_features=None):
+        return np.array([f"img_feat_{i}" for i in range(2048)]) # 2048 es el tamaño de ResNet50
         
 def build_preprocess_word2vec(X_tr, columns, svd):
     #preprocesamiento para word2vec
@@ -166,6 +179,8 @@ def build_preprocess_word2vec(X_tr, columns, svd):
     for col in columns:
         if types_of_prepro[col] == "text":
             transformers.append((col, Word2VecVectorizer(model), col))
+        elif col == "img_embedding":
+            transformers.append((col, EmbeddingReshaper(), [col]))
         else:
             transformers.append((col, types_of_prepro[col], [col]))
     return ColumnTransformer(transformers = transformers)
@@ -191,6 +206,8 @@ def build_preprocess_deep_learning(columns):
     for col in columns:
         if types_of_prepro[col] == "text":
             transformers.append((col, TransformerVectorizer(), col))
+        elif col == "img_embedding":
+            transformers.append((col, EmbeddingReshaper(), [col]))
         elif types_of_prepro[col] == "passthrough": 
              transformers.append((col, "passthrough", [col]))
         else:
