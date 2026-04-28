@@ -31,13 +31,13 @@ def main():
 
     parser.add_argument(
         "-p","--proporcion_adults", 
-        type=float, default=0.8, 
+        type=float, default=0.5, 
         help="Proporción de videos para adultos (entre 0 y 1)"
     ) #opcional, por defecto 0.8
 
     parser.add_argument(
         "-i","--iteraciones", 
-        type=int, default=1, 
+        type=int, default=4, 
         help="Numero de veces que se va a ejecutar el código"
     )
 

@@ -4,7 +4,6 @@ argumentos insertados desde consola.
 '''
 import argparse
 import extraccion.collect_all_data as collect_all_data
-
 def main():
     '''
     Llamando a este archivo desde consola se ejecuta el scripts de extracción de datos
