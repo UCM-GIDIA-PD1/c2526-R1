@@ -6,9 +6,8 @@ from comun.Server_PD import get_minio_client, upload_dataframe_minio
 import json
 
 def extraer_texto_miniaturas(bucket, prefix, claves):
-    client = get_minio_client(claves) #
-    # Inicializamos el lector (Español e Inglés)
-    reader = easyocr.Reader(['es', 'en'])
+    client = get_minio_client(claves) 
+    reader = easyocr.Reader(['en'])     # Idioma
     
     objects = client.list_objects(bucket, prefix=prefix, recursive=True) #
     data_ocr = []
