@@ -161,7 +161,6 @@ if __name__ == "__main__":
 
     bucket = "pd1"
     prefix = "grupo1/raw_new_test/" #raw_new_test o raw
-
     df_final = unir_parquets_minio(bucket, prefix, claves)
 
     print("\n--- ANÁLISIS DE DUPLICADOS ---")

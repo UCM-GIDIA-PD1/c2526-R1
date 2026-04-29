@@ -37,7 +37,7 @@ def main():
 
     parser.add_argument(
         "-i","--iteraciones", 
-        type=int, default=4, 
+        type=int, default=3, 
         help="Numero de veces que se va a ejecutar el código"
     )
 

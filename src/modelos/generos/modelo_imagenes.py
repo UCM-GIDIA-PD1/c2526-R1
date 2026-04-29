@@ -6,7 +6,7 @@ from xgboost import XGBClassifier
 if __name__ == '__main__':
     to_predict = "Generos"
     #Añadimos la columna de las imagenes
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal", "img_embedding"]
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal", "img_embedding", "OCR_text"]
 
     max_features = 3000
     ngram = (1,3)
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     project = "Procesamiento imagenes ()"
     name = "V0"
-    preprocess_type = "Word2Vec"
+    preprocess_type = "DeepLearning"
 
     # param_name = "n_neighbours"
     # param_vals = range(3,5)

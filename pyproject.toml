@@ -24,6 +24,7 @@ dependencies = [
     "cryptography==46.0.4",
     "debugpy==1.8.19",
     "decorator==5.2.1",
+    "easyocr>=1.7.2",
     "executing==2.2.1",
     "farama-notifications==0.0.4",
     "fastapi>=0.135.3",
