@@ -113,3 +113,8 @@ packages = [
     "src/comun",
     "src/extraccion"
     ]
+
+[dependency-groups]
+app = [
+    "fastapi>=0.135.3",
+]

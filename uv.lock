@@ -331,6 +331,11 @@ dependencies = [
     { name = "yt-dlp" },
 ]
 
+[package.dev-dependencies]
+app = [
+    { name = "fastapi" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "asttokens", specifier = "==3.0.1" },
@@ -431,6 +436,9 @@ requires-dist = [
     { name = "xyzservices", specifier = "==2025.11.0" },
     { name = "yt-dlp", specifier = "==2026.1.31" },
 ]
+
+[package.metadata.requires-dev]
+app = [{ name = "fastapi", specifier = ">=0.135.3" }]
 
 [[package]]
 name = "cachetools"
