@@ -3,12 +3,10 @@ from sklearn.linear_model import LogisticRegression
 from comun.optuna_utils import entrenamiento
 
 def objective(trial):
-
     params = {
         "C": trial.suggest_float("C", 1e-3, 100, log=True),
         "solver": trial.suggest_categorical("solver", ["lbfgs", "saga"]),
         "max_iter": trial.suggest_int("max_iter", 2000, 5000, step=500),
-        "multi_class": "multinomial",
         "n_jobs": -1,
         "random_state": 42
     }
@@ -38,7 +36,7 @@ def objective(trial):
 if __name__ == "__main__":
     study = optuna.create_study(direction="maximize")
     
-    study.optimize(objective, n_trials=20)
+    study.optimize(objective, n_trials=10)
 
     print("\n" + "="*50)
     print("RESUMEN DE OPTIMIZACIÓN - REGRESIÓN LOGÍSTICA")

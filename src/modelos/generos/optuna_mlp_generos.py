@@ -11,7 +11,7 @@ def objective(trial):
         "solver": "adam",
         "alpha": trial.suggest_float("alpha", 1e-5, 1e-2, log=True),
         "learning_rate": "adaptive",
-        "max_iter": 2000, #(reducir para Optuna)
+        "max_iter": 2000,
         "random_state": 42
     }
     
