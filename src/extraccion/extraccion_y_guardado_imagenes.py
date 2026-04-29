@@ -3,7 +3,7 @@ Este archivo contiene la funcion para llamar al script mediante
 argumentos insertados desde consola.
 '''
 import argparse
-import extraccion.collect_all_data as collect_all_data
+import extraccion.Prueba_imagenes_collect_all_data as collect_all_data_imagenes
 def main():
     '''
     Llamando a este archivo desde consola se ejecuta el scripts de extracción de datos
@@ -31,13 +31,13 @@ def main():
 
     parser.add_argument(
         "-p","--proporcion_adults", 
-        type=float, default=0.8, 
+        type=float, default=0.5, 
         help="Proporción de videos para adultos (entre 0 y 1)"
     ) #opcional, por defecto 0.8
 
     parser.add_argument(
         "-i","--iteraciones", 
-        type=int, default=1, 
+        type=int, default=4, 
         help="Numero de veces que se va a ejecutar el código"
     )
 
@@ -53,7 +53,7 @@ def main():
     try:
         for i in range(args.iteraciones):
             print(f'Iteracion numero {i+1} de {args.iteraciones}')
-            data = collect_all_data.collect_all_data(
+            data = collect_all_data_imagenes.collect_all_data(
                 num_videos=args.num_videos,
                 fecha=args.fecha,
                 proporcion_adults=args.proporcion_adults

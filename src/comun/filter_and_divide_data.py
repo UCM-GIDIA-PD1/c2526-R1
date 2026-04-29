@@ -319,7 +319,7 @@ if __name__ == '__main__':
     #print(df_filtered["Made for kids"].value_counts())
     #print(df["Made for kids"].value_counts())
 
-def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids"):
+def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids", include_images= False):
     """
     Obten un X_train, y_train, X_test, y_test más reciente posible.
     Estratificado para niños o generos
@@ -332,13 +332,34 @@ def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids"
 
     to_predict: string
         Dice que columna vamos a predecir: Generos o Made for kids
+    
+    include_images: Boolean
+        True: Descarga el df que tiene imagenes
+        False: Descarga el df normal (sin el procesamiento de imagenes)
 
     Returns
     -------
     X_train, X_test, y_train, y_test:
         Datos descargados
     """ 
-    df = download_latest_extraction_correct(filtrado).copy()
+
+    if include_images:
+        print("Cargando datos exclusivos de la carpeta 'test_images'...")
+        df = download_test_extraction_metadata()
+        
+        # Descargamos y unimos los embeddings visuales
+        df_emb = download_test_image_embeddings()
+        df = pd.merge(df, df_emb, on="ID", how="inner")
+
+        counts = df[to_predict].value_counts()
+        # Nos quedamos solo con las clases que tienen al menos 2 miembros
+        valid_classes = counts[counts >= 2].index
+        df = df[df[to_predict].isin(valid_classes)]
+        print(f"Dataset de estudio listo con {len(df)} videos filtrados.")
+    else:
+        df = download_latest_extraction_correct(filtrado).copy()
+        
+
     y = df[to_predict]
     X = df.drop([to_predict], axis=1)
     
@@ -355,3 +376,21 @@ def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids"
     y_test = y_test.reset_index(drop = True)
     return pd.DataFrame(X_train), pd.DataFrame(X_test), (y_train), (y_test) #Nos aseguramos de que se pasen los tipos correctos
 
+
+def download_test_image_embeddings():
+    """Descarga los embeddings sacados de las imagenes (miniaturas de los videos)"""
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    df_emb = download_dataframe_minio("pd1", "grupo1/test_images/embeddings_vision", claves, "parquet")
+    return df_emb
+
+def download_test_extraction_metadata():
+    """Descarga los metadatos de los vídeos que sí tienen imágenes (carpeta de prueba)."""
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    
+    df = download_dataframe_minio("pd1", "grupo1/test_images/raw/df_videos_PRUEBA_2026-04-26_20-11-44", claves, "parquet")
+    
+    df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos)
+    df = made_for_kids(df)
+    return df

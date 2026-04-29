@@ -1,9 +1,7 @@
 import optuna
 from sklearn.neighbors import KNeighborsClassifier
-from comun.optuna_utils import entrenamiento_para_optuna
-
+from comun.optuna_utils import entrenamiento
 def objective(trial):
-    # Espacio de búsqueda de hiperparámetros para KNN
     params = {
         "n_neighbors": trial.suggest_int("n_neighbors", 3, 25),
         "weights": trial.suggest_categorical("weights", ["uniform", "distance"]),
@@ -11,7 +9,7 @@ def objective(trial):
         "n_jobs": -1
     }
 
-    score = entrenamiento_para_optuna(
+    score = entrenamiento(
         project_="Modelo Knn Generos Optuna",
         trial_name=f"knn_trial_{trial.number}",
         modelo=KNeighborsClassifier,
@@ -19,8 +17,8 @@ def objective(trial):
         max_features=5000,
         ngram=(1, 3),
         svd=100,
-        preprocess_type="Word2Vec", # Cambiar a "TF-IDF" si Word2Vec tarda demasiado
-        columns=["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Titulo_canal"],
+        preprocess_type="Word2Vec",
+        columns = ["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Subtitulos","Titulo_canal"], #Se elimina subtitulos y rango_edad
         params=params,
         score_metric="F1",
         average="weighted",
@@ -36,7 +34,6 @@ if __name__ == "__main__":
 
     study.optimize(objective, n_trials=20)
 
-    # 3. Resultados finales
     print("\n" + "=" * 30)
     print("MEJOR RESULTADO ENCONTRADO")
     print(f"F1-Score: {study.best_value:.4f}")

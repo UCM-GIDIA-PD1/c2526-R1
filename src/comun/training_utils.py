@@ -5,7 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix, precision_recall_curve, f1_score, auc
 from comun.preprocess_utils import build_preprocess, unzip_params, build_score
-from comun.filter_and_divide_data import get_data_models_train_test
+from comun.filter_and_divide_data import get_data_models_train_test, get_data_models_train_test_latest
 from collections import defaultdict
 import numpy as np
 import pandas as pd
@@ -173,7 +173,7 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     return best_model
 
 #He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
-def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score, average, n_splits, filtrado = False):
+def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score, average, n_splits, filtrado = False, include_images=False):
     """
     Ejecuta un modelo especificado, haz una run en wandb y devuelve por pantalla la mejor selección de parametros
 
@@ -222,6 +222,10 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
        0 para no filtrar, 1 para filtrar videos con longitud extrema o sin información textual,
        2 para filtrar videos con subtítulos a None, dejando un poco de estos videos como ruido
 
+    include_images: Boolean
+        True: incluye la columna con los embedings de las imagenes
+        False: No incluye imagenes
+
     Returns
     -------
     Nada:
@@ -229,7 +233,10 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     """ 
     #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
-    X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
+    if include_images:
+        X_train, X_test, y_train, y_test = get_data_models_train_test_latest(filtrado = 0, to_predict = to_predict, include_images = True)
+    else:
+        X_train, X_test, y_train, y_test = get_data_models_train_test(filtrado = filtrado, to_predict=to_predict)
     print("Finished data acquisition, starting crossvalidation")
 
     le = LabelEncoder()

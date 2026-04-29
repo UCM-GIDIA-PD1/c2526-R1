@@ -8,14 +8,12 @@ import wandb
 from comun.preprocess_utils import build_preprocess, build_score
 from comun.filter_and_divide_data import get_data_models_train_test
 
-def entrenamiento_para_optuna(project_, trial_name, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score_metric, average, n_splits, filtrado):
-    # 1. Adquisición de datos
+def entrenamiento(project_, trial_name, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score_metric, average, n_splits, filtrado):
     X_train_full, _, y_train_full, _ = get_data_models_train_test(filtrado=filtrado, to_predict=to_predict)
     
     le = LabelEncoder()
     y_encoded = pd.Series(le.fit_transform(y_train_full))
 
-    # 2. Configuración de WandB
     run = wandb.init(
         project=project_,
         name=trial_name,
@@ -27,12 +25,10 @@ def entrenamiento_para_optuna(project_, trial_name, modelo, to_predict, max_feat
     kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     cv_scores = []
 
-    # 3. Ciclo de Cross-Validation
     for train_idx, val_idx in kf.split(X_train_full, y_encoded):
         X_tr, X_val = X_train_full.iloc[train_idx], X_train_full.iloc[val_idx]
         y_tr, y_val = y_encoded.iloc[train_idx], y_encoded.iloc[val_idx]
 
-        # Construcción del preprocesamiento (aquí se entrena el Word2Vec si aplica)
         preprocess = build_preprocess(preprocess_type, columns, X_tr, max_features, ngram, svd)
         
         pipe = Pipeline([
@@ -48,8 +44,6 @@ def entrenamiento_para_optuna(project_, trial_name, modelo, to_predict, max_feat
         cv_scores.append(score_val)
 
     mean_score = np.mean(cv_scores)
-    
-    # 4. Reportar a WandB y cerrar trial
     wandb.log({f"mean_cv_{score_metric}": mean_score})
     run.finish()
     
