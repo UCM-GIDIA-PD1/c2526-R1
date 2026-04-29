@@ -1,10 +1,10 @@
-from extraccion.collect_all_data import get_info
+from collect_all_data import get_info
 import re
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.preprocessing import LabelEncoder
-import comun.training_utils as train
-from comun.filter_and_divide_data import iso_a_minutos
+import training_utils as train
+from filter_and_divide_data import iso_a_minutos
 import string
 
 class model_kids:

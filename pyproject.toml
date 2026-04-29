@@ -21,10 +21,12 @@ dependencies = [
     "cloudpickle==3.1.2",
     "colorama==0.4.6",
     "comm==0.2.3",
+    "comun",
     "cryptography==46.0.4",
     "debugpy==1.8.19",
     "decorator==5.2.1",
     "executing==2.2.1",
+    "extraccion",
     "farama-notifications==0.0.4",
     "fastapi>=0.135.3",
     "fastparquet>=2025.12.0",
@@ -108,13 +110,33 @@ dependencies = [
     "yt-dlp==2026.1.31",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = [
+#[tool.hatch.build.targets.wheel]
+#packages = [
+#    "src/comun",
+#    "src/extraccion"
+#    ]
+
+[tool.uv.workspace]
+members = [
     "src/comun",
-    "src/extraccion"
-    ]
+    "src/extraccion",
+]
+
+[tool.uv.sources]
+comun = { workspace = true }
+extraccion = { workspace = true }
 
 [dependency-groups]
 app = [
+    "comun",
+    "extraccion",
     "fastapi>=0.135.3",
+    "google-api-python-client>=2.188.0",
+    "jinja2>=3.1.6",
+    "joblib>=1.5.3",
+    "minio>=7.2.20",
+    "pandas>=3.0.0",
+    "scikit-learn>=1.8.0",
+    "uvicorn>=0.44.0",
+    "yt-dlp>=2026.1.31",
 ]
