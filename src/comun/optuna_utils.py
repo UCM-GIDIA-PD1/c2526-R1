@@ -5,8 +5,8 @@ from sklearn.decomposition import TruncatedSVD
 import numpy as np
 import pandas as pd
 import wandb
-from comun.preprocess_utils import build_preprocess, build_score
-from comun.filter_and_divide_data import get_data_models_train_test
+from preprocess_utils import build_preprocess, build_score
+from filter_and_divide_data import get_data_models_train_test
 
 def entrenamiento(project_, trial_name, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score_metric, average, n_splits, filtrado):
     X_train_full, _, y_train_full, _ = get_data_models_train_test(filtrado=filtrado, to_predict=to_predict)

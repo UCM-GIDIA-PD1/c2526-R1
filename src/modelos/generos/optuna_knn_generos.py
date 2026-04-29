@@ -1,6 +1,6 @@
 import optuna
 from sklearn.neighbors import KNeighborsClassifier
-from comun.optuna_utils import entrenamiento
+from optuna_utils import entrenamiento
 def objective(trial):
     params = {
         "n_neighbors": trial.suggest_int("n_neighbors", 3, 25),

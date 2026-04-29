@@ -1,6 +1,6 @@
 import isodate
 import json
-from comun.Server_PD import download_dataframe_minio
+from Server_PD import download_dataframe_minio
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.compose import ColumnTransformer

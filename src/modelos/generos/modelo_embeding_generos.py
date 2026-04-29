@@ -2,7 +2,7 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
-from comun.training_utils import entrenamiento
+from training_utils import entrenamiento
 
 def build_ensemble(voting='soft'):
     clf1 = KNeighborsClassifier(n_neighbors=6, metric="cosine", weights="distance")

@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 from transformers import pipeline
-from comun.preprocess_utils import download_model_dfs
+from preprocess_utils import download_model_dfs
 
 def analizar_kids_llm_rubrica(n_muestras=15):
     print("Descargando dataframes desde MinIO...")

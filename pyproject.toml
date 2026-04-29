@@ -1,7 +1,3 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "c2526-r1"
 version = "0.1.0"
@@ -108,12 +104,6 @@ dependencies = [
     "yt-dlp==2026.1.31",
 ]
 
-#[tool.hatch.build.targets.wheel]
-#packages = [
-#    "src/comun",
-#    "src/extraccion"
-#    ]
-
 [tool.uv.workspace]
 members = [
     "src/comun",
@@ -126,6 +116,7 @@ extraccion = { workspace = true }
 
 [dependency-groups]
 app = [
+    "bs4>=0.0.2",
     "comun",
     "extraccion",
     "fastapi>=0.135.3",
@@ -135,6 +126,9 @@ app = [
     "minio>=7.2.20",
     "pandas>=3.0.0",
     "scikit-learn>=1.8.0",
+    "selenium>=4.41.0",
+    "tqdm>=4.67.3",
     "uvicorn>=0.44.0",
+    "wonderwords>=3.0.1",
     "yt-dlp>=2026.1.31",
 ]

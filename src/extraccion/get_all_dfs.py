@@ -3,8 +3,9 @@ from datetime import datetime
 import json
 import os
 import tempfile
-from comun.Server_PD import get_minio_client
-from comun.Server_PD import upload_dataframe_minio
+from Server_PD import get_minio_client
+from Server_PD import upload_dataframe_minio
+
 #   bucket = "pd1"
 #   prefix = "grupo1/"
 #   with open("Private/claves.json", "r", encoding="utf-8") as archivo:

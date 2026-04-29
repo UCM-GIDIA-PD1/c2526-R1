@@ -1,6 +1,6 @@
 #Para filtrar los datos y dividirlos en entrenamiento, validación y test
-from comun.Server_PD import download_dataframe_minio, upload_dataframe_minio
-import comun.analisisutils as utils
+from Server_PD import download_dataframe_minio, upload_dataframe_minio
+import analisisutils as utils
 import pandas as pd
 import json
 import isodate

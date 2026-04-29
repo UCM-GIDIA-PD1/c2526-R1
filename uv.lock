@@ -237,7 +237,7 @@ wheels = [
 [[package]]
 name = "c2526-r1"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "asttokens" },
     { name = "beautifulsoup4" },
@@ -340,6 +340,7 @@ dependencies = [
 
 [package.dev-dependencies]
 app = [
+    { name = "bs4" },
     { name = "comun" },
     { name = "extraccion" },
     { name = "fastapi" },
@@ -349,7 +350,10 @@ app = [
     { name = "minio" },
     { name = "pandas" },
     { name = "scikit-learn" },
+    { name = "selenium" },
+    { name = "tqdm" },
     { name = "uvicorn" },
+    { name = "wonderwords" },
     { name = "yt-dlp" },
 ]
 
@@ -456,6 +460,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 app = [
+    { name = "bs4", specifier = ">=0.0.2" },
     { name = "comun", editable = "src/comun" },
     { name = "extraccion", editable = "src/extraccion" },
     { name = "fastapi", specifier = ">=0.135.3" },
@@ -465,7 +470,10 @@ app = [
     { name = "minio", specifier = ">=7.2.20" },
     { name = "pandas", specifier = ">=3.0.0" },
     { name = "scikit-learn", specifier = ">=1.8.0" },
+    { name = "selenium", specifier = ">=4.41.0" },
+    { name = "tqdm", specifier = ">=4.67.3" },
     { name = "uvicorn", specifier = ">=0.44.0" },
+    { name = "wonderwords", specifier = ">=3.0.1" },
     { name = "yt-dlp", specifier = ">=2026.1.31" },
 ]
 

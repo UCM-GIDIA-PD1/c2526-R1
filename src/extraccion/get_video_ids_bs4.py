@@ -8,7 +8,7 @@ import datetime
 from tqdm import tqdm
 import time
 
-from extraccion.get_video_ids_kids import get_vkids_ids
+from get_video_ids_kids import get_vkids_ids
 
 def get_video_ids(query):
     '''

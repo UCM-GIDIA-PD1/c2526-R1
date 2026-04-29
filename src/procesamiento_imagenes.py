@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
 from tensorflow.keras.preprocessing import image
-from comun.Server_PD import get_minio_client, upload_dataframe_minio
+from Server_PD import get_minio_client, upload_dataframe_minio
 
 def generar_embeddings_imagenes(bucket, prefix, claves):
     client = get_minio_client(claves) 

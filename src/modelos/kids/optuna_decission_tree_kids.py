@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics import recall_score
 from sklearn.model_selection import KFold
-from comun.preprocess_utils import download_model_dfs
+from preprocess_utils import download_model_dfs
 
 
 print('Cargando dataframes para clasificación Kids...')

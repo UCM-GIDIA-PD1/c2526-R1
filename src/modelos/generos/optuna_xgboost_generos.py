@@ -1,6 +1,6 @@
 import optuna
 from xgboost import XGBClassifier
-from comun.optuna_utils import entrenamiento
+from optuna_utils import entrenamiento
 
 def objective(trial):
     params = {

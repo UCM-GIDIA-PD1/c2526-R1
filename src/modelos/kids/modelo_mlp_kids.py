@@ -1,5 +1,5 @@
 from sklearn.neural_network import MLPClassifier
-from comun.optuna_utils import entrenamiento
+from optuna_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Made for kids"

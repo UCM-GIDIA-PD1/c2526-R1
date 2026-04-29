@@ -1,6 +1,6 @@
 import optuna
 from sklearn.neural_network import MLPClassifier
-from comun.optuna_utils import entrenamiento
+from optuna_utils import entrenamiento
 
 def objective(trial):
     params = {
