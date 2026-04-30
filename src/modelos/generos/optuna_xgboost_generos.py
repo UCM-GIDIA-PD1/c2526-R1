@@ -1,6 +1,6 @@
 import optuna
 from xgboost import XGBClassifier
-from comun.optuna_utils import entrenamiento
+from optuna_utils import entrenamiento
 
 def objective(trial):
     params = {
@@ -27,7 +27,7 @@ def objective(trial):
         ngram=(1, 3),
         svd=150,
         preprocess_type="Word2Vec",
-        columns=["Titulo", "Descripcion", "Tags", "Made for kids","Duracion","Subgeneros","Titulo_canal"],
+        columns=["Titulo", "Descripcion", "Tags", "Made for kids","Duracion","Subtitulos","Titulo_canal"],
         params=params,
         score_metric="F1",
         average="weighted",

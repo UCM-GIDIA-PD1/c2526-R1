@@ -1,6 +1,6 @@
 import optuna
 from sklearn.neighbors import KNeighborsClassifier
-from comun.optuna_utils import entrenamiento
+from optuna_utils import entrenamiento
 def objective(trial):
     params = {
         "n_neighbors": trial.suggest_int("n_neighbors", 3, 25),
@@ -18,7 +18,7 @@ def objective(trial):
         ngram=(1, 3),
         svd=100,
         preprocess_type="Word2Vec",
-        columns = ["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Subgeneros","Titulo_canal"], #Se elimina subtitulos y rango_edad
+        columns = ["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Subtitulos","Titulo_canal"], #Se elimina subtitulos y rango_edad
         params=params,
         score_metric="F1",
         average="weighted",

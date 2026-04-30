@@ -10,6 +10,13 @@ resolution-markers = [
     "python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 
+[manifest]
+members = [
+    "c2526-r1",
+    "comun",
+    "extraccion",
+]
+
 [[package]]
 name = "abnf"
 version = "2.2.0"
@@ -230,7 +237,7 @@ wheels = [
 [[package]]
 name = "c2526-r1"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "asttokens" },
     { name = "beautifulsoup4" },
@@ -244,11 +251,13 @@ dependencies = [
     { name = "cloudpickle" },
     { name = "colorama" },
     { name = "comm" },
+    { name = "comun" },
     { name = "cryptography" },
     { name = "debugpy" },
     { name = "decorator" },
     { name = "easyocr" },
     { name = "executing" },
+    { name = "extraccion" },
     { name = "farama-notifications" },
     { name = "fastapi" },
     { name = "fastparquet" },
@@ -332,6 +341,25 @@ dependencies = [
     { name = "yt-dlp" },
 ]
 
+[package.dev-dependencies]
+app = [
+    { name = "bs4" },
+    { name = "comun" },
+    { name = "extraccion" },
+    { name = "fastapi" },
+    { name = "google-api-python-client" },
+    { name = "jinja2" },
+    { name = "joblib" },
+    { name = "minio" },
+    { name = "pandas" },
+    { name = "scikit-learn" },
+    { name = "selenium" },
+    { name = "tqdm" },
+    { name = "uvicorn" },
+    { name = "wonderwords" },
+    { name = "yt-dlp" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "asttokens", specifier = "==3.0.1" },
@@ -346,11 +374,13 @@ requires-dist = [
     { name = "cloudpickle", specifier = "==3.1.2" },
     { name = "colorama", specifier = "==0.4.6" },
     { name = "comm", specifier = "==0.2.3" },
+    { name = "comun", editable = "src/comun" },
     { name = "cryptography", specifier = "==46.0.4" },
     { name = "debugpy", specifier = "==1.8.19" },
     { name = "decorator", specifier = "==5.2.1" },
     { name = "easyocr", specifier = ">=1.7.2" },
     { name = "executing", specifier = "==2.2.1" },
+    { name = "extraccion", editable = "src/extraccion" },
     { name = "farama-notifications", specifier = "==0.0.4" },
     { name = "fastapi", specifier = ">=0.135.3" },
     { name = "fastparquet", specifier = ">=2025.12.0" },
@@ -432,6 +462,25 @@ requires-dist = [
     { name = "xgboost", specifier = ">=3.2.0" },
     { name = "xyzservices", specifier = "==2025.11.0" },
     { name = "yt-dlp", specifier = "==2026.1.31" },
+]
+
+[package.metadata.requires-dev]
+app = [
+    { name = "bs4", specifier = ">=0.0.2" },
+    { name = "comun", editable = "src/comun" },
+    { name = "extraccion", editable = "src/extraccion" },
+    { name = "fastapi", specifier = ">=0.135.3" },
+    { name = "google-api-python-client", specifier = ">=2.188.0" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "joblib", specifier = ">=1.5.3" },
+    { name = "minio", specifier = ">=7.2.20" },
+    { name = "pandas", specifier = ">=3.0.0" },
+    { name = "scikit-learn", specifier = ">=1.8.0" },
+    { name = "selenium", specifier = ">=4.41.0" },
+    { name = "tqdm", specifier = ">=4.67.3" },
+    { name = "uvicorn", specifier = ">=0.44.0" },
+    { name = "wonderwords", specifier = ">=3.0.1" },
+    { name = "yt-dlp", specifier = ">=2026.1.31" },
 ]
 
 [[package]]
@@ -634,6 +683,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/4c/13/7d740c5849255756b
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/97/891a0971e1e4a8c5d2b20bbe0e524dc04548d2307fee33cdeba148fd4fc7/comm-0.2.3-py3-none-any.whl", hash = "sha256:c615d91d75f7f04f095b30d1c1711babd43bdc6419c1be9886a85f2f4e489417", size = 7294, upload-time = "2025-07-25T14:02:02.896Z" },
 ]
+
+[[package]]
+name = "comun"
+version = "0.1.0"
+source = { editable = "src/comun" }
 
 [[package]]
 name = "confection"
@@ -945,6 +999,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/cc/28/c14e053b6762b1044
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/ea/53f2148663b321f21b5a606bd5f191517cf40b7072c0497d3c92c4a13b1e/executing-2.2.1-py2.py3-none-any.whl", hash = "sha256:760643d3452b4d777d295bb167ccc74c64a81df23fb5e08eff250c425a4b2017", size = 28317, upload-time = "2025-09-01T09:48:08.5Z" },
 ]
+
+[[package]]
+name = "extraccion"
+version = "0.1.0"
+source = { editable = "src/extraccion" }
 
 [[package]]
 name = "farama-notifications"

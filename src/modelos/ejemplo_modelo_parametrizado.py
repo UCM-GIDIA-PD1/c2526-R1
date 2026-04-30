@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.dummy import DummyClassifier 
 from xgboost import XGBClassifier
-from comun.training_utils import entrenamiento
+from training_utils import entrenamiento
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score
 
 

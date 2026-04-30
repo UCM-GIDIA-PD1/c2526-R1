@@ -1,6 +1,6 @@
 from sklearn.neighbors import KNeighborsClassifier
-from comun.training_utils import entrenamiento
-from comun.Server_PD import upload_model_minio
+from training_utils import entrenamiento
+from Server_PD import upload_model_minio
 import numpy as np
 import json
 

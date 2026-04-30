@@ -3,9 +3,9 @@ import json
 import wandb
 import pandas as pd
 from sklearn.inspection import permutation_importance
-from comun.Server_PD import download_model_minio
+from Server_PD import download_model_minio
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_recall_curve, auc
-from comun.filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
+from filter_and_divide_data import extract_definitive_test, get_data_models_train_test_latest
 import numpy as np
 
 def evaluar_modelo_final(proyecto, nombre, model, X_test_trans, y_test, encoder = None):

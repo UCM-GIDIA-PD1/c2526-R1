@@ -1,12 +1,13 @@
-import comun.filter_and_divide_data as f
-import comun.Server_PD as spd
-import comun.training_utils as train
+import filter_and_divide_data as f
+import Server_PD as spd
+import training_utils as train
 from sklearn.neighbors import KNeighborsClassifier
 from xgboost import XGBClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.preprocessing import LabelEncoder
 import json
+
 if __name__ == '__main__':
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)

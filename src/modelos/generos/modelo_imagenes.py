@@ -1,5 +1,5 @@
 
-from comun.training_utils import entrenamiento
+from training_utils import entrenamiento
 from xgboost import XGBClassifier
 
 

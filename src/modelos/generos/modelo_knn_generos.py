@@ -1,5 +1,5 @@
 from sklearn.neighbors import KNeighborsClassifier
-from comun.training_utils import entrenamiento
+from training_utils import entrenamiento
 import numpy as np
 
 if __name__ == '__main__':

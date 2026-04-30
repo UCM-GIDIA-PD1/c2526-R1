@@ -1,5 +1,5 @@
 from sklearn.ensemble import RandomForestClassifier
-from comun.training_utils import entrenamiento
+from training_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Made for kids"

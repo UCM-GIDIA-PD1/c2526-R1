@@ -3,36 +3,33 @@ from sklearn.neural_network import MLPClassifier
 from optuna_utils import entrenamiento
 
 def objective(trial):
+
     params = {
         "hidden_layer_sizes": trial.suggest_categorical("hidden_layer_sizes", [
-            (10,), (30,), (50,), (30, 15), (50, 25)
+            (10,), (30,), (50,), (20, 10), (50, 25)
         ]),
-        "activation": trial.suggest_categorical("activation", ["tanh", "relu"]),
+        "activation": trial.suggest_categorical("activation", ["relu", "tanh"]),
         "solver": "adam",
         "alpha": trial.suggest_float("alpha", 1e-5, 1e-2, log=True),
         "learning_rate": "adaptive",
         "max_iter": 2000,
         "random_state": 42
     }
-    
-    project_name = "Modelo MLP Generos Optuna"
-    trial_name = f"mlp_trial_{trial.number}"
-    
+
     score = entrenamiento(
-        project_=project_name,
-        trial_name=trial_name,
+        project_="Modelo MLP Kids Optuna",
+        trial_name=f"mlp_kids_trial_{trial.number}",
         modelo=MLPClassifier,
-        to_predict="Generos",
+        to_predict="Made for kids",
         max_features=5000,
         ngram=(1, 2),
         svd=150,
-        preprocess_type="Word2Vec",
-        columns=["Titulo", "Descripcion", "Tags", "Made for kids", "Duracion", "Subtitulos","Titulo_canal"],
-        
+        preprocess_type="TF-IDF",
+        columns=["Titulo", "Descripcion", "Tags", "Subtitulos", "Duracion", "Subgeneros", "Titulo_canal"],
         params=params,
-        score_metric="F1",
+        score_metric="Precision", 
         average="weighted",
-        n_splits=2, 
+        n_splits=2,
         filtrado=0
     )
     
@@ -40,14 +37,16 @@ def objective(trial):
 
 if __name__ == "__main__":
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=10)
+    
+    print("Iniciando optimización para MLP (Kids)...")
+    study.optimize(objective, n_trials=12)
 
     print("\n" + "="*50)
-    print("RESUMEN DE OPTIMIZACIÓN - MULTILAYER PERCEPTRON")
+    print("MEJOR RESULTADO MLP - MADE FOR KIDS")
     print("="*50)
-    print(f"Mejor F1-Score:  {study.best_value:.4f}")
-    print("-"*50)
-    print("MEJORES HIPERPARÁMETROS:")
+    print(f"Mejor Recall: {study.best_value:.4f}")
+    print("-" * 50)
+    print("MEJOES PARÁMETROS:")
     for key, value in study.best_params.items():
         print(f" > {key:20}: {value}")
     print("="*50)
