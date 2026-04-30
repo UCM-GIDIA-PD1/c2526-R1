@@ -819,7 +819,7 @@ def graficar_bertopic_multiple(df_bertopic, lista_generos, columna_analizada):
 
     # Gráfico
     plt.figure(figsize=(15, 7))
-    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Genero_Origen", palette="viridis")
+    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Genero_Origen", palette="hsv")
 
     nombres_vs = " vs ".join(lista_generos)
     plt.title(f"Comparación de Topics - {columna_analizada} ({nombres_vs})")
