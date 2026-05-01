@@ -4,7 +4,7 @@ FROM python:3.13.12-slim
 # Copiar uv (gestor de paquetes rápido) desde su imagen oficial
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Necesitamos unas dependecias de C para compilar algunas librerias
+# Necesitamos unas dependecias de C para compilar algunas librerias ( tal vez ahora no?)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -17,12 +17,15 @@ WORKDIR /app
 
 # 1. Copiamos primero las dependencias
 COPY pyproject.toml uv.lock README.md .
+COPY src/comun ./src/comun
+COPY src/extraccion ./src/extraccion
 
 # 2. Instalar las dependencias
-RUN uv sync --no-cache
+RUN uv sync --frozen --only-group app --no-cache
 
 # 3. Copiar el resto de codigo (origen - destino)
-COPY . .
+COPY app/ /app/app/
+COPY src/Private /app/src/Private/
 
 # Ponemos el codigo para la aplicacion
 EXPOSE 2350

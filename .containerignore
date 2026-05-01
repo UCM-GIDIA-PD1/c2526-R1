@@ -11,10 +11,8 @@
 # Carpetas que no hace falta subir
 "Images readme"
 
-# Ignoramos las carpetas co archivos que no necesitamos
+# Ignoramos las carpetas que no necesitamos
 src/analisis
 src/deprecated
+src/modelos
 src/notebooks
-
-# La carpeta private hay no tiene q estar aqui, tiene que subirse al contenedor para poder acceder a lo que necesite
-# En caso de querer subirlo (publicarlo) sería un problema de seguridad.
