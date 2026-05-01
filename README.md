@@ -185,11 +185,11 @@ La forma de ejecutar el contenedor es la siguiente:
 
 1. Tenemos que tener instalado la herramienta Podman, que se puede instalar desde el siguiente enlace: [Podman Desktop](https://podman.io/).
 
-    Sigue todas las instrucciones de instalación: instalar extensiones recomendados, creacion de la maquina virtual de linux, etc.
+    Sigue todas las instrucciones de instalación: instalar extensiones recomendados, creación de la maquina virtual de linux, etc.
 
 2. Una vez que tenemos todo instalado, abrimos una terminal dentro de la dirección del proyecto para poder ejecutar los siguientes comandos.
 
-    - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar un par de minutos)
+    - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar unos minutos)
     
         ````
         $ podman build --tag sfkids .
@@ -202,7 +202,14 @@ La forma de ejecutar el contenedor es la siguiente:
         ````
 
         El nombre que le hemos puesto a nuestro contenedor es el nombre de la aplicación para poder identificarlo (no es necesario, se le puede poner cualquier otro nombre y, en caso de no ponerlo, se genera solo automáticamente).
+    
+3. Cuando el contenedor este listo, podremos acceder a la aplicación. Abriremos una pestaña en nuestro buscador y pondremos:
 
+    ````
+    http://localhost:2350
+    ````
+
+    Esto abrirá la aplicación desde local (esto significa que se está ejecutando en nuestra máquina).
 
 ### **8. Equipo de desarrollo**
 - Andrea Yu García Gómez
