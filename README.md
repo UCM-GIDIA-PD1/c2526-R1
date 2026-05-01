@@ -116,7 +116,7 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
 3. Instalamos las dependencias del proyecto usando el siguiente comando:
 
     ````
-    uv sync
+    uv sync --all-groups
     ````
 
     Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto.
@@ -176,7 +176,33 @@ uv run python app/main.py
 Aquí va la explicación para acceder a la aplicación, si hay un servidor o se deber ejecutar local, etc.
 
 ### **7. Instrucciones para crear y ejecutar el contenedor**
-Aquí va la explicación de Docker
+
+Para poder ejecutar nuestra aplicación de forma aislada y portátil, usaremos los contenedores de Docker. De esta manera, la aplicación se ejecuta dentro de un contenedor que funciona igual en cualquier entorno y sistema operativo.
+
+La configuración del contenedor está en un archivo llamado `Containerfile`, que tiene las instrucciones para descargar el entorno, las dependencias, etc.
+
+La forma de ejecutar el contenedor es la siguiente:
+
+1. Tenemos que tener instalado la herramienta Podman, que se puede instalar desde el siguiente enlace: [Podman Desktop](https://podman.io/).
+
+    Sigue todas las instrucciones de instalación: instalar extensiones recomendados, creacion de la maquina virtual de linux, etc.
+
+2. Una vez que tenemos todo instalado, abrimos una terminal dentro de la dirección del proyecto para poder ejecutar los siguientes comandos.
+
+    - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar un par de minutos)
+    
+        ````
+        $ podman build --tag sfkids .
+        ````
+
+     - A continuación, una vez que tenemos la imagen creada, ejecutamos el contenedor, que es una instancia de la imagen que acabamos de crear (puede tardar varios minutos debido a la descarga de dependencias de la aplicación).
+
+        ````
+        $ podman run -d -p 2350:2350 --name SFKids localhost/sfkids
+        ````
+
+        El nombre que le hemos puesto a nuestro contenedor es el nombre de la aplicación para poder identificarlo (no es necesario, se le puede poner cualquier otro nombre y, en caso de no ponerlo, se genera solo automáticamente).
+
 
 ### **8. Equipo de desarrollo**
 - Andrea Yu García Gómez
