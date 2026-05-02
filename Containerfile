@@ -23,7 +23,7 @@ COPY src/extraccion ./src/extraccion
 RUN uv sync --frozen --only-group app --no-cache
 
     # 3. Copiar el resto de codigo (origen - destino)
-COPY app/ /app/app/
+COPY app /app/app/
 COPY src/Private /app/src/Private/
 
 # Ponemos el codigo para la aplicacion
@@ -31,5 +31,5 @@ EXPOSE 2350
 
 # Comando para ejecutar el contenedor
 # Añadimos el directorio actual al PYTHONPATH para que Python encuentre la carpeta 'app'
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/src
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2350"]
