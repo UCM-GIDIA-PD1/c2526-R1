@@ -185,9 +185,9 @@ La forma de ejecutar el contenedor es la siguiente:
 
 1. Tenemos que tener instalado la herramienta Podman, que se puede instalar desde el siguiente enlace: [Podman Desktop](https://podman.io/).
 
-    Sigue todas las instrucciones de instalación: instalar extensiones recomendados, creación de la maquina virtual de linux, etc.
+    Sigue todas las instrucciones de instalación: instala las extensiones recomendadas. Con ellas podrás usar una máquina de linux para poder ejecutar los siguientes comandos. Tendrás que tenerla activa para poder usarla.
 
-2. Una vez que tenemos todo instalado, abrimos una terminal dentro de la dirección del proyecto para poder ejecutar los siguientes comandos.
+2. Una vez que tenemos todo instalado, abrimos una terminal y nos dirigimos a la dirección del proyecto para ejecutar los siguientes comandos:
 
     - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar unos minutos)
     
@@ -203,13 +203,31 @@ La forma de ejecutar el contenedor es la siguiente:
 
         El nombre que le hemos puesto a nuestro contenedor es el nombre de la aplicación para poder identificarlo (no es necesario, se le puede poner cualquier otro nombre y, en caso de no ponerlo, se genera solo automáticamente).
     
-3. Cuando el contenedor este listo, podremos acceder a la aplicación. Abriremos una pestaña en nuestro buscador y pondremos:
+3. Para segurarnos que el contenedor esta listo, entra en la aplicación de Podman Desktop, y busca el contenedor que acabamos de crear (si le has puesto nombre, buscalo por ese nombre) y haz click sobre él. Una vez dentro verás distintas pestañas (summary, logs, Inspect, Kube, Terminal) entra en "Logs" y observa si por el final se encuentra este mensaje:
+
+    ````
+    INFO:     Started server process [67]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    INFO:     Uvicorn running on http://0.0.0.0:2350 (Press CTRL+C to quit)
+    ````
+
+    Si ves este mensaje, significa que la aplicación se ha iniciado con éxito y ya puedes abrir el buscador y poner:
 
     ````
     http://localhost:2350
     ````
 
-    Esto abrirá la aplicación desde local (esto significa que se está ejecutando en nuestra máquina).
+    Esto abrirá la aplicación web y podrás utilizarla.
+
+    Para parar la aplicación solo tendrás que detener el contenedor usando eta instruccion:
+
+    ````
+    $ podman stop <nombre_del_contenedor>
+    ````
+
+    > [!NOTE]
+    > Al ejecutarlo desde local, solo podrás acceder desde tu ordenador y no desde otro.
 
 ### **8. Equipo de desarrollo**
 - Andrea Yu García Gómez
