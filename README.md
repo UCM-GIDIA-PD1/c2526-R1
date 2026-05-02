@@ -234,8 +234,8 @@ La forma de ejecutar el contenedor es la siguiente:
     $ podman stop <nombre_del_contenedor>
     ````
 
-    >[!NOTE]
-    > Al ejecutarlo desde local, solo podrás acceder desde tu ordenador y no desde otro.
+>[!NOTE]
+> Al ejecutarlo desde local, solo podrás acceder desde tu ordenador y no desde otro.
 
 ### **8. Equipo de desarrollo**
 - Andrea Yu García Gómez
