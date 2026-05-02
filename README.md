@@ -32,7 +32,7 @@
 
 - `.gitignore`: Contiene los archivos que no se deben subir al git desde el repositorio local.
 
-- `.python-version`: Contiene la version de python usada en el proyecto.
+- `.python-version`: Contiene la versión de python usada en el proyecto.
 
 - `pyproyect.toml` y `uv.lock`: Contiene la configuración del entorno, con las dependencias y las versiones correspondientes a la versión de python.
 
@@ -119,7 +119,7 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
     uv sync --all-groups
     ````
 
-    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto.
+    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto. (Usamos --all-goups porque tenemos distintos grupos de dependencias y, de esta manera, se descargan las dependencias del proyecto entero).
 
 ### **4. Ejecutar los scripts del proyecto**
 
@@ -163,6 +163,7 @@ En este paso se define la arquitectura de los objetos de predicción en `app/tra
 **4.4. Ejecución de la Aplicación Web**
 
 Para interactuar con los modelos de clasificación de forma visual y sencilla, se debe lanzar el servidor local.
+
 ````
 uv run python app/main.py
 ````
@@ -173,13 +174,20 @@ uv run python app/main.py
 - Para el objetivo de clasificación de generos, el mejor modelo construído es KNN con un F1-score de 0.69%.
 
 ### **6. Instrucciones para ejecutar la aplicación web**
-Aquí va la explicación para acceder a la aplicación, si hay un servidor o se deber ejecutar local, etc.
+
+Para poder ejecutar la web hemos creado un script llamado `main.py` dentro de la carpeta `app`. Para poder arrancar la web solo el necesario ejecutar el script y esperar a que la web se active.
+
+>[!IMPORTANT]
+> Para que el script funcione correctamente, en el script `app/main.py` asegurate que el `import train ...` no lleve el punto delante de train para que, al ejecutar, encuentre el archivo y no de errores.
 
 ### **7. Instrucciones para crear y ejecutar el contenedor**
 
 Para poder ejecutar nuestra aplicación de forma aislada y portátil, usaremos los contenedores de Docker. De esta manera, la aplicación se ejecuta dentro de un contenedor que funciona igual en cualquier entorno y sistema operativo.
 
 La configuración del contenedor está en un archivo llamado `Containerfile`, que tiene las instrucciones para descargar el entorno, las dependencias, etc.
+
+>[!IMPORTANT]
+> Para que el contenedor funcione correctamente, en el script `app/main.py` asegurate que el `import .train ...` lleve el punto delante de train para que, al ejecutar, encuentre el archivo.
 
 La forma de ejecutar el contenedor es la siguiente:
 
