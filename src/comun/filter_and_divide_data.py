@@ -392,7 +392,7 @@ def download_test_extraction_metadata():
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     
-    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260429", claves, "parquet")
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260503", claves, "parquet")
     
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos)
     df = made_for_kids(df)
