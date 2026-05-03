@@ -186,18 +186,23 @@ def build_preprocess_word2vec(X_tr, columns, svd):
     return ColumnTransformer(transformers = transformers)
 
 class TransformerVectorizer(BaseEstimator, TransformerMixin):
+    _shared_model = None 
+
     def __init__(self, model_name='paraphrase-multilingual-MiniLM-L12-v2'):
         self.model_name = model_name
-        self.model = SentenceTransformer(model_name)
+        if TransformerVectorizer._shared_model is None:
+            print(f"Cargando modelo BERT compartido: {model_name}...")
+            TransformerVectorizer._shared_model = SentenceTransformer(model_name)
+        
+        self.model = TransformerVectorizer._shared_model
         self.dim = self.model.get_sentence_embedding_dimension()
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        return self.model.encode(list(X), show_progress_bar=False)
+        return self.model.encode(list(X.astype(str)), show_progress_bar=False)
 
-    # Pesos 
     def get_feature_names_out(self, input_features=None):
         return np.array([f"trans_{i}" for i in range(self.dim)])
 
