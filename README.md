@@ -1,6 +1,6 @@
 # **SAFE FOR KIDS (SFKids)**
 
-![Imagen portada](./Images%20readme/imagen%20portada.png)
+![Imagen portada](./Images%20readme/portada.png)
 
 ## **Índice**
 
@@ -93,7 +93,7 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
     
     - Podemos hacerlo desde el explorador de archivos de nuestro equipo y en la dirección escribir cmd para abrir la terminal desde esa dirección.
 
-        ![Imagen de ayuda](./Images%20readme/Direccion%20para%20replicar%20entorno.png)
+        ![Imagen de ayuda](./Images%20readme/dir_replicar_entorno.png)
 
     - O mediante el siguiente comando desde terminal.
 
@@ -191,11 +191,27 @@ La configuración del contenedor está en un archivo llamado `Containerfile`, qu
 
 La forma de ejecutar el contenedor es la siguiente:
 
-1. Tenemos que tener instalado la herramienta Podman, que se puede instalar desde el siguiente enlace: [Podman Desktop](https://podman.io/).
+1. Tendrás que tener instalado la herramienta Podman, que se puede instalar desde el siguiente enlace: [Podman Desktop](https://podman.io/). Sigue todas las instrucciones de instalación: descarga las extensiones recomendadas para poder utilizar una máquina virtual de linux.
 
-    Sigue todas las instrucciones de instalación: instala las extensiones recomendadas. Con ellas podrás usar una máquina de linux para poder ejecutar los siguientes comandos. Tendrás que tenerla activa para poder usarla.
+2. Una vez que tengas el programa instalado, inícialo y te saldrá la pantalla de inicio.
 
-2. Una vez que tenemos todo instalado, abrimos una terminal y nos dirigimos a la dirección del proyecto para ejecutar los siguientes comandos:
+    ![Pantalla inicio Podman](./Images%20readme/inicio_podman.png)
+
+    Ahora crearás y activarás la máquina virtual (si no lo ha hecho Podman de forma predeterminada). Para ello, entra en **settings** (esquina inferior izquierda). Una vez dentro verás distintas pestañas en el lateral izquierdo, ve al que pone **resources**.
+
+    ![Pantalla resources](./Images%20readme/settings_podman.png)
+
+    Dentro de esta pantalla tendrás las extensiones que se han instalado. En la que pone **Podman**, dale a **Create New ...** para crear la máquina virtual. Te saldrá una pantalla parecida a esta:
+
+    ![Pantalla máquina](./Images%20readme/maquina_virtual_creacion.png)
+
+    Y dale al botón de **Create**.
+
+    Una vez creado, dentro de la extensión saldrá la máquina virtual. Dentro habrá distintos botones, asegurate que el botón de **Start** está iniciado.
+
+    ![Pantalla extension con máquina](./Images%20readme/extension_maquina.png)
+
+3. Tras el paso 2 podremos ejecutar los siguientes comandos. Abre una terminal dentro de la carpeta del proyecto:
 
     - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar unos minutos)
     
@@ -211,7 +227,7 @@ La forma de ejecutar el contenedor es la siguiente:
 
         El nombre que le hemos puesto a nuestro contenedor es el nombre de la aplicación para poder identificarlo (no es necesario, se le puede poner cualquier otro nombre y, en caso de no ponerlo, se genera solo automáticamente).
     
-3. Para segurarnos que el contenedor esta listo, entra en la aplicación de Podman Desktop, y busca el contenedor que acabamos de crear (si le has puesto nombre, buscalo por ese nombre) y haz click sobre él. Una vez dentro verás distintas pestañas (summary, logs, Inspect, Kube, Terminal) entra en "Logs" y observa si por el final se encuentra este mensaje:
+4. Para segurarnos que el contenedor esta listo, entra en la aplicación de Podman Desktop, y busca el contenedor que acabamos de crear (si le has puesto nombre, buscalo por ese nombre) y haz click sobre él. Una vez dentro verás distintas pestañas (summary, logs, Inspect, Kube, Terminal) entra en "Logs" y observa si por el final se encuentra este mensaje:
 
     ````
     INFO:     Started server process [67]
