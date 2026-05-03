@@ -216,18 +216,30 @@ La forma de ejecutar el contenedor es la siguiente:
     - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar unos minutos)
     
         ````
-        $ podman build --tag sfkids .
+        podman build --tag sfkids .
         ````
+
+        Puedes ver las imagenes creadas en la pestaña **Images**.
+
+        ![Pantalla Images](./Images%20readme/pantalla%20images.png)
 
      - A continuación, una vez que tenemos la imagen creada, ejecutamos el contenedor, que es una instancia de la imagen que acabamos de crear (puede tardar varios minutos debido a la descarga de dependencias de la aplicación).
 
         ````
-        $ podman run -d -p 2350:2350 --name SFKids localhost/sfkids
+        podman run -d -p 2350:2350 --name SFKids localhost/sfkids
         ````
+
+        Puedes ver también lso contenedores que tienes en la pestana **Container**.
+
+        ![Pantalla container](./Images%20readme/pantalla_container.png)
 
         El nombre que le hemos puesto a nuestro contenedor es el nombre de la aplicación para poder identificarlo (no es necesario, se le puede poner cualquier otro nombre y, en caso de no ponerlo, se genera solo automáticamente).
     
-4. Para segurarnos que el contenedor esta listo, entra en la aplicación de Podman Desktop, y busca el contenedor que acabamos de crear (si le has puesto nombre, buscalo por ese nombre) y haz click sobre él. Una vez dentro verás distintas pestañas (summary, logs, Inspect, Kube, Terminal) entra en "Logs" y observa si por el final se encuentra este mensaje:
+4. Para segurarnos que el contenedor esta listo, entra en la aplicación de Podman Desktop, y busca el contenedor que acabamos de crear (si le has puesto nombre, buscalo por ese nombre) y haz click sobre él. 
+
+    ![Pantalla logs container](./Images%20readme/pantalla_logs_container.png)
+
+    Una vez dentro verás distintas pestañas (summary, logs, Inspect, Kube, Terminal) entra en "Logs" y observa si por el final se encuentra este mensaje:
 
     ````
     INFO:     Started server process [67]
@@ -244,10 +256,10 @@ La forma de ejecutar el contenedor es la siguiente:
 
     Esto abrirá la aplicación web y podrás utilizarla.
 
-    Para parar la aplicación solo tendrás que detener el contenedor usando eta instruccion:
+    Para parar la aplicación solo tendrás que detener el contenedor usando dándole al boton de stop dentro del contenedor en la aplicación o usando este comando en la terminal.
 
     ````
-    $ podman stop <nombre_del_contenedor>
+    podman stop <nombre_del_contenedor>
     ````
 
 >[!NOTE]
