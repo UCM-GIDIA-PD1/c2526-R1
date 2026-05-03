@@ -32,7 +32,7 @@
 
 - `.gitignore`: Contiene los archivos que no se deben subir al git desde el repositorio local.
 
-- `.python-version`: Contiene la version de python usada en el proyecto.
+- `.python-version`: Contiene la versión de python usada en el proyecto.
 
 - `pyproyect.toml` y `uv.lock`: Contiene la configuración del entorno, con las dependencias y las versiones correspondientes a la versión de python.
 
@@ -116,10 +116,10 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
 3. Instalamos las dependencias del proyecto usando el siguiente comando:
 
     ````
-    uv sync
+    uv sync --all-groups
     ````
 
-    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto.
+    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto. (Usamos --all-goups porque tenemos distintos grupos de dependencias y, de esta manera, se descargan las dependencias del proyecto entero).
 
 ### **4. Ejecutar los scripts del proyecto**
 
@@ -163,6 +163,7 @@ En este paso se define la arquitectura de los objetos de predicción en `app/tra
 **4.4. Ejecución de la Aplicación Web**
 
 Para interactuar con los modelos de clasificación de forma visual y sencilla, se debe lanzar el servidor local.
+
 ````
 uv run python app/main.py
 ````
@@ -173,10 +174,68 @@ uv run python app/main.py
 - Para el objetivo de clasificación de generos, el mejor modelo construído es KNN con un F1-score de 0.69%.
 
 ### **6. Instrucciones para ejecutar la aplicación web**
-Aquí va la explicación para acceder a la aplicación, si hay un servidor o se deber ejecutar local, etc.
+
+Para poder ejecutar la web hemos creado un script llamado `main.py` dentro de la carpeta `app`. Para poder arrancar la web solo el necesario ejecutar el script y esperar a que la web se active.
+
+>[!IMPORTANT]
+> Para que el script funcione correctamente, en el script `app/main.py` asegurate que el `import train ...` no lleve el punto delante de train para que, al ejecutar, encuentre el archivo y no de errores.
 
 ### **7. Instrucciones para crear y ejecutar el contenedor**
-Aquí va la explicación de Docker
+
+Para poder ejecutar nuestra aplicación de forma aislada y portátil, usaremos los contenedores de Docker. De esta manera, la aplicación se ejecuta dentro de un contenedor que funciona igual en cualquier entorno y sistema operativo.
+
+La configuración del contenedor está en un archivo llamado `Containerfile`, que tiene las instrucciones para descargar el entorno, las dependencias, etc.
+
+>[!IMPORTANT]
+> Para que el contenedor funcione correctamente, en el script `app/main.py` asegurate que el `import .train ...` lleve el punto delante de train para que, al ejecutar, encuentre el archivo.
+
+La forma de ejecutar el contenedor es la siguiente:
+
+1. Tenemos que tener instalado la herramienta Podman, que se puede instalar desde el siguiente enlace: [Podman Desktop](https://podman.io/).
+
+    Sigue todas las instrucciones de instalación: instala las extensiones recomendadas. Con ellas podrás usar una máquina de linux para poder ejecutar los siguientes comandos. Tendrás que tenerla activa para poder usarla.
+
+2. Una vez que tenemos todo instalado, abrimos una terminal y nos dirigimos a la dirección del proyecto para ejecutar los siguientes comandos:
+
+    - Este comando crea la imagen con el nombre (--tag) "sfkids". Dejamos que se cree la imagen (puede tardar unos minutos)
+    
+        ````
+        $ podman build --tag sfkids .
+        ````
+
+     - A continuación, una vez que tenemos la imagen creada, ejecutamos el contenedor, que es una instancia de la imagen que acabamos de crear (puede tardar varios minutos debido a la descarga de dependencias de la aplicación).
+
+        ````
+        $ podman run -d -p 2350:2350 --name SFKids localhost/sfkids
+        ````
+
+        El nombre que le hemos puesto a nuestro contenedor es el nombre de la aplicación para poder identificarlo (no es necesario, se le puede poner cualquier otro nombre y, en caso de no ponerlo, se genera solo automáticamente).
+    
+3. Para segurarnos que el contenedor esta listo, entra en la aplicación de Podman Desktop, y busca el contenedor que acabamos de crear (si le has puesto nombre, buscalo por ese nombre) y haz click sobre él. Una vez dentro verás distintas pestañas (summary, logs, Inspect, Kube, Terminal) entra en "Logs" y observa si por el final se encuentra este mensaje:
+
+    ````
+    INFO:     Started server process [67]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    INFO:     Uvicorn running on http://0.0.0.0:2350 (Press CTRL+C to quit)
+    ````
+
+    Si ves este mensaje, significa que la aplicación se ha iniciado con éxito y ya puedes abrir el buscador y poner:
+
+    ````
+    http://localhost:2350
+    ````
+
+    Esto abrirá la aplicación web y podrás utilizarla.
+
+    Para parar la aplicación solo tendrás que detener el contenedor usando eta instruccion:
+
+    ````
+    $ podman stop <nombre_del_contenedor>
+    ````
+
+>[!NOTE]
+> Al ejecutarlo desde local, solo podrás acceder desde tu ordenador y no desde otro.
 
 ### **8. Equipo de desarrollo**
 - Andrea Yu García Gómez
