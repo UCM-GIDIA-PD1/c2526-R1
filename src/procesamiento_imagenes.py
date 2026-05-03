@@ -9,6 +9,9 @@ from Server_PD import get_minio_client, upload_dataframe_minio
 def generar_embeddings_imagenes(bucket, prefix, claves):
     client = get_minio_client(claves) 
 
+    #weights='imagenet para que tenga en cuenta el conocimiento ya adquirido y sea más eficiente
+    #include_top = False para quedarnos solo con lo conceptual
+    #pooling='avg' opción estandar
     model = ResNet50(weights='imagenet', include_top=False, pooling='avg')
     
     objects = client.list_objects(bucket, prefix=prefix, recursive=True) 
