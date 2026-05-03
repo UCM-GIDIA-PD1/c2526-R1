@@ -3,8 +3,9 @@ from datetime import datetime
 import json
 import os
 import tempfile
-from comun.Server_PD import get_minio_client
-from comun.Server_PD import upload_dataframe_minio
+from Server_PD import get_minio_client
+from Server_PD import upload_dataframe_minio
+
 #   bucket = "pd1"
 #   prefix = "grupo1/"
 #   with open("Private/claves.json", "r", encoding="utf-8") as archivo:
@@ -160,8 +161,7 @@ if __name__ == "__main__":
         claves = json.load(archivo)
 
     bucket = "pd1"
-    prefix = "grupo1/raw_new_test/" #raw_new_test o raw
-
+    prefix = "grupo1/test_images/raw/" #raw_new_test, raw, test_images/raw 
     df_final = unir_parquets_minio(bucket, prefix, claves)
 
     print("\n--- ANÁLISIS DE DUPLICADOS ---")

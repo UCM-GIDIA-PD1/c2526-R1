@@ -10,10 +10,12 @@ from typing import Annotated
 from pydantic import BaseModel, HttpUrl         #HttpUrl - adicional
 from joblib import load
 import json
-from comun.Server_PD import download_model_minio
+from Server_PD import download_model_minio
 # Adicionales
-from extraccion.get_video_info_api import get_info
+from get_video_info_api import get_info
 import re
+# para ejecutarlo desde consola hay que quitar el punto a .train
+# para crear la imagen y el contenedor debe llevar el punto, xq si no lo lleva, al ejecutar el contenedor, no encuentra el archivo train
 from train import model_kids, model_genres
 
 from pydantic import BaseModel

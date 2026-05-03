@@ -1,6 +1,6 @@
 #Para filtrar los datos y dividirlos en entrenamiento, validación y test
-from comun.Server_PD import download_dataframe_minio, upload_dataframe_minio
-import comun.analisisutils as utils
+from Server_PD import download_dataframe_minio, upload_dataframe_minio
+import analisisutils as utils
 import pandas as pd
 import json
 import isodate
@@ -295,8 +295,8 @@ def divide_save_data(df, name): #Deberíamos eliminarla
     upload_dataframe_minio(df_test, "pd1", f"grupo1/modelos/test_{name}", claves, "parquet")
     upload_dataframe_minio(df_val, "pd1", f"grupo1/modelos/validation_{name}", claves, "parquet")
 
-def extract_definitive_model_data(columna = "Made for Kids"): 
-    X_train, X_test, y_train, y_test = get_data_models_train_test(columna)
+def extract_definitive_model_data(columna = "Made for kids"): 
+    X_train, X_test, y_train, y_test = get_data_models_train_test(2, columna)
     X_train = pd.concat([X_train, X_test], axis=0).reset_index(drop=True)
     y_train = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)
     return X_train, y_train
@@ -350,6 +350,9 @@ def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids"
         # Descargamos y unimos los embeddings visuales
         df_emb = download_test_image_embeddings()
         df = pd.merge(df, df_emb, on="ID", how="inner")
+        # Añadimos el texto extraído por OCR
+        df_ocr = download_test_ocr_results()
+        df = pd.merge(df, df_ocr, on="ID", how="inner")
 
         counts = df[to_predict].value_counts()
         # Nos quedamos solo con las clases que tienen al menos 2 miembros
@@ -389,8 +392,14 @@ def download_test_extraction_metadata():
     with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
         claves = json.load(archivo)
     
-    df = download_dataframe_minio("pd1", "grupo1/test_images/raw/df_videos_PRUEBA_2026-04-26_20-11-44", claves, "parquet")
+    df = download_dataframe_minio("pd1", "grupo1/clean/union_dfs_20260503", claves, "parquet")
     
     df['Duracion'] = df['Duracion'].apply(utils.iso_a_minutos)
     df = made_for_kids(df)
     return df
+
+def download_test_ocr_results():
+    """Descarga los resultados del OCR de las imagenes"""
+    with open("src/Private/claves.json", "r", encoding="utf-8") as archivo:
+        claves = json.load(archivo)
+    return download_dataframe_minio("pd1", "grupo1/test_images/ocr_results", claves, "parquet")

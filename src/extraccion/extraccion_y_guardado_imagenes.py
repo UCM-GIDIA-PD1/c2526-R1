@@ -3,7 +3,8 @@ Este archivo contiene la funcion para llamar al script mediante
 argumentos insertados desde consola.
 '''
 import argparse
-import extraccion.Prueba_imagenes_collect_all_data as collect_all_data_imagenes
+import Prueba_imagenes_collect_all_data as collect_all_data_imagenes
+
 def main():
     '''
     Llamando a este archivo desde consola se ejecuta el scripts de extracción de datos
@@ -37,7 +38,7 @@ def main():
 
     parser.add_argument(
         "-i","--iteraciones", 
-        type=int, default=4, 
+        type=int, default=3, 
         help="Numero de veces que se va a ejecutar el código"
     )
 

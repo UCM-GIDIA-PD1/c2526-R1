@@ -1,7 +1,7 @@
 #Carga de datos
 import pandas as pd
 import numpy as np
-from comun.Server_PD import download_dataframe_minio
+from Server_PD import download_dataframe_minio
 from bertopic import BERTopic 
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -819,7 +819,7 @@ def graficar_bertopic_multiple(df_bertopic, lista_generos, columna_analizada):
 
     # Gráfico
     plt.figure(figsize=(15, 7))
-    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Genero_Origen", palette="viridis")
+    sns.barplot(data=df_plot, x="Topic", y="Count", hue="Genero_Origen", palette="hsv")
 
     nombres_vs = " vs ".join(lista_generos)
     plt.title(f"Comparación de Topics - {columna_analizada} ({nombres_vs})")

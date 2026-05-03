@@ -5,8 +5,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.decomposition import TruncatedSVD 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay, confusion_matrix
-from comun.preprocess_utils import build_preprocess, unzip_params, build_score
-from comun.filter_and_divide_data import get_data_models_train_test
+from preprocess_utils import build_preprocess, unzip_params, build_score
+from filter_and_divide_data import get_data_models_train_test
 from collections import defaultdict
 from sklearn.inspection import permutation_importance
 import matplotlib.pyplot as plt

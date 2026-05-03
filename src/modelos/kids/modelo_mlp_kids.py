@@ -1,7 +1,5 @@
 from sklearn.neural_network import MLPClassifier
-from training_utils_logistic import entrenamiento
-
-# No se puede sacar la matriz de confusión.
+from optuna_utils import entrenamiento
 
 if __name__ == '__main__':
     to_predict = "Made for kids"

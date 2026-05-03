@@ -3,8 +3,8 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
-from comun.preprocess_utils import build_preprocess, unzip_params, build_score
-from comun.filter_and_divide_data import get_data_models_train_test
+from preprocess_utils import build_preprocess, unzip_params, build_score
+from filter_and_divide_data import get_data_models_train_test
 import pandas as pd
 import wandb
 from collections import defaultdict

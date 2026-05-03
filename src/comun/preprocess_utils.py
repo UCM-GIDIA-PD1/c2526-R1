@@ -1,6 +1,6 @@
 import isodate
 import json
-from comun.Server_PD import download_dataframe_minio
+from Server_PD import download_dataframe_minio
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.compose import ColumnTransformer
@@ -92,7 +92,7 @@ def download_and_divide(to_predict): #Deprecated
 
 types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", "Titulo_canal": "text", 
                    "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), "Subgeneros": "text", #Subgeneros la analizamos como texto por su tamaño 
-                   "Duracion": StandardScaler(), "Made for kids": "passthrough", "img_embedding": "passthrough"} #passthrough marca que no se hacen transformaciones
+                   "Duracion": StandardScaler(), "Made for kids": "passthrough", "img_embedding": "passthrough", "OCR_text": "text"} #passthrough marca que no se hacen transformaciones
 
 def build_preprocess_bow(columns, max, ngram):
     transformers = []
@@ -186,18 +186,23 @@ def build_preprocess_word2vec(X_tr, columns, svd):
     return ColumnTransformer(transformers = transformers)
 
 class TransformerVectorizer(BaseEstimator, TransformerMixin):
+    _shared_model = None 
+
     def __init__(self, model_name='paraphrase-multilingual-MiniLM-L12-v2'):
         self.model_name = model_name
-        self.model = SentenceTransformer(model_name)
+        if TransformerVectorizer._shared_model is None:
+            print(f"Cargando modelo BERT compartido: {model_name}...")
+            TransformerVectorizer._shared_model = SentenceTransformer(model_name)
+        
+        self.model = TransformerVectorizer._shared_model
         self.dim = self.model.get_sentence_embedding_dimension()
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        return self.model.encode(list(X), show_progress_bar=False)
+        return self.model.encode(list(X.astype(str)), show_progress_bar=False)
 
-    # Pesos 
     def get_feature_names_out(self, input_features=None):
         return np.array([f"trans_{i}" for i in range(self.dim)])
 
