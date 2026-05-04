@@ -50,7 +50,7 @@ def analizar_kids_llm_rubrica(n_muestras=15):
     # Aplica lógica y expande el resultado en tres columnas de la tupla devuelta
     resultados = df_eval['Subtitulos'].apply(lambda x: pd.Series(clasificar_subtitulo(x)))
     df_eval[['LLM_Categoria', 'LLM_Is_Kids', 'Confianza']] = resultados
-
+    
     return df_eval
 
 if __name__ == "__main__":
