@@ -6,26 +6,20 @@ from sklearn.neural_network import MLPClassifier
 if __name__ == '__main__':
     to_predict = "Generos"
     #Añadimos la columna de las imagenes
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal"] #, "img_embedding"
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal", "img_embedding", "OCR_text"]  
 
     max_features = 3000
     ngram = (1,3)
     svd = 150
 
     project = "Procesamiento imagenes ()"
-    name = "Prueba con imagenes XGboost y DL"
-    preprocess_type = "Deep Learning"
+    name = "Modelo imagenes + DL"
+    preprocess_type = "DeepLearning"
 
     # param_name = "n_neighbours"
     # param_vals = range(3,5)
     # metric = "cosine"
-    """
-    params = {
-        "max_iter": [10000], 
-        "hidden_layer_sizes": [10], 
-        "random_state": [42]
-    }
-    """
+    
     params = {
         "n_estimators": [190], 
         "max_depth": [10],
@@ -33,11 +27,11 @@ if __name__ == '__main__':
         }
     score = 'F1'
     average = 'weighted'
-    n_fold = 5
+    n_fold = 2
 
     filtrado = True
 
     entrenamiento(project, name, XGBClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
-                    params, score, average, n_fold, filtrado, include_images=False)
+                    params, score, average, n_fold, filtrado, include_images=True)
     #entrenamiento(project, name, MLPClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
     #            params, score, average, n_fold, filtrado, include_images=False)

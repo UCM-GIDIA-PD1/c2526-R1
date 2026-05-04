@@ -9,7 +9,7 @@ if __name__ == '__main__':
     
     project = "Modelo Knn Generos"
     name = "Sin subgeneros"
-    preprocess_type = "DeepLearning"
+    preprocess_type = "Word2Vec"
     max = 5000
     ngram = (1,3)
     svd = 100
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     
     score = "F1"
     average = "weighted"
-    n_fold = 2
+    n_fold = 5
     filtrado = False
 
     entrenamiento(project, name, KNeighborsClassifier, to_predict, max, ngram, svd, preprocess_type, columns, 
