@@ -351,8 +351,9 @@ def get_data_models_train_test_latest(filtrado = 0, to_predict = "Made for kids"
         df_emb = download_test_image_embeddings()
         df = pd.merge(df, df_emb, on="ID", how="inner")
         # Añadimos el texto extraído por OCR
-        df_ocr = download_test_ocr_results()
-        df = pd.merge(df, df_ocr, on="ID", how="inner")
+        #PRUEBA
+        #df_ocr = download_test_ocr_results()
+        #df = pd.merge(df, df_ocr, on="ID", how="inner")
 
         counts = df[to_predict].value_counts()
         # Nos quedamos solo con las clases que tienen al menos 2 miembros

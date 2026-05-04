@@ -92,7 +92,7 @@ def download_and_divide(to_predict): #Deprecated
 
 types_of_prepro = {"Titulo": "text", "Descripcion": "text", "Tags": "text", "Subtitulos": "text", "Titulo_canal": "text", 
                    "Rango_edad": OneHotEncoder(), "Generos": OneHotEncoder(), "Subgeneros": "text", #Subgeneros la analizamos como texto por su tamaño 
-                   "Duracion": StandardScaler(), "Made for kids": "passthrough", "img_embedding": "passthrough", "OCR_text": "text"} #passthrough marca que no se hacen transformaciones
+                   "Duracion": StandardScaler(), "Made for kids": "passthrough", "img_embedding": "StandardScaler()", "OCR_text": "text"} #passthrough marca que no se hacen transformaciones
 
 def build_preprocess_bow(columns, max, ngram):
     transformers = []
