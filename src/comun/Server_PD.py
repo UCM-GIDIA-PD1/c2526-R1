@@ -150,7 +150,7 @@ def download_model_minio(
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-# Imagenes (Prueba para redes neuronales - Maria - 22/04)
+# Imagenes (Prueba para redes neuronales)
 def upload_image_minio(image_bytes, bucket, object_name, claves):
     """
     Sube el contenido binario de una imagen a MinIO.
