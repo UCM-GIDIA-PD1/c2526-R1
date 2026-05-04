@@ -1,64 +1,71 @@
 import pandas as pd
 import torch
+import numpy as np
 from transformers import pipeline
-from preprocess_utils import download_model_dfs
+# Importamos las herramientas de tu proyecto
+from comun.preprocess_utils import download_model_dfs 
 
 def analizar_kids_llm_rubrica(n_muestras=15):
     print("Descargando dataframes desde MinIO...")
-    df_test = download_model_dfs()
+    _, _, df_test = download_model_dfs() #Ignora los dfs de train y validation
     
-    # 2. DEFINICIÓN DE CATEGORÍAS Y TARGET
-    # Usamos las categorías exactas solicitadas
+    # Filtra los videos que tengan subtitulos y no sean nulos
+    df_eval = df_test[
+        df_test["Subtitulos"].notna() & 
+        (df_test["Subtitulos"].str.strip() != "")
+    ].copy()
+
+    if len(df_eval) == 0:
+        print("No se encontraron registros con subtítulos válidos.")
+        return None
+
+    #Usa unos pocos para probar y crea una copia por si hay errores
+    df_eval = df_eval.sample(min(n_muestras, len(df_eval))).copy()
+    
+
     categorias = ["News & Politics", "People & Blogs", "Entertainment", "Education", "Made for Kids"]
     
-    # Seleccionamos la muestra únicamente del set de TEST
-    # Filtramos para asegurar que tengan subtítulos
-    df_eval = df_test[df_test["Subtitulos"].notna()].sample(n_muestras).copy()
-
-    # 3. CARGA DEL MODELO (Zero-Shot)
-    print(f"Cargando LLM en {'GPU' if torch.cuda.is_available() else 'CPU'}...")
-    classifier = pipeline(
-        "zero-shot-classification",
-        model="facebook/bart-large-mnli",
-        device=0 if torch.cuda.is_available() else -1
+    #Verifica si hay GPU disponible para acelerar el proceso
+    device = 0 if torch.cuda.is_available() else -1
+    print(f"Cargando BART en {'GPU' if device == 0 else 'CPU'}...")
+    
+    #Convierte el texto a números, pasa por las capas de BART, convierte las probabilidades finales en categorías asociadas a las etiquetas.
+    classifier = pipeline( 
+        model="facebook/bart-large-mnli", #Natural Language Inference: Determinar la relación entre dos fragmentos de texto: una premisa y una hipótesis.
+        device=device
     )
 
     def clasificar_subtitulo(texto):
-        # El LLM analiza el contexto semántico del inicio del subtítulo
-        # (Límite de tokens para eficiencia)
-        res = classifier(str(texto)[:600], candidate_labels=categorias)
-        
-        # Obtenemos la etiqueta ganadora y su confianza
-        mejor_clase = res['labels'][0]
-        confianza = res['scores'][0]
-        
-        # Mapeo lógico: Si la clase ganadora es "Made for Kids", el predictor es True
-        es_kids_llm = (mejor_clase == "Made for Kids")
+        #Asigna valor de caracteres que bart lea para no saturar el modelo
+        res = classifier(str(texto)[:800], candidate_labels=categorias) #res es un diccionario con las etiquetas y sus respectivas puntuaciones
+        mejor_clase = res['labels'][0] #toma la etiqueta con mayor puntuación
+        confianza = res['scores'][0] #toma el puntake de la etiqueta
+        #Si es muy bajo, está "adivinando"
+        es_kids_llm = (mejor_clase == "Made for Kids") #Si la mejor clase es "Made for Kids", entonces es un video para niños
         
         return mejor_clase, es_kids_llm, confianza
 
-    # 4. EJECUCIÓN DEL ANÁLISIS SEMÁNTICO
-    print(f"Evaluando {n_muestras} videos del set de TEST...")
+    print(f"Analizando {len(df_eval)} videos extraídos...")
     
+    # Aplica lógica y expande el resultado en tres columnas de la tupla devuelta
     resultados = df_eval['Subtitulos'].apply(lambda x: pd.Series(clasificar_subtitulo(x)))
     df_eval[['LLM_Categoria', 'LLM_Is_Kids', 'Confianza']] = resultados
 
     return df_eval
 
 if __name__ == "__main__":
-    # Ejecución del reporte
-    reporte_test = analizar_kids_llm_rubrica(n_muestras=10)
+    reporte = analizar_kids_llm_rubrica(n_muestras=10)
     
-    print("\n" + "="*80)
-    print("COMPARATIVA LLM - EVALUACIÓN SOBRE SET DE TEST (KIDS)")
-    print("="*80)
-    
-    # Comparamos la predicción del LLM contra el valor real del set de Test
-    columnas_comparar = ['Titulo', 'Made for kids', 'LLM_Is_Kids', 'LLM_Categoria', 'Confianza']
-    print(reporte_test[columnas_comparar])
-    
-    # Cálculo de acierto simple en la muestra
-    aciertos = (reporte_test['Made for kids'] == reporte_test['LLM_Is_Kids']).sum()
-    print("-" * 80)
-    print(f"Coincidencia LLM vs Dataset en Test: {aciertos}/{len(reporte_test)}")
-    print("="*80)
+    if reporte is not None:
+        print("\n" + "="*80)
+        print("REPORTE SEMÁNTICO (BART) - DATOS DE MINIO")
+        print("="*80)
+        
+        # Columnas clave para verificar la extracción
+        cols = ['Titulo', 'Made for kids', 'LLM_Is_Kids', 'LLM_Categoria', 'Confianza']
+        print(reporte[cols])
+        
+        # Cálculo de coincidencia con la etiqueta real
+        coincidencias = (reporte['Made for kids'] == reporte['LLM_Is_Kids']).sum()
+        print("-" * 80)
+        print(f"Coincidencia con etiqueta del Dataset: {coincidencias}/{len(reporte)}")
