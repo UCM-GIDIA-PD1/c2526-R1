@@ -73,8 +73,8 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
                 row["Rango_edad"] = id[1]
                 df_videos.append(row)
                 #print(df_videos)
-                time.sleep(0.2) #to not get too many requests error
-            except Exception as e: print("Ran into exception", e, "for video", id) #for some videos the downloader does not work for some reason
+                time.sleep(0.2)
+            except Exception as e: print("Ran into exception", e, "for video", id) 
     #Si en algún momento de la ejecución ocurre algo que haga que termine, los datos que se hayan extraido se guardan autométicamente en Minio o en local
     finally:
         df_data = pd.concat(df_videos, ignore_index=True)

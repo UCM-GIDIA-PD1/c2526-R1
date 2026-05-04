@@ -172,7 +172,6 @@ def run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, 
     wandb.finish()
     return best_model
 
-#He añadido una nueva variable que es filtrado --> Dice si utilizar el dataframe filtrado o sin filtrar
 def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score, average, n_splits, filtrado = False, include_images=False):
     """
     Ejecuta un modelo especificado, haz una run en wandb y devuelve por pantalla la mejor selección de parametros
@@ -231,7 +230,6 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     Nada:
         No devuelve nada
     """ 
-    #He modificado esta parte del codigo porque download_and_divide sigue sin estratificar datos o accede a datos filtrados
     print("Starting data acquisition")
     if include_images:
         X_train, X_test, y_train, y_test = get_data_models_train_test_latest(filtrado = 0, to_predict = to_predict, include_images = True)
@@ -253,10 +251,8 @@ def entrenamiento(project_, name_, modelo, to_predict, max_features, ngram, svd,
     print("Finished crossvalidation, starting evaluating best model")
     #print(best_param)
 
-    #PRUEBAS PARA MATRIZ DE CONFUSION
-    # CODIFICA TAMBIÉN EL TEST AQUÍ
+    #MATRIZ DE CONFUSION
     y_test_encoded = pd.Series(le.transform(y_test))
-    #FIN PRUEBAS
 
     best_model = run_best_model(max_features, ngram, svd, preprocess_type, columns, X_train, y_train_encoded, X_test, y_test_encoded, modelo, best_param, score, average, le)
     print("Ready!")

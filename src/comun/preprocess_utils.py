@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import numpy as np
 import random
-from sentence_transformers import SentenceTransformer   #Redes neuronales
+from sentence_transformers import SentenceTransformer   #Adicional
 
 np.random.seed(42)
 random.seed(42)
