@@ -2,7 +2,7 @@ import io
 import pandas as pd
 from tqdm import tqdm
 import easyocr
-from comun.Server_PD import get_minio_client, upload_dataframe_minio
+from Server_PD import get_minio_client, upload_dataframe_minio
 import json
 
 def extraer_texto_miniaturas(bucket, prefix, claves):
