@@ -119,12 +119,13 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
     uv sync --all-groups
     ````
 
-    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto. (Usamos --all-goups porque tenemos distintos grupos de dependencias y, de esta manera, se descargan las dependencias del proyecto entero).
+    Esto creará automáticamente el entorno del proyecto y descargará todas las dependecias necesarias del proyecto. (Usamos `--all-groups` porque tenemos dos grupos de dependencias y, de esta manera, se descargan las dependencias del proyecto entero. En caso de solo querer descargar las dependencias necesarias para la app, habrá que usar `--only-group app`).
 
 ### **4. Ejecutar los scripts del proyecto**
 
-Para ejecutar los scripts principales del proyecto, utiliza el gestor uv. Los scripts están diseñados para ser ejecutados desde la raíz del repositorio. 
-Antes de ejecutar  cualquier script, hay que asegurarse de que la carpeta Private está configurada correctamente (ver apartado 2 del README).
+Para ejecutar los scripts principales del proyecto, utiliza el gestor uv. Los scripts están diseñados para ser ejecutados desde la raíz del repositorio.
+
+Antes de ejecutar  cualquier script, hay que asegurarse de que la carpeta Private está configurada correctamente (ver apartado 2 del README). Además, necesitarás usar una VPN para que los scripts tengan acceso a MinIO al ejecutarse.
 
 Se pueden ejecutar dentro del entorno usando:
 
@@ -146,6 +147,9 @@ En donde:
 - `-p` (Proportion): Define la proporción de videos para adultos (0 para una muestra infantil, 1 para adultos)
 - `-i` (Iterations): Determina el número de ciclos de búsqueda por palabras aleatorias, controlando el volumen final de la extracción.
 
+>[!NOTE]
+> Es posible que durante la extracción de datos salgan algunos errores, lo cual es normal, ya que accede a vídeos que no tienen subtítulos.
+
 **4.2. Consolidación y limpieza**
 
 Una vez finalizadas las tandas de extracción, se deben integrar todos los ficheros `.parquet` en un único DataFrame global. Este proceso elimina los duplicados por ID y la normalización inicial:
@@ -165,21 +169,39 @@ En este paso se define la arquitectura de los objetos de predicción en `app/tra
 
 Para interactuar con los modelos de clasificación de forma visual y sencilla, se debe lanzar el servidor local.
 
+Este proceso se explica en el [punto 6](#6-instrucciones-para-ejecutar-la-aplicación-web).
+
+### **5. Mejores modelos construídos**
+
+- Para el objetivo de predicción de vídeos 'Made for Kids', el mejor modelo construído es Random Forest con precisión de 0.94%.
+
+- Para el objetivo de clasificación de géneros, el mejor modelo construído es KNN con un F1-score de 0.69%.
+
+### **6. Instrucciones para ejecutar la aplicación web**
+
+Para poder ejecutar la web hemos creado un script llamado `main.py` dentro de la carpeta `app`. Para poder arrancar la web solo es necesario ejecutar el script y esperar a que la web se active. La activación de la web puede durar entre 5 y 10 minutos debido a la descarga de los modelos.
+
+Antes de ejecutar el comando, accede al scrip `main.py` de la carpeta `app` y fijate (al principio donde están colocados los `import`) que donde pone `from train import ...`, train NO lleve un punto delante (asi `from .train import ...`). En caso de llevarlo, quitalo y guarda el script. De esta forma, al ejecutar el script desde consola, nos aseguramos de que se encuentra correctamente la dirección del archivo.
+
+Tras esta comprobación ejecuta el siguiente comando:
+
 ````
 uv run python app/main.py
 ````
 
-### **5. Mejores modelos construídos**
-- Para el objetivo de predicción de videos 'Made for Kids', el mejor modelo construído es Random Forest con precision de 0.94%.
+Para saber si está activada, debes poder ver en los ***logs*** este mensaje:
 
-- Para el objetivo de clasificación de generos, el mejor modelo construído es KNN con un F1-score de 0.69%.
+````
+INFO:     Application startup complete.
+````
+Una vez que aparezca este mensaje, se abrá activado la web y podremos acceder a ella mediante la siguiente dirección en nuestro buscador:
 
-### **6. Instrucciones para ejecutar la aplicación web**
-
-Para poder ejecutar la web hemos creado un script llamado `main.py` dentro de la carpeta `app`. Para poder arrancar la web solo el necesario ejecutar el script y esperar a que la web se active.
+````
+http://localhost:2350
+````
 
 >[!IMPORTANT]
-> Para que el script funcione correctamente, en el script `app/main.py` asegurate que el `import train ...` no lleve el punto delante de train para que, al ejecutar, encuentre el archivo y no de errores.
+> Para que el script funcione correctamente, en el script `main.py` de la carpeta `app` asegurate que el `from train import ...` no lleve el punto delante de train (que aparezca tal que asi `from train import ...`) para que, al ejecutar, encuentre el archivo y no de errores.
 
 ### **7. Instrucciones para crear y ejecutar el contenedor**
 
@@ -188,7 +210,7 @@ Para poder ejecutar nuestra aplicación de forma aislada y portátil, usaremos l
 La configuración del contenedor está en un archivo llamado `Containerfile`, que tiene las instrucciones para descargar el entorno, las dependencias, etc.
 
 >[!IMPORTANT]
-> Para que el contenedor funcione correctamente, en el script `app/main.py` asegurate que el `import .train ...` lleve el punto delante de train para que, al ejecutar, encuentre el archivo.
+> Para que el contenedor funcione correctamente, en el script `main.py` de la carpeta `app` asegurate que el `from .train import ...` lleve el punto delante de train para que, al ejecutar, encuentre el archivo (que salga asi `from .train import ...`).
 
 La forma de ejecutar el contenedor es la siguiente:
 
@@ -267,6 +289,7 @@ La forma de ejecutar el contenedor es la siguiente:
 > Al ejecutarlo desde local, solo podrás acceder desde tu ordenador y no desde otro.
 
 ### **8. Equipo de desarrollo**
+
 - Andrea Yu García Gómez
   
 - Marina Gurova
