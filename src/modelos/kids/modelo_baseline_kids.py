@@ -17,7 +17,7 @@ if __name__ == '__main__':
     score = "Precision" 
     average = "weighted"
     n_fold = 5 
-    filtrado = False
+    filtrado = 2
 
     max_features = 5000
     ngram = (1,2)
