@@ -32,7 +32,7 @@ def run_cross_validation(project_, name_, X_train, y_train, max_features, ngram,
     
     kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42) #n splits 5
     params_ = unzip_params(params=params)
-    scores_dict = [] #{k.keys()[0]: [] for k in params_} #Revisad
+    scores_dict = [] 
     i = 0
     for train_idx, val_idx in tqdm(kf.split(X_train, y_train)):
         X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
