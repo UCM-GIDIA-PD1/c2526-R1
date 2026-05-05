@@ -38,7 +38,9 @@
 
 **Carpetas:**
 
-- Carpeta `Images readme`: Contiene las imágenes de este archivo.
+- Carpeta `Images readme`: Contiene las imágenes explicativas de este archivo.
+
+- Carpeta `adicional`: Contiene ficheros del modelo imagenes y del modelo ensemble.
 
 - Carpeta `app`: Contiene los ficheros necesarios para ejecutar la aplicación web (API y Frontend), organizada de la siguiente manera:
 
@@ -62,11 +64,11 @@
 
     - Carpeta `extraccion`: Implementa el pipeline de obtención de datos mediante la búsqueda de videos aleatorios y la consulta a la API de YouTube. Incluye el script principal `collect_all_data.py` para la captura de información de videos infantiles y adultos, `get_all_dfs.py` para la consolidación de múltiples conjuntos de datos en un DataFrame único, y `extraccion_y_guardado.py` para la ejecución automatizada del proceso desde la consola.
 
+        - Carpeta `notebooks`: Contiene pruebas de experimentación y desarrollo del proyecto. Incluye ficheros iniciales de extracción de identificadores (IDs) para YouTube y YouTube Kids mediante web scraping, el diseño y prueba del pipeline completo de datos, y los experimentos preliminares de modelado con árboles de decisión para validar la capacidad predictiva de las variables seleccionadas.
+
     - Carpeta `modelos`: Contiene los ficheros que entrenan la predicción de si un vídeo es apto o no para niños y la clasificación de videos por género y subcategorías.
 
         Para cada objetivo, se entrenaron los siguientes modelos junto con el Baseline: KNN, MLP, Naive Bayes, Random Forest, Regresión Logística, XGBoost. En Kids, además, se entrenó el algoritmo Decision Tree.
-
-    - Carpeta `notebooks`: Contiene pruebas de experimentación y desarrollo del proyecto. Incluye ficheros iniciales de extracción de identificadores (IDs) para YouTube y YouTube Kids mediante web scraping, el diseño y prueba del pipeline completo de datos, y los experimentos preliminares de modelado con árboles de decisión para validar la capacidad predictiva de las variables seleccionadas.
 
     - Carpeta Private: Dentro de la carpeta src, el usuario que desee utilizar este proyecto debe crear una carpeta llamada Private. En el interior de esa carpeta, es necesario añadir un archivo llamado `claves.json` donde se almacenarán las credenciales y configuraciones necesarias para el funcionamiento del proyecto (APIs y otros servicios externos). El archivo debe tener la siguiente estructura:
 
@@ -279,7 +281,7 @@ La forma de ejecutar el contenedor es la siguiente:
 
     Esto abrirá la aplicación web y podrás utilizarla.
 
-    Para parar la aplicación solo tendrás que detener el contenedor usando dándole al boton de stop dentro del contenedor en la aplicación o usando este comando en la terminal.
+    Para parar la aplicación solo tendrás que detener el contenedor usado dándole al boton de stop dentro del contenedor en la aplicación o usando este comando en la terminal.
 
     ````
     podman stop <nombre_del_contenedor>
