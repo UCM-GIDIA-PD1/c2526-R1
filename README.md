@@ -115,7 +115,23 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
     cd c2526-R1
     ````
 
-3. Instalamos las dependencias del proyecto usando el siguiente comando:
+3. Creamos y activamos el entorno virtual:
+
+     Para crearlo
+    ````
+    uv venv
+    ````
+   Para activarlo en Windows:
+   ````
+   .venv\Scripts\activate
+   ````
+
+   Para activarlo en macOS/Linux:
+   ````
+   source .venv/bin/activate
+   ````
+   
+5. Instalamos las dependencias del proyecto usando el siguiente comando:
 
     ````
     uv sync --all-groups
