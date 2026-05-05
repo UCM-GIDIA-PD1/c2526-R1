@@ -9,8 +9,8 @@ from get_video_info_api import get_info
 from get_video_ids_bs4 import get_random_ids, get_random_ids_kids
 from Server_PD import upload_dataframe_minio
 
-# Redes neuronales
-import requests                                 # Descargar la imagen de URL
+# Descargar la imagen de URL
+import requests                                 
 from Server_PD import upload_image_minio 
 
 def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
@@ -43,7 +43,7 @@ def collect_all_data(num_videos=500, fecha=None, proporcion_adults=0.8):
     for i, rango in enumerate(["0-4", "5-8", "9-12"]):
         try:
             palabras_kids, ids_kids = get_random_ids_kids(num_ids=num_rango_kids[i], after_date=str(datetime.date.today()-datetime.timedelta(days=1)), rango=rango)
-            print('ola')
+            #print('ola')
         except KeyboardInterrupt:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             with open(f"data/lista_ids_ages{timestamp}.json", "w", encoding="utf-8") as f:
