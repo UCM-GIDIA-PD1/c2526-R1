@@ -1,5 +1,5 @@
 from sklearn.linear_model import LogisticRegression
-from training_utils_logistic import entrenamiento
+from training_utils import entrenamiento
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score
 
 # No se puede sacar la matriz de confusión.
