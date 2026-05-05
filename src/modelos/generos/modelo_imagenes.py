@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     project = "Procesamiento imagenes ()"
     name = "Modelo imagenes + DL"
-    preprocess_type = "DeepLearning"
+    preprocess_type = "Word2Vec" #"DeepLearning"
 
     # param_name = "n_neighbours"
     # param_vals = range(3,5)

@@ -9,6 +9,7 @@ from preprocess_utils import build_preprocess, build_score
 from filter_and_divide_data import get_data_models_train_test
 
 def entrenamiento(project_, trial_name, modelo, to_predict, max_features, ngram, svd, preprocess_type, columns, params, score_metric, average, n_splits, filtrado):
+    print("Starting data acquisition")
     X_train_full, _, y_train_full, _ = get_data_models_train_test(filtrado=filtrado, to_predict=to_predict)
     
     le = LabelEncoder()

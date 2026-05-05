@@ -5,6 +5,7 @@ if __name__ == "__main__":
     to_predict = "Made for kids"
     columns = ["Titulo", "Descripcion", "Tags", "Subtitulos"]
     
+    print("Starting data acquisition")
     X_train, X_test, y_train, y_test = get_data_models_train_test(
         filtrado=True, 
         to_predict=to_predict

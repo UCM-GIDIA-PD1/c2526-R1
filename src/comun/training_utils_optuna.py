@@ -37,7 +37,7 @@ def objective(trial, X_train, y_train, preprocess_type, columns, score_name):
     return current_score
 
 def run_optuna_nb(project_, name, X_train, y_train, preprocess_type, columns, score_name, n_trials=20):
-
+    print("Starting run")
     wandb.init(project=project_, name=f"{name}_optuna_{score_name}")
 
     study = optuna.create_study(direction="maximize")

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     
     project = "Modelo Ensemble Mixto"
     name = "KNN_LR_XGB_Ensemble con deepLearning"
-    preprocess_type = "DeepLearning" 
+    preprocess_type = "Word2Vec" #"DeepLearning" 
 
     max_features = 3000
     ngram = (1,2)

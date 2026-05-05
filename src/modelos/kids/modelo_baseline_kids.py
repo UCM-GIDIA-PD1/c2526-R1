@@ -12,7 +12,6 @@ if __name__ == '__main__':
     
     preprocess_type = "Bag of words" 
 
-
     params = {"strategy": ["most_frequent"]}
     
     score = "Precision" 
@@ -20,5 +19,9 @@ if __name__ == '__main__':
     n_fold = 5 
     filtrado = False
 
-    entrenamiento(project, name, DummyClassifier, to_predict, preprocess_type, columns, 
+    max_features = 5000
+    ngram = (1,2)
+    svd = 150
+
+    entrenamiento(project, name, DummyClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
                   params, score, average, n_fold, filtrado)
