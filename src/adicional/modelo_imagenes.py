@@ -6,7 +6,7 @@ from sklearn.neural_network import MLPClassifier
 if __name__ == '__main__':
     to_predict = "Generos"
     #Añadimos la columna de las imagenes
-    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal"]  #, "img_embedding", "OCR_text"
+    columns = ["Titulo", "Descripcion", "Tags", "Subtitulos", "Rango_edad", "Duracion", "Titulo_canal", "img_embedding", "OCR_text"]  
 
     max_features = 3000
     ngram = (1,3)
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     filtrado = True
 
     entrenamiento(project, name, XGBClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
-                    params, score, average, n_fold, filtrado, include_images=False)
+                    params, score, average, n_fold, filtrado, include_images=True)
 
     # Pruebas con otros modelos                
     #entrenamiento(project, name, MLPClassifier, to_predict, max_features, ngram, svd, preprocess_type, columns, 
