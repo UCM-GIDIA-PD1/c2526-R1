@@ -191,15 +191,23 @@ Este proceso se explica en el [punto 6](#6-instrucciones-para-ejecutar-la-aplica
 
 ### **5. Mejores modelos construídos**
 
-- Para el objetivo de predicción de vídeos 'Made for Kids', el mejor modelo construído es Random Forest con precisión de 0.94%.
-
-- Para el objetivo de clasificación de géneros, el mejor modelo construído es KNN con un F1-score de 0.69%.
+| Tarea de Predicción | Modelo | Métrica Principal | Hiperparámetros |
+| :--- | :--- | :--- | :--- |
+| **Made for Kids** | XGBoost | Precisión: **0.949** | `learning_rate`: 0.3, `n_estimators`: 190, `max_depth`: 10 |
+| **Género** | KNN | F1-score: **0.69** | `n_neighbors`: 6, `metric`: "cosine", `weight`: "distance" |
+---
 
 ### **6. Instrucciones para ejecutar la aplicación web**
 
 Para poder ejecutar la web hemos creado un script llamado `main.py` dentro de la carpeta `app`. Para poder arrancar la web solo es necesario ejecutar el script y esperar a que la web se active. La activación de la web puede durar entre 5 y 10 minutos debido a la descarga de los modelos.
 
-Antes de ejecutar el comando, accede al scrip `main.py` de la carpeta `app` y fijate (al principio donde están colocados los `import`) que donde pone `from train import ...`, train NO lleve un punto delante (asi `from .train import ...`). En caso de llevarlo, quitalo y guarda el script. De esta forma, al ejecutar el script desde consola, nos aseguramos de que se encuentra correctamente la dirección del archivo.
+Antes de ejecutar el comando, verifica el script main.py en la carpeta app. Asegúrate de que en la línea `from train import ...`, el módulo train no tenga un punto prefijado (es decir, antes de la palabra "train".
+
+Debe quedar así: 
+````
+from .train import ...
+````
+En caso de llevarlo, quítalo y guarda el script. De esta forma, al ejecutar el script desde consola, nos aseguramos de que se encuentra correctamente la dirección del archivo.
 
 Tras esta comprobación ejecuta el siguiente comando:
 
@@ -217,9 +225,8 @@ Una vez que aparezca este mensaje, se abrá activado la web y podremos acceder a
 ````
 http://localhost:2350
 ````
-
->[!IMPORTANT]
-> Para que el script funcione correctamente, en el script `main.py` de la carpeta `app` asegurate que el `from train import ...` no lleve el punto delante de train (que aparezca tal que asi `from train import ...`) para que, al ejecutar, encuentre el archivo y no de errores.
+> [!IMPORTANT]
+> Para evitar errores de ejecución, asegúrate de que en el archivo `app/main.py` La línea debe aparecer exactamente como `from train import ...` (sin un punto inicial), de lo contrario Python no localizará el módulo correctamente al lanzar la aplicación.
 
 ### **7. Instrucciones para crear y ejecutar el contenedor**
 
@@ -228,7 +235,7 @@ Para poder ejecutar nuestra aplicación de forma aislada y portátil, usaremos l
 La configuración del contenedor está en un archivo llamado `Containerfile`, que tiene las instrucciones para descargar el entorno, las dependencias, etc.
 
 >[!IMPORTANT]
-> Para que el contenedor funcione correctamente, en el script `main.py` de la carpeta `app` asegurate que el `from .train import ...` lleve el punto delante de train para que, al ejecutar, encuentre el archivo (que salga asi `from .train import ...`).
+>Para que el contenedor funcione correctamente, asegúrate de que en el archivo `app/main.py` la siguiente línea de codigo incluya un punto inicial: `from .train import ...`.
 
 La forma de ejecutar el contenedor es la siguiente:
 
@@ -307,15 +314,14 @@ La forma de ejecutar el contenedor es la siguiente:
 > Al ejecutarlo desde local, solo podrás acceder desde tu ordenador y no desde otro.
 
 ### **8. Equipo de desarrollo**
+Este proyecto fue desarrollado en la asignatura de Proyecto de Datos I de la Universidad Complutense de Madrid, Grado en Ingeniería de Datos e Inteligencia Artificial.
 
-- Andrea Yu García Gómez
-  
-- Marina Gurova
-
-- Luis López Rodríguez
-
-- María Martín Portal
-  
-- Alejo Muñoz Pinilla
-
-- Angie Ruiz Martínez
+| Estudiante | User en github | 
+| :--- | :--- |
+| Andrea Yu García Gómez | @andygg-06 | 
+| Marina Gurova | @philintma |
+| Luis López Rodríguez | @Luislopvid07 |
+| María Martín Portal | @marmar98-yuju |
+| Alejo Muñoz Pinilla | @alejop33 |
+| Anguie Ruiz Martínez | @anguieru |
+---
