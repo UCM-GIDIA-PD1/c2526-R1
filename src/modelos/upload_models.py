@@ -50,9 +50,9 @@ if __name__ == '__main__':
     modelo_generos = KNeighborsClassifier()
     modelo_generos.fit(X_train_trans, y_train_trans)
     
-    spd.upload_model_minio(pipe, "pd1", "grupo1/models/genres/pipe_genres", claves) #Guarda las transformaciones necesarias
-    spd.upload_model_minio(le, "pd1", "grupo1/models/genres/encoder", claves) #Guarda el encoder
-    spd.upload_model_minio(modelo_generos, "pd1", "grupo1/models/genres/genres_definitive", claves) #Guarda el modelo
-
+    #spd.upload_model_minio(pipe, "pd1", "grupo1/models/genres/pipe_genres", claves) #Guarda las transformaciones necesarias
+    #spd.upload_model_minio(le, "pd1", "grupo1/models/genres/encoder", claves) #Guarda el encoder
+    #spd.upload_model_minio(modelo_generos, "pd1", "grupo1/models/genres/genres_definitive", claves) #Guarda el modelo
+    print("Process finished")
 
 

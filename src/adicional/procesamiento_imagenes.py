@@ -42,10 +42,11 @@ def generar_embeddings_imagenes(bucket, prefix, claves):
 
 if __name__ == "__main__":
     import json
-    with open("src/Private/claves.json", "r") as f:
+    with open("src/Private/Claves.json", "r") as f:
         claves = json.load(f)
     
     df_vectores = generar_embeddings_imagenes("pd1", "grupo1/test_images/thumbnails/", claves)
     
     # Subimos el resultado a MinIO
-    upload_dataframe_minio(df_vectores, "pd1", "grupo1/test_images/embeddings_vision", claves, "parquet")
+    #upload_dataframe_minio(df_vectores, "pd1", "grupo1/test_images/embeddings_vision", claves, "parquet")
+    print("Proceso finalizado")
