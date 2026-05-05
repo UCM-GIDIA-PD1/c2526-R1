@@ -124,6 +124,7 @@ Para desarrollar este proyecto hemos utilizado un gestor de entornos y dependenc
 ### **4. Ejecutar los scripts del proyecto**
 
 Para ejecutar los scripts principales del proyecto, utiliza el gestor uv. Los scripts están diseñados para ser ejecutados desde la raíz del repositorio. 
+Antes de ejecutar  cualquier script, hay que asegurarse de que la carpeta Private está configurada correctamente (ver apartado 2 del README).
 
 Se pueden ejecutar dentro del entorno usando:
 
